@@ -1,10 +1,8 @@
 {
-  "name": "nextjs-tailwind-campaign-page",
+  "name": "book-window",
   "version": "1.0.0",
   "private": true,
-  "author": "Creative Tim",
-  "license": "See license in https://www.creative-tim.com/license",
-  "homepage": "https://demos.creative-tim.com/nextjs-tailwind-campaign-page",
+  "author": "Techbeeps Services",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -12,28 +10,28 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@heroicons/react": "^2.0.18",
-    "@material-tailwind/react": "2.1.2",
-    "axios": "^1.8.4",
+    "@heroicons/react": "^2.2.0",
+    "@material-tailwind/react": "^2.1.10",
+    "axios": "^1.18.1",
+    "framer-motion": "^12.42.2",
     "iron-session": "^8.0.4",
-    "next": "13.4.0",
+    "next": "^16.2.9",
     "placeholder-loading": "^0.7.0",
     "razorpay": "^2.9.6",
-    "react": "18",
-    "react-dom": "18",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
     "react-spinners": "^0.17.0",
-    "uuid": "^11.1.0"
+    "uuid": "^14.0.1"
   },
   "devDependencies": {
-    "@types/node": "20",
-    "@types/react": "18",
-    "@types/react-dom": "18",
-    "@types/uuid": "^10.0.0",
-    "autoprefixer": "10",
-    "eslint": "8",
-    "eslint-config-next": "13.5.4",
-    "postcss": "8",
-    "tailwindcss": "3",
-    "typescript": "5"
+    "@types/node": "26",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "autoprefixer": "^10.5.2",
+    "eslint": "10",
+    "eslint-config-next": "^16.2.9",
+    "postcss": "^8.5.16",
+    "tailwindcss": "^3.4.17",
+    "typescript": "6"
   }
 }
