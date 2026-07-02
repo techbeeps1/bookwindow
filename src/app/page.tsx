@@ -123,9 +123,9 @@ export default function Campaign() {
         className="w-full"
       >
         <img
-          src="/image/banner-img.jpg"
+          src="/image/banner-2-.png"
           alt="Rare & Reloved Banner"
-          className="w-full h-[800px] object-cover"
+          className="w-full xl:h-[700px] lg:h-[580px] object-cover"
         />
       </motion.div>
       <Footer />
