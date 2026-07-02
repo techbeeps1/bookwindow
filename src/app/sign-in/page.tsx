@@ -577,5 +577,5 @@
 // }
 
 export default function Page() {
-  return <div>signin disabled</div>;
+  return <div>Reset Password Disabled</div>;
 }
