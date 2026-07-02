@@ -18,27 +18,27 @@ interface PublicationsCategoryProps {
 const DEFAULT_PUBLICATIONS: Publication[] = [
   {
     name: "Arihant Publications",
-    image: "https://images.unsplash.com/photo-1576243345690-4e4b79b63288?auto=format&fit=crop&w=600&h=800&q=80",
+    image: "/image/book.jpg",
     link: "/category",
   },
   {
     name: "McGraw Hill India",
-    image: "https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=600&h=800&q=80",
+    image: "/image/book-2.jpg",
     link: "/category",
   },
   {
     name: "Disha Publication",
-    image: "https://images.unsplash.com/photo-1511499767150-a48a237f0083?auto=format&fit=crop&w=600&h=800&q=80",
+    image: "/image/book-3.jpg",
     link: "/category",
   },
   {
     name: "MTG Learning Media",
-    image: "https://images.unsplash.com/photo-1590874103328-eac38a683ce7?auto=format&fit=crop&w=600&h=800&q=80",
+    image: "/image/book-4.jpg",
     link: "/category",
   },
   {
     name: "Ashirwad Publication store",
-    image: "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=600&h=800&q=80",
+    image: "/image/book-5.jpg",
     link: "/category",
   },  
 ];
@@ -48,7 +48,7 @@ export function PublicationsCategory({
   publications = DEFAULT_PUBLICATIONS,
 }: PublicationsCategoryProps) {
   return (
-    <section className="container mx-auto px-8 pb-20 pt-10">
+    <section className="container mx-auto px-8">
       {/* Header */}
       <div className="mb-12 grid place-items-center text-center">
         <motion.h2

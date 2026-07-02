@@ -16,14 +16,14 @@ export function TopBookCategories({
   return (
     <section
       ref={divRef}
-      className={`container mx-auto px-8 pb-20 pt-20 lg:pt-0 ${
+      className={`container mx-auto px-8  ${
         highlightDiv ? "bg-gray-300 shadow-2xl p-4" : ""
       }`}
     >
       {category_section ? (
         <>
           {" "}
-          <div className="mb-20 grid place-items-center text-center pt-20">
+          <div className="mb-6 grid place-items-center text-center pt-20">
             <Typography
               variant="h2"
               color="blue-gray"

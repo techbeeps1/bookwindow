@@ -5,6 +5,49 @@ import Image from "next/image";
 import config from "@/app/config";
 function Hero({ onButtonClick, bannerData }: any) {
   const [current, setCurrent] = useState(0);
+  const [dragOffset, setDragOffset] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const startX = React.useRef(0);
+  const wasDragged = React.useRef(false);
+
+  const handlePointerDown = (clientX: number) => {
+    setIsDragging(true);
+    startX.current = clientX;
+    wasDragged.current = false;
+  };
+
+  const handlePointerMove = (clientX: number) => {
+    if (!isDragging) return;
+    const offset = clientX - startX.current;
+    setDragOffset(offset);
+    if (Math.abs(offset) > 10) {
+      wasDragged.current = true;
+    }
+  };
+
+  const handlePointerUp = () => {
+    if (!isDragging) return;
+    setIsDragging(false);
+    
+    // Threshold for slide transition: 100px
+    if (dragOffset < -100) {
+      nextSlide();
+    } else if (dragOffset > 100) {
+      prevSlide();
+    }
+    setDragOffset(0);
+  };
+
+  const handleSlideClick = (e: React.MouseEvent) => {
+    if (wasDragged.current) {
+      e.preventDefault();
+      e.stopPropagation();
+      return;
+    }
+    if (onButtonClick) {
+      onButtonClick();
+    }
+  };
 
   const slides = [
     {
@@ -55,92 +98,29 @@ function Hero({ onButtonClick, bannerData }: any) {
 
   return (
     <>
-      {/* ORIGINAL HERO SECTION */}
-      {/* <section className="bg-yellow-50 px-8 pb-8 pt-4">
-        {bannerData ? (
-          <div className="container mx-auto grid h-full min-h-[65vh] w-full grid-cols-1 place-items-center gap-y-10 lg:grid-cols-2">
-            <div className="row-start-2 lg:row-auto lg:-mt-6">
-              <a href="/">
-                <Image
-                  src={`${config.apiUrl}storage/app/public/${bannerData?.logo_img}`}
-                  alt={"book window logo"}
-                  className="w-[55%]"
-                  width={768}
-                  height={768}
-                />
-              </a>
-              <Typography
-                className="mb-6 font-normal !text-gray-500 md:pr-16 xl:pr-28 ml-2"
-                dangerouslySetInnerHTML={{
-                  __html: bannerData?.banner_description,
-                }}
-                variant="lead"
-                {...({} as React.ComponentProps<typeof Typography>)}
-              />
-              <Button
-                size="lg"
-                color="gray"
-                {...({} as React.ComponentProps<typeof Button>)}
-                onClick={onButtonClick}
-                className="ml-2"
-              >
-                {bannerData?.banner_button_title}
-              </Button>
-            </div>
-            <div className="mt-20 grid gap-6">
-              <Image
-                src={`${config.apiUrl}storage/app/public/${bannerData?.images}`}
-                alt="hero image"
-                width={768}
-                height={768}
-              />
-            </div>
-          </div>
-        ) : (
-          <div
-            role="status"
-            className="space-y-8 animate-pulse md:space-y-0 md:space-x-8 rtl:space-x-reverse md:flex md:items-center"
-          >
-            <div className="w-full">
-              <div className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-48 mb-4"></div>
-              <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[480px] mb-2.5"></div>
-              <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 mb-2.5"></div>
-              <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[440px] mb-2.5"></div>
-              <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[460px] mb-2.5"></div>
-              <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[360px]"></div>
-            </div>
-            <div className="flex items-center justify-center w-full h-48 bg-gray-300 rounded-sm sm:w-96 dark:bg-gray-700">
-              <svg
-                className="w-10 h-10 text-gray-200 dark:text-gray-600"
-                aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="currentColor"
-                viewBox="0 0 20 18"
-              >
-                <path d="M18 0H2a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2Zm-5.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Zm4.376 10.481A1 1 0 0 1 16 15H4a1 1 0 0 1-.895-1.447l3.5-7A1 1 0 0 1 7.468 6a.965.965 0 0 1 .9.5l2.775 4.757 1.546-1.887a1 1 0 0 1 1.618.1l2.541 4a1 1 0 0 1 .028 1.011Z" />
-              </svg>
-            </div>
-            <span className="sr-only">Loading...</span>
-          </div>
-        )}
-      </section> */}
-
-      {/* NEW WIDESCREEN IMAGE SLIDER */}
       <section className="relative w-full overflow-hidden bg-gray-900 group">
-        <div className="relative w-full h-[90vh] overflow-hidden">
+        <div className="relative w-full xl:h-[90vh] lg:h-[80vh] md:h-[60vh] sm:h-[40vh] h-[25vh] overflow-hidden">
           {/* Slider Content Row */}
           <div 
-            className="flex h-full transition-transform duration-700 ease-in-out"
+            className={`flex h-full ${isDragging ? "" : "transition-transform duration-700 ease-in-out"}`}
             style={{
               width: `${slides.length * 100}%`,
-              transform: `translateX(-${current * (100 / slides.length)}%)`
+              transform: `translateX(calc(-${current * (100 / slides.length)}% + ${dragOffset}px))`,
+              cursor: isDragging ? "grabbing" : "grab"
             }}
+            onMouseDown={(e) => handlePointerDown(e.clientX)}
+            onMouseMove={(e) => handlePointerMove(e.clientX)}
+            onMouseUp={handlePointerUp}
+            onMouseLeave={handlePointerUp}
+            onTouchStart={(e) => handlePointerDown(e.touches[0].clientX)}
+            onTouchMove={(e) => handlePointerMove(e.touches[0].clientX)}
+            onTouchEnd={handlePointerUp}
           >
             {slides.map((slide, idx) => (
               <div
                 key={slide.id}
-                onClick={onButtonClick}
-                className="relative h-full cursor-pointer"
+                onClick={handleSlideClick}
+                className="relative h-full cursor-pointer select-none"
                 style={{ width: `${100 / slides.length}%` }}
               >
                 {/* Background Image */}
@@ -149,7 +129,8 @@ function Hero({ onButtonClick, bannerData }: any) {
                   alt={slide.title}
                   fill
                   priority={idx === 0}
-                  className="object-cover w-full h-full"
+                  className="object-cover w-full h-full select-none pointer-events-none"
+                  draggable={false}
                   sizes="100vw"
                 />
               </div>

@@ -5,17 +5,16 @@ import { Navbar, Footer } from "@/components";
 // sections
 import Hero from "../components/hero";
 import TopBookCategories from "../components/top-book-categories";
-import BrandsCategory from "../components/brands-category";
-import PublicationsCategory from "../components/publications-category";
-import HobbyCategory from "../components/hobby-category";
-import BackToSchoolBooks from "../components/back-to-school-books";
-import CarouselFeatures from "../components/carousel-features";
-import GetYourBookFromUs from "../components/get-your-book-from-us";
+
+
 import { useRef, useState } from "react";
 import { motion } from "framer-motion";
 import React from "react";
 import axios from "axios";
 import config from "./config";
+import { BestSubjects } from "@/components/BestSubjects";
+import PublicationsCategory from "@/components/PublicationsCategory";
+import HobbyCategory from "@/components/HobbyCategory";
 
 export default function Campaign() {
   const [itemsCount, setItemsCount] = useState<number>(0);
@@ -98,7 +97,7 @@ export default function Campaign() {
         transition={{ duration: 0.85, ease: "easeOut" }}
         viewport={{ once: true }}
       >
-        <BrandsCategory />
+        <BestSubjects/>
       </motion.div>
       <motion.div
         initial={{ opacity: 0, y: 50 }}

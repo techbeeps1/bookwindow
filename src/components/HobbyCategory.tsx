@@ -19,13 +19,13 @@ const DEFAULT_ITEMS: HobbyItem[] = [
   {
     name: "Travel",
     header: "Sara Inspiration",
-    image: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=600&h=800&q=80",    
+    image: "/image/NCERT.jpg",    
     link: "/category",
   },
   {
     name: "Fashion",
     header: "Scriptures",
-    image: "https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=600&h=800&q=80",   
+    image: "/image/Engineering.jpg",   
     link: "/category",
   },
 ];
@@ -35,7 +35,7 @@ export function HobbyCategory({
   items = DEFAULT_ITEMS,
 }: HobbyCategoryProps) {
   return (
-    <section className="container mx-auto px-8 pb-20 pt-10">
+    <section className="container mx-auto px-8 py-20">
       {/* Header */}
       <div className="mb-12 grid place-items-center text-center">
         <motion.h2

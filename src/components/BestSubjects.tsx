@@ -20,48 +20,48 @@ interface BrandsCategoryProps {
 const DEFAULT_BRANDS: Brand[] = [
   {
     name: "History",    
-    image: "https://images.unsplash.com/photo-1614162692292-7ac56d7f7f1e?auto=format&fit=crop&w=600&h=800&q=80",
+    image: "/image/history.jpg",
     link: "/category",
   },
   {
     name: "Polity",    
-    image: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=600&h=800&q=80",
+    image: "/image/polity.jpg",
     link: "/category",
   },
   {
     name: "Math",    
-    image: "https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=600&h=800&q=80",
+    image: "/image/math.jpg",
     link: "/category",
   },
   {
     name: "English",    
-    image: "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?auto=format&fit=crop&w=600&h=800&q=80",
+    image: "/image/english.jpg",
     link: "/category",
   },
   {
     name: "Reasoning",    
-    image: "https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=600&h=800&q=80",
+    image: "/image/reasoning.jpg",
     link: "/category",
   },
   {
     name: "Geography",    
-    image: "https://images.unsplash.com/photo-1539109136881-3be0616acf4b?auto=format&fit=crop&w=600&h=800&q=80",
+    image: "/image/geography.jpg",
     link: "/category",
   },
   {
     name: "Physics",    
-    image: "https://images.unsplash.com/photo-1539109136881-3be0616acf4b?auto=format&fit=crop&w=600&h=800&q=80",
+    image: "/image/physics.jpg",
     link: "/category",
   },
   {
     name: "Chemistry",   
-    image: "https://images.unsplash.com/photo-1539109136881-3be0616acf4b?auto=format&fit=crop&w=600&h=800&q=80",
+    image: "/image/chemistry.jpg",
     link: "/category",
   },
   
 ];
 
-export function BrandsCategory({
+export function BestSubjects({
   title = "Best Subjects",  
   brands = DEFAULT_BRANDS,
 }: BrandsCategoryProps) {
@@ -154,7 +154,7 @@ export function BrandsCategory({
   };
 
   return (
-    <section className="w-full pb-20 pt-10 overflow-hidden">
+    <section className="w-full py-20 overflow-hidden">
       {/* Header (Aligned with container) */}
       <div className="container mx-auto px-8 mb-12 grid place-items-center text-center">
         <motion.h2
@@ -200,7 +200,7 @@ export function BrandsCategory({
           onMouseLeave={handleMouseLeave}
           onMouseUp={handleMouseUp}
           onMouseMove={handleMouseMove}
-          className="flex gap-6 overflow-x-auto no-scrollbar pb-6 px-8 md:px-16 lg:px-24 cursor-grab active:cursor-grabbing select-none"
+          className="flex gap-6 overflow-x-auto no-scrollbar px-8 md:px-16 lg:px-24 cursor-grab active:cursor-grabbing select-none"
         >
           {brands.map((brand, index) => (
             <motion.div
@@ -239,4 +239,4 @@ export function BrandsCategory({
   );
 }
 
-export default BrandsCategory;
+export default BestSubjects;
