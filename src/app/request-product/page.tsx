@@ -9,7 +9,6 @@ import {
   Alert,
 } from "@material-tailwind/react";
 import { Navbar, Footer } from "@/components";
-import MainNavbar from "@/components/main-navbar";
 import { FormEvent, useState } from "react";
 import Image from "next/image";
 import React from "react";
@@ -129,8 +128,7 @@ export default function RequestProduct() {
   return (
     <>
       <Navbar />
-      <MainNavbar />
-      <Card
+            <Card
         color="transparent"
         shadow={false}
         className="items-center mb-4 mt-4"

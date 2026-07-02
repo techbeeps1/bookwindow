@@ -7,7 +7,6 @@ import {
   CardHeader,
 } from "@material-tailwind/react";
 import { Navbar, Footer } from "@/components";
-import MainNavbar from "@/components/main-navbar";
 import React from "react";
 import axios from "axios";
 import config from "../config";
@@ -143,8 +142,7 @@ export default function CurrentAffairsPage() {
   return (
     <>
       <Navbar />
-      <MainNavbar />
-      <section className="px-8 py-10 lg:py-28">
+            <section className="px-8 py-10 lg:py-28">
         <div className="container mx-auto">
           <Typography
             variant="h2"

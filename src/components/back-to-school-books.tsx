@@ -126,34 +126,7 @@ export function BackToSchoolBooks({ onItemsCountUpdate, category_tabs }: any) {
         </Typography>
         <div className="mt-20 flex items-center justify-center">
           {activeTab && (
-          <Tabs value={activeTab} className="w-full">
-            {/* {Array.isArray(category?.child) && category.child.length > 0 && (
-            <TabsHeader
-              className="h-12 bg-transparent"
-              indicatorProps={{
-                className: "!bg-gray-900 rounded-lg",
-              }}
-              {...({} as React.ComponentProps<typeof TabsHeader>)}
-            >
-              {category?.child?.map((tab: any) => (
-                <Tab
-                  key={tab.id}
-                  value={tab.name}
-                  className={`!font-medium capitalize transition-all duration-300 rounded-xl
-                    ${
-                      activeTab === tab?.name
-                        ? "text-white bg-black"
-                        : "capitalize"
-                    }
-                  `}
-                  onClick={() => setActiveTab(tab?.name)}
-                  {...({} as any)}
-                >
-                  {tab?.name}
-                </Tab>
-              ))}
-            </TabsHeader>
-          )} */}
+          <Tabs value={activeTab} className="w-full">            
             {Array.isArray(categoryTabs) && categoryTabs?.length > 0 && (
               <TabsHeader
                 className="bg-transparent flex flex-col lg:flex-row"

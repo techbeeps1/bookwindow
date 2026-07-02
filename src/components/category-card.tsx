@@ -1,75 +1,42 @@
+"use client";
 import React from "react";
 import Image from "next/image";
-import { motion } from "framer-motion";
-
-import { Card, CardBody, Typography } from "@material-tailwind/react";
+import Link from "next/link";
 import config from "@/app/config";
 
 interface CategoryCardProps {
   cat_image: string;
   cat_title: string;
-  cat_content: string;
-  // cat_icon: React.ElementType;
-  cat_icon: any;
+  cat_content?: string;
+  cat_icon?: any;
 }
 
 function CategoryCard({
   cat_image,
   cat_title,
-  cat_content,
-  cat_icon,
 }: CategoryCardProps) {
+  // Dynamic slug based on title
+  const slug = cat_title?.toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)+/g, "") || "school-books";
+
   return (
-    <Card
-      className="relative grid min-h-[12rem] w-full overflow-hidden cursor-pointer"
-      {...({} as React.ComponentProps<typeof Card>)}
-    >
-      <Image
-        width={768}
-        height={768}
-        src={`${config.apiUrl}storage/${cat_image}`}
-        alt={cat_title}
-        className="absolute inset-0 h-full w-full object-contain object-center"
-      />
-      <div className="absolute inset-0 h-full w-full bg-black/30" />
-      <CardBody
-        className="relative flex flex-col justify-between"
-        {...({} as React.ComponentProps<typeof CardBody>)}
-      >
+    <Link href={`/category/${slug}`} className="group block w-full cursor-pointer">
+      <div className="relative w-full aspect-[4/5] rounded-[24px] overflow-hidden bg-gray-50 border border-gray-150 shadow-sm">
         <Image
-          className="h-8 w-8 text-white"
-          width={768}
-          height={768}
-          alt={cat_icon}
-          src={`${config.apiUrl}storage/${cat_icon}`}
+          width={400}
+          height={500}
+          src={`${config.apiUrl}storage/app/public/${cat_image}`}
+          alt={cat_title || "Category"}
+          className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500 ease-out"
+          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 16vw"
         />
-        <motion.div
-          initial={{ opacity: 0, y: 50 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1.0, ease: "easeOut" }}
-          viewport={{ once: true }}
-        >
-          <Typography
-            as="a"
-            href="/category/school-books"
-            variant="h5"
-            className="mb-1 hover:underline"
-            color="white"
-            {...({} as React.ComponentProps<typeof Typography>)}
-          >
-            {cat_title}
-          </Typography>
-          <Typography
-            color="white"
-            className="text-xs font-bold opacity-50"
-            dangerouslySetInnerHTML={{ __html: cat_content }}
-            {...({} as React.ComponentProps<typeof Typography>)}
-          >
-            {/* {cat_content} */}
-          </Typography>
-        </motion.div>
-      </CardBody>
-    </Card>
+      </div>
+      <h3 className="text-center mt-3 font-semibold text-gray-800 text-sm md:text-[15px] group-hover:text-[#A9001F] transition-colors duration-300">
+        {cat_title}
+      </h3>
+    </Link>
   );
 }
+
 export default CategoryCard;

@@ -12,7 +12,6 @@ import {
   Checkbox,
 } from "@material-tailwind/react";
 import { Navbar, Footer } from "@/components";
-import MainNavbar from "@/components/main-navbar";
 import config from "../config";
 import { useState, useRef, useEffect, FormEvent } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -265,8 +264,7 @@ export default function SignIn() {
   return (
     <>
       <Navbar />
-      <MainNavbar />
-      <Card
+            <Card
         color="transparent"
         shadow={false}
         className="items-center mb-4 pt-20 pb-10 min-h-screen"

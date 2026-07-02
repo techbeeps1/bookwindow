@@ -5,13 +5,12 @@ import { Navbar, Footer } from "@/components";
 // sections
 import Hero from "../components/hero";
 import TopBookCategories from "../components/top-book-categories";
+import BrandsCategory from "../components/brands-category";
+import PublicationsCategory from "../components/publications-category";
+import HobbyCategory from "../components/hobby-category";
 import BackToSchoolBooks from "../components/back-to-school-books";
-import OtherBookOffers from "../components/other-book-offers";
 import CarouselFeatures from "../components/carousel-features";
 import GetYourBookFromUs from "../components/get-your-book-from-us";
-import Faq from "../components/faq";
-import MainNavbar from "@/components/main-navbar";
-import Feature from "@/components/features";
 import { useRef, useState } from "react";
 import { motion } from "framer-motion";
 import React from "react";
@@ -70,8 +69,7 @@ export default function Campaign() {
   return (
     <>
       <Navbar items_count={itemsCount} />
-      <MainNavbar />
-      <motion.div
+        <motion.div
         initial={{ opacity: 0, y: 50 }}
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
@@ -97,25 +95,18 @@ export default function Campaign() {
       <motion.div
         initial={{ opacity: 0, y: 50 }}
         whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.9, ease: "easeOut" }}
+        transition={{ duration: 0.85, ease: "easeOut" }}
         viewport={{ once: true }}
       >
-        <BackToSchoolBooks
-          onItemsCountUpdate={handleItemsCountUpdate}
-          category_tabs={homePageData?.category_tabs}
-        />
+        <BrandsCategory />
       </motion.div>
-      {/* <OtherBookOffers /> */}
       <motion.div
         initial={{ opacity: 0, y: 50 }}
         whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 1.0, ease: "easeOut" }}
+        transition={{ duration: 0.88, ease: "easeOut" }}
         viewport={{ once: true }}
       >
-        <CarouselFeatures
-          onButtonClick={handleButtonClick}
-          testimonial_sections={homePageData?.testimonial_sections}
-        />
+        <PublicationsCategory />
       </motion.div>
       <motion.div
         initial={{ opacity: 0, y: 50 }}
@@ -123,10 +114,21 @@ export default function Campaign() {
         transition={{ duration: 0.9, ease: "easeOut" }}
         viewport={{ once: true }}
       >
-        <GetYourBookFromUs feature_sections={homePageData?.feature_sections} />
+        <HobbyCategory />
       </motion.div>
-      {/* <Faq /> */}
-      {/* <Feature /> */}
+      <motion.div
+        initial={{ opacity: 0, y: 50 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.92, ease: "easeOut" }}
+        viewport={{ once: true }}
+        className="w-full"
+      >
+        <img
+          src="/image/banner-img.jpg"
+          alt="Rare & Reloved Banner"
+          className="w-full h-[800px] object-cover"
+        />
+      </motion.div>
       <Footer />
     </>
   );

@@ -3,7 +3,6 @@
 import { useState, useRef, useEffect } from "react";
 // components
 import { Navbar, Footer } from "@/components";
-import MainNavbar from "@/components/main-navbar";
 import OtherBookOffers from "@/components/other-book-offers";
 import { CartPopup } from "@/components/cart-popup";
 import axios from "axios";
@@ -125,8 +124,7 @@ export default function ProductDetail({ params }: any) {
   return (
     <>
       <Navbar items_count={items_count} />
-      <MainNavbar />
-      <div className="container mx-auto px-4 py-8 md:flex md:col-12">
+            <div className="container mx-auto px-4 py-8 md:flex md:col-12">
         {loading ? (
           <FadeLoaderOverlay />
         ) : (

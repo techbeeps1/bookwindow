@@ -2,7 +2,6 @@
 
 import config from "@/app/config";
 import { Footer, Navbar } from "@/components";
-import MainNavbar from "@/components/main-navbar";
 import { Alert } from "@material-tailwind/react";
 import React, { FormEvent } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -81,8 +80,7 @@ const ResetPassword: React.FC = () => {
   return (
     <>
       <Navbar />
-      <MainNavbar />
-      <main
+            <main
         id="content"
         role="main"
         className="w-full max-w-md mx-auto p-6 mb-7"

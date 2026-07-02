@@ -9,7 +9,6 @@ import {
   Alert,
 } from "@material-tailwind/react";
 import { Navbar, Footer } from "@/components";
-import MainNavbar from "@/components/main-navbar";
 import config from "../config";
 import axios from "axios";
 
@@ -128,8 +127,7 @@ export default function ContactSection() {
   return (
     <>
       <Navbar />
-      <MainNavbar />
-      <section className="px-8 py-8 lg:py-16">
+            <section className="px-8 py-8 lg:py-16">
         <div className="container mx-auto text-center">
           <Typography
             variant="h5"

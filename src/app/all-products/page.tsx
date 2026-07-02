@@ -1,7 +1,6 @@
 "use client";
 
 import { Navbar, Footer } from "@/components";
-import MainNavbar from "@/components/main-navbar";
 import BookCard from "@/components/book-card";
 import { useEffect, useState } from "react";
 import axios from "axios";
@@ -111,8 +110,7 @@ export default function Category() {
   return (
     <>
       <Navbar items_count={itemsCount} />
-      <MainNavbar />
-      <section className="container mx-auto mb-10 mt-10 md:flex shadow-lg border border-1">
+            <section className="container mx-auto mb-10 mt-10 md:flex shadow-lg border border-1">
         <AllProductSidebar
           onCategorySelect={handleCategorySelect}
           onPublicationSelect={handlePublicationSelect}

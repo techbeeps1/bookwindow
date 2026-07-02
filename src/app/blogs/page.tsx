@@ -1,7 +1,6 @@
 "use client";
 import { Typography } from "@material-tailwind/react";
 import { Navbar, Footer } from "@/components";
-import MainNavbar from "@/components/main-navbar";
 import React from "react";
 import config from "../config";
 import axios from "axios";
@@ -44,8 +43,7 @@ export default function Blogs() {
   return (
     <>
       <Navbar />
-      <MainNavbar />
-      <Typography
+            <Typography
         color="black"
         variant="h2"
         className="mb-4 text-2xl font-bold text-center mt-4"

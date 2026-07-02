@@ -1,7 +1,6 @@
 "use client";
 import { Typography } from "@material-tailwind/react";
 import { Navbar, Footer } from "@/components";
-import MainNavbar from "@/components/main-navbar";
 import React from "react";
 import config from "@/app/config";
 import axios from "axios";
@@ -43,8 +42,7 @@ export default function BlogDetail({ params }: any) {
   return (
     <>
       <Navbar />
-      <MainNavbar />
-      <section className="container min-h-screen mx-auto px-4 mb-4 mt-10 shadow-xl">
+            <section className="container min-h-screen mx-auto px-4 mb-4 mt-10 shadow-xl">
         {loading ? (
           <div
             role="status"

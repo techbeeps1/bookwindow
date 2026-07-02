@@ -1,7 +1,6 @@
 "use client";
 import { Typography } from "@material-tailwind/react";
 import { Navbar, Footer } from "@/components";
-import MainNavbar from "@/components/main-navbar";
 import React from "react";
 import config from "../config";
 import axios from "axios";
@@ -37,8 +36,7 @@ export default function ReturnPolicy() {
   return (
     <>
       <Navbar />
-      <MainNavbar />
-      <section className="container mx-auto px-4 mb-4 mt-10">
+            <section className="container mx-auto px-4 mb-4 mt-10">
         {!returnPolicyData?.title ? (
           <div role="status" className="animate-pulse min-h-screen">
             <div className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-48 mb-4"></div>

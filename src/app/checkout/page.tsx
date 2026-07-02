@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 // components
 import { Navbar, Footer } from "@/components";
-import MainNavbar from "@/components/main-navbar";
 import { useRouter, useSearchParams } from "next/navigation";
 import config from "@/app/config";
 import axios from "axios";
@@ -565,8 +564,7 @@ export default function ShoppingCart() {
         customerData={customerData || {}}
         isCartEmpty={isCartEmpty}
       />
-      <MainNavbar />
-      <section className="bg-white py-8 md:py-16 mb-4 min-h-screen">
+            <section className="bg-white py-8 md:py-16 mb-4 min-h-screen">
         {!cartFetched ? (
           <FadeLoaderOverlay />
         ) : cartItems?.length > 0 && items_count > 0 ? (

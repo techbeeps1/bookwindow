@@ -2,7 +2,6 @@
 
 // components/AccountPage.tsx
 import Footer from "@/components/footer";
-import MainNavbar from "@/components/main-navbar";
 import Navbar from "@/components/navbar";
 import axios from "axios";
 import { FormEvent, useEffect, useState } from "react";
@@ -110,8 +109,7 @@ export default function AccountPage() {
   return (
     <>
       <Navbar />
-      <MainNavbar />
-      <div className="container mx-auto md:flex  min-h-screen max-w-screen-xl px-2 pt-8 2xl:px-0 shadow-xl">
+            <div className="container mx-auto md:flex  min-h-screen max-w-screen-xl px-2 pt-8 2xl:px-0 shadow-xl">
         <aside className="w-64 border-r p-4">
           <nav className="space-y-2">
             {tabs.map((tab) => (

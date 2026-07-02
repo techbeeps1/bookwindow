@@ -10,6 +10,7 @@ const config: Config = withMT({
     extend: {
       colors: {
         primary: {
+          DEFAULT: "var(--color-primary, #A9001F)",
           "50": "#eff6ff",
           "100": "#dbeafe",
           "200": "#bfdbfe",

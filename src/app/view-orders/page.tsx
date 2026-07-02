@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 // components
 import { Navbar, Footer } from "@/components";
-import MainNavbar from "@/components/main-navbar";
 import config from "@/app/config";
 import axios from "axios";
 import { useSearchParams } from "next/navigation";
@@ -68,8 +67,7 @@ export default function ShoppingCart() {
   return (
     <>
       <Navbar />
-      <MainNavbar />
-      <section className="bg-white py-8 md:py-16 mb-4">
+            <section className="bg-white py-8 md:py-16 mb-4">
         <div className="mx-auto max-w-screen-xl px-4 2xl:px-0">
           <h2 className="text-xl font-semibold text-gray-900  sm:text-2xl">
             Your Orders

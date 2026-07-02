@@ -2,7 +2,6 @@
 
 import config from "@/app/config";
 import { Navbar, Footer } from "@/components";
-import MainNavbar from "@/components/main-navbar";
 import { Typography, Card, ListItem, List } from "@material-tailwind/react";
 import axios from "axios";
 import Link from "next/link";
@@ -61,8 +60,7 @@ export default function Detail({ params }: any) {
   return (
     <>
       <Navbar />
-      <MainNavbar />
-      <section className="container mx-auto mb-10 mt-10 md:flex min-h-screen">
+            <section className="container mx-auto mb-10 mt-10 md:flex min-h-screen">
         {currentAffairsData && currentAffairsList?.length ? (
           <>
             <div className="grid grid-cols-1 gap-x-6 gap-y-20 col-8 p-4 shadow-lg">
