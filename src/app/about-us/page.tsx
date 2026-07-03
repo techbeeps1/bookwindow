@@ -1,12 +1,14 @@
 "use client";
-import { Typography } from "@material-tailwind/react";
+
 import { Navbar, Footer } from "@/components";
 import React from "react";
+import Image from "next/image";
 import config from "../config";
 import axios from "axios";
+import Link from "next/link";
 
 export default function AboutUs() {
-  const [aboutUsData, setAboutUsData] = React.useState([] as any);
+  const [aboutUsData, setAboutUsData] = React.useState<any>(null);
 
   React.useEffect(() => {
     window.scrollTo(0, 0);
@@ -23,52 +25,69 @@ export default function AboutUs() {
         setAboutUsData(response.data);
       } catch (error) {
         console.log("error", error);
-      } finally {
-        // console.log("An error occured");
       }
     };
 
     fetchAboutUsData();
   }, []);
 
-  React.useEffect(() => {
-    // console.log("aboutUsData", aboutUsData);
-  }, [aboutUsData]);
-
   return (
     <>
       <Navbar />
-            <section className="container mx-auto px-4 mb-4 mt-10">
+      
+      {/* Banner Section */}
+      <section className="relative w-full h-[55vh] md:h-[80vh] flex items-center justify-center bg-gray-900 overflow-hidden">
+        {/* Background Image with Dark Overlay */}
+        <div className="absolute inset-0 z-0">
+          <Image
+            src="/image/about-us.jpg"
+            alt="About Us Background"
+            fill
+            priority
+            className="object-cover w-full h-full opacity-35 select-none pointer-events-none"
+            sizes="100vw"
+          />
+          <div className="absolute inset-0 bg-black/40" />
+        </div>
+
+        {/* Banner Content */}
+        <div className="relative z-10 text-center max-w-4xl px-6 flex flex-col items-center">
+          <h1 className="text-4xl md:text-6xl font-bold text-white mb-5 uppercase">
+            About Us
+          </h1>
+          <p className="text-gray-300 text-sm md:text-base lg:text-lg max-w-3xl leading-relaxed mb-8 font-light">
+            We are a dedicated book distribution platform committed to providing high-quality educational, competitive, and general reading books with a secure shopping experience. With a focus on reliability and customer care, we aim to be your favorite online bookstore. Shop with confidence knowing we support your learning journey at every step.
+          </p>
+          <Link
+            href="/contact-us"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-white text-black text-sm font-semibold rounded-md transition-all duration-300 hover:shadow-lg focus:outline-none uppercase tracking-wider"
+          >
+            Contact Us 
+          </Link>
+        </div>
+      </section>
+
+      {/* CMS Content Section */}
+      <section className="container mx-auto px-4 max-w-5xl my-16 md:my-24">
         {!aboutUsData?.title ? (
-          <div role="status" className="animate-pulse min-h-screen">
-            <div className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-48 mb-4"></div>
-            <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[360px] mb-2.5"></div>
-            <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 mb-2.5"></div>
-            <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[330px] mb-2.5"></div>
-            <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[300px] mb-2.5"></div>
-            <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[360px]"></div>
+          <div role="status" className="animate-pulse space-y-4 min-h-[300px]">
+            <div className="h-6 bg-gray-200 rounded-full w-48 mb-6"></div>
+            <div className="h-4 bg-gray-150 rounded-full w-full"></div>
+            <div className="h-4 bg-gray-150 rounded-full w-[92%]"></div>
+            <div className="h-4 bg-gray-150 rounded-full w-[95%]"></div>
+            <div className="h-4 bg-gray-150 rounded-full w-[85%]"></div>
             <span className="sr-only">Loading...</span>
           </div>
         ) : (
-          <>
-            <Typography
-              color="black"
-              variant="h2"
-              className="mb-4"
-              {...({} as React.ComponentProps<typeof Typography>)}
-            >
-              {aboutUsData?.title}
-            </Typography>
-            <Typography
-              className="w-full text-gray-600"
-              variant="lead"
-              as="div"
+          <div className="bg-white p-6 md:p-10 rounded-2xl border border-gray-100 shadow-sm">           
+            <div 
+              className="text-base text-gray-600 space-y-4 leading-relaxed dynamic-content"
               dangerouslySetInnerHTML={{ __html: aboutUsData?.content }}
-              {...({} as React.ComponentProps<typeof Typography>)}
-            ></Typography>
-          </>
+            />
+          </div>
         )}
       </section>
+
       <Footer />
     </>
   );
