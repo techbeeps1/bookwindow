@@ -176,8 +176,8 @@ export function Navbar({ items_count, customerData, isCartEmpty }: any) {
             {/* Top Row: Search and Icons */}
             <div className="flex items-center justify-between gap-8 w-full">
               {/* Centered Search Bar */}
-              <div className="flex-grow max-w-4xl">
-                <div className="relative w-full">
+              <div className="flex-grow flex justify-center">
+                <div className="relative w-full max-w-3xl">
                   {/* Search icon */}
                   <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
                     <svg
@@ -323,8 +323,8 @@ export function Navbar({ items_count, customerData, isCartEmpty }: any) {
             </div>
 
             {/* Bottom Row: Categories Menu */}
-            <div className="border-t border-white/20 mt-3 pt-2">
-              <div className="flex justify-start items-center text-[13px] text-white font-semibold tracking-wider space-x-8">              
+            <div className="border-t border-white/20 mt-3 pt-2 flex justify-center">
+              <div className="flex justify-center items-center text-[13px] text-white font-semibold tracking-wider space-x-8">              
                 {headerMenu?.map((item: any, index: number) => {
                   const hasChildren = item.children && item.children.length > 0;
                   if (hasChildren) {
