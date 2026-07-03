@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Navbar, Footer } from "@/components";
 import config from "@/app/config";
 import axios from "axios";
-import { useSearchParams } from "next/navigation";
+
 import Image from "next/image";
 
 interface CartItem {
@@ -17,8 +17,8 @@ interface CartItem {
 }
 
 export default function ShoppingCart() {
-  const searchParams = useSearchParams();
-  const orderNumber = searchParams.get("order_number");
+  
+  const orderNumber = "5555" ;
 
   const [orderItems, setOrderItems] = useState<CartItem[]>([]);
   const [orderData, setOrderData] = useState<any>({});

@@ -3,11 +3,14 @@
 import { Navbar, Footer } from "@/components";
 import BookCard from "@/components/book-card";
 import { useEffect, useState } from "react";
+import { use } from "react";
 import axios from "axios";
 import config from "../../config";
 import CategoryPublicationSidebar from "@/components/category-publication-sidebar";
 
-export default function Category({ params }: any) {
+export default function Category({ params }:  {
+  params: Promise<{ slug: string }>;
+}) {
   const [itemsCount, setItemsCount] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
@@ -16,13 +19,13 @@ export default function Category({ params }: any) {
   const handleItemsCountUpdate = (count: number) => {
     setItemsCount(count);
   };
-  const { slug } = params;
+    const { slug } = use(params);
   const [products, setProducts] = useState([] as any);
   const [filteredProducts, setFilteredProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [isProductFetched, setIsProductFetched] = useState(false);
   const [childCategory, setChildCategory] = useState([] as any);
-  const [mainCategories, setMainCategories] = useState([] as any);
+
   const [selectedCategoryIds, setSelectedCategoryIds] = useState<number[]>([]);
   const [selectedPublicationIds, setSelectedPublicationIds] = useState<
     number[]
@@ -41,12 +44,8 @@ export default function Category({ params }: any) {
           url: `${config.apiUrl}api/category/${slug}`,
           responseType: "json",
         });
-        const response2 = await axios({
-          method: "get",
-          url: `${config.apiUrl}api/category`,
-          responseType: "json",
-        });
-        setMainCategories(response2?.data);
+   
+        console.log("response", response?.data);
         setChildCategory(response.data?.category);
         setProducts(response.data?.products);
         setIsProductFetched(true)
@@ -63,21 +62,18 @@ export default function Category({ params }: any) {
     }
   }, [slug]);
 
-  useEffect(() => {}, [products, childCategory, mainCategories]);
-
+// Filter products based on selected categories and publications
   useEffect(() => {
     const filtered = products.filter((product: any) => {
       const categoryMatch =
         selectedCategoryIds.length === 0 ||
         selectedCategoryIds.includes(product.sub_category_id);
-
       const publicationMatch =
         selectedPublicationIds.length === 0 ||
         selectedPublicationIds.includes(product.production_id);
 
       return categoryMatch && publicationMatch;
     });
-
     setFilteredProducts(filtered);
   }, [products, selectedCategoryIds, selectedPublicationIds]);
 
@@ -180,9 +176,7 @@ export default function Category({ params }: any) {
                 const subcategory = childCategory?.find(
                   (sub: any) => sub.id === product.sub_category_id
                 );
-                const mainCategory = mainCategories?.find(
-                  (main: any) => main.id === product.category_id
-                );
+             
                 return (
                   <BookCard
                     key={product.id}
@@ -200,7 +194,7 @@ export default function Category({ params }: any) {
                     quantity={product.quantity}
                     onItemsCountUpdate={handleItemsCountUpdate}
                     subcategoryName={subcategory?.name}
-                    mainCategoryName={mainCategory?.name}
+                    mainCategoryName={"slug"}
                   />
                 );
               })}

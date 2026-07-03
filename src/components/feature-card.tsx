@@ -25,7 +25,7 @@ export function FeatureCard({ icon, title, children }: FeatureCardProps) {
           {/* <Typography className="px-8 font-normal !text-gray-500" {...({} as React.ComponentProps<typeof Typography>)}>
             {children}
           </Typography> */}
-          <Typography className="px-8 font-normal !text-gray-500" 
+          <Typography as="div" className="px-8 font-normal !text-gray-500" 
            dangerouslySetInnerHTML={{ __html: children }}
           {...({} as React.ComponentProps<typeof Typography>)}>
           </Typography>

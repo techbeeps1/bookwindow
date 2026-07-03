@@ -128,7 +128,8 @@ function Hero({ onButtonClick, bannerData }: any) {
                   src={slide.image}
                   alt={slide.title}
                   fill
-                  priority={idx === 0}
+                  
+                  priority
                   className="object-cover w-full h-full select-none pointer-events-none"
                   draggable={false}
                   sizes="100vw"

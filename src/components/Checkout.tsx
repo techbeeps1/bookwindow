@@ -174,15 +174,6 @@ export default function Checkout({
   setFormValues((prev: any) => ({ ...prev, state: value })); // Update form values
 };
 
-  const checkSession = async () => {
-    const res = await fetch("/api/debug", {
-      method: "GET",
-      credentials: "include",
-    });
-    const data = await res.json();
-    setSession(data?.session_id);
-    // console.log("Session info:", data);
-  };
 
   useEffect(() => {
     const viewCart = async () => {
@@ -206,9 +197,7 @@ export default function Checkout({
     viewCart();
   }, [session]);
 
-  useEffect(() => {
-    checkSession();
-  }, []);
+
 
   useEffect(() => {}, [session, cartItems, items_count]);
 

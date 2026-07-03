@@ -79,6 +79,8 @@ export default function Detail({ params }: any) {
                 </Typography>
                 <Typography
                   className="text-gray-600 mt-2"
+                  variant="lead"
+                  as="div"
                   {...({} as React.ComponentProps<typeof Typography>)}
                   dangerouslySetInnerHTML={{
                     __html: currentAffairsData?.content,
