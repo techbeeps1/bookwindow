@@ -36,7 +36,7 @@ export default function AboutUs() {
       <Navbar />
       
       {/* Banner Section */}
-      <section className="relative w-full h-[55vh] md:h-[80vh] flex items-center justify-center bg-gray-900 overflow-hidden">
+      <section className="relative w-full h-[50vh] flex items-center justify-center bg-gray-900 overflow-hidden">
         {/* Background Image with Dark Overlay */}
         <div className="absolute inset-0 z-0">
           <Image
