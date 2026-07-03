@@ -83,16 +83,8 @@ export default function ReturnPolicy() {
             <div 
               className="text-base text-gray-600 space-y-4 leading-relaxed dynamic-content"
               dangerouslySetInnerHTML={{ __html: returnPolicyData?.content }}
-<<<<<<< HEAD
-              variant="lead"
-              as="div"
-              {...({} as React.ComponentProps<typeof Typography>)}
-            ></Typography>
-          </>
-=======
             />
           </div>
->>>>>>> 608bcc23a4275e03e6025553a74cbc7925b9a08d
         )}
       </section>
 

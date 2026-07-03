@@ -8,10 +8,13 @@ import { CartPopup } from "@/components/cart-popup";
 import axios from "axios";
 import config from "@/app/config";
 import Image from "next/image";
+import { use } from "react";
 import FadeLoaderOverlay from "@/components/loader";
 
-export default function ProductDetail({ params }: any) {
-  const { slug } = params;
+export default function ProductDetail({ params }:{
+  params: Promise<{ slug: string }>;
+}) {
+  const { slug } = use(params);
   const [mainImage, setMainImage] = useState("");
   const [showPopup, setShowPopup] = useState(false);
   const popupRef = useRef(null as any);
@@ -72,31 +75,8 @@ export default function ProductDetail({ params }: any) {
     }
   };
 
-  // const postToSession = async () => {
-  //   const res = await fetch("/api/debug", {
-  //     method: "POST",
-  //     credentials: "include", // required to include cookies
-  //   });
 
-  //   const data = await res.json();
-  //   console.log("Session POST response:", data);
-  // };
 
-  const checkSession = async () => {
-    const res = await fetch("/api/debug", {
-      method: "GET",
-      credentials: "include",
-    });
-    const data = await res.json();
-    setSession(data?.session_id);
-    // console.log("Session info:", data);
-  };
-
-  useEffect(() => {
-    checkSession();
-  }, []);
-
-  useEffect(() => {}, [session]);
 
   const handleAddToCart = async (productId: string, quantity: number) => {
     try {

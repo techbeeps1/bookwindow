@@ -300,7 +300,7 @@ export function Navbar({ items_count, customerData, isCartEmpty }: any) {
                 )}
 
                 {/* Shopping Bag / Cart */}
-                <Link href="/checkout?step=cart" className="relative text-white hover:text-white/80 transition-colors">
+                <Link href="/checkout" className="relative text-white hover:text-white/80 transition-colors">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
@@ -430,7 +430,7 @@ export function Navbar({ items_count, customerData, isCartEmpty }: any) {
               )}
 
               {/* Shopping Bag / Cart */}
-              <Link href="/checkout?step=cart" className="relative text-white hover:text-white/80 transition-colors">
+              <Link href="/checkout" className="relative text-white hover:text-white/80 transition-colors">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"

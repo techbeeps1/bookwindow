@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 // components
 import { Navbar, Footer } from "@/components";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import config from "@/app/config";
 import axios from "axios";
 import { Button, Input, Typography } from "@material-tailwind/react";
@@ -31,9 +31,8 @@ const steps = ["cart", "shipping", "order"];
 
 export default function ShoppingCart() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const stepParam = searchParams.get("step");
-  const initialStep = steps.includes(stepParam || "") ? stepParam! : "cart";
+
+  const initialStep =  "cart";
   const [cartFetched, setCartFetched] = useState(false);
   const [session, setSession] = useState("");
   const [cartItems, setCartItems] = useState([] as CartItem[] | any[]);
@@ -44,7 +43,7 @@ export default function ShoppingCart() {
   const [couponSuccess, setCouponSuccess] = useState("");
   const [couponError, setCouponError] = useState("");
 
-  //for placeorder
+
   const [deliveryType, setDeliveryType] = useState("standard");
   const [payment_method, setPaymentMethod] = useState("cod");
   const [orderNumber, setOrderNumber] = useState<number>(0);
@@ -120,13 +119,7 @@ export default function ShoppingCart() {
     // prevStep === "cart" ? setShowCoupon(true) : setShowCoupon(false);
     if (prevStep) setActiveTab(prevStep);
   };
-  useEffect(() => {
-    const params = new URLSearchParams(Array.from(searchParams.entries()));
-    if (params.get("step") !== activeTab) {
-      params.set("step", activeTab);
-      router.replace(`${window.location.pathname}?${params.toString()}`);
-    }
-  }, [activeTab, router, searchParams]);
+  
 
   const checkSession = async () => {
     const res = await fetch("/api/debug", {
@@ -141,21 +134,7 @@ export default function ShoppingCart() {
   useEffect(() => {
     const viewCart = async () => {
       setLoading(true);
-      // try {
-      //   const response = await axios({
-      //     method: "get",
-      //     url: `${config.apiUrl}api/cart/viewcart?session_id=${session}`,
-      //     responseType: "json",
-      //   });
-      //   const data = response?.data;
-      //   setCartItems(data?.items);
-      //   setItemsCount(data?.items_count);
-      // } catch (error) {
-      //   console.error("Error loading cart:", error);
-      //   setCartItems([]); // fallback to empty array
-      // } finally {
-      //   setLoading(false); // stop loader
-      // }
+ 
       try {
         const response = await axios({
           method: "get",

@@ -4,13 +4,18 @@ import config from "@/app/config";
 import { Footer, Navbar } from "@/components";
 import { Alert } from "@material-tailwind/react";
 import React, { FormEvent } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 const ResetPassword: React.FC = () => {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const token = searchParams.get("token");
-  const email = searchParams.get("email");
+  const [token, setToken] = React.useState("");
+  const [email, setEmail] = React.useState("");
+  React.useEffect(() => {
+  const params = new URLSearchParams(window.location.search);
+
+  setToken(params.get("token") || "");
+  setEmail(params.get("email") || "");
+}, []);
   const [alertMessage, setAlertMessage] = React.useState("");
   const [alertType, setAlertType] = React.useState<"error" | "success" | "">(
     ""

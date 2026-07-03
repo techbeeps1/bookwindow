@@ -48,19 +48,6 @@ export function BookCard({
   const [session, setSession] = useState("");
   const [cartData, setCartData] = useState({} as any);
 
-  const checkSession = async () => {
-    const res = await fetch("/api/debug", {
-      method: "GET",
-      credentials: "include",
-    });
-    const data = await res.json();
-    setSession(data?.session_id);
-    // console.log("Session info:", data);
-  };
-
-  useEffect(() => {
-    checkSession();
-  }, []);
 
   useEffect(() => {}, [session]);
 

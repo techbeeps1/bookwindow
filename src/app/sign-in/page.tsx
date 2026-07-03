@@ -14,7 +14,7 @@ import {
 import { Navbar, Footer } from "@/components";
 import config from "../config";
 import { useState, useRef, useEffect, FormEvent } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import Modal from "@/components/modal";
 import ForgotPassword from "@/components/forgot-password";
 const generateCaptchaText = () => {
@@ -28,25 +28,17 @@ const generateCaptchaText = () => {
 };
 export default function SignIn() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const register = searchParams.get("tab");
+  
+  
   const [customerData, setCustomerData] = useState({} as any);
   const [alertMessage, setAlertMessage] = useState("");
   const [alertType, setAlertType] = useState<"error" | "success" | "">("");
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState("");
+  const [activeTab, setActiveTab] = useState("login");
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
-
-  useEffect(() => {
-    if (register) {
-      setActiveTab("register");
-    } else {
-      setActiveTab("login");
-    }
-  }, [register]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
