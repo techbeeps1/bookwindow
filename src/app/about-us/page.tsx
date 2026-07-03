@@ -62,6 +62,7 @@ export default function AboutUs() {
             <Typography
               className="w-full text-gray-600"
               variant="lead"
+              as="div"
               dangerouslySetInnerHTML={{ __html: aboutUsData?.content }}
               {...({} as React.ComponentProps<typeof Typography>)}
             ></Typography>

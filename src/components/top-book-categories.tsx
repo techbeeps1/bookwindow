@@ -35,6 +35,7 @@ export function TopBookCategories({
             </Typography>
             <Typography
               variant="lead"
+              as="div"
               className="!text-gray-500 lg:w-6/12"
               {...({} as React.ComponentProps<typeof Typography>)}
             >

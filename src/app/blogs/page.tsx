@@ -103,6 +103,7 @@ export default function Blogs() {
                 <Typography
                   className="w-full text-gray-600"
                   variant="lead"
+                  as="div"
                   dangerouslySetInnerHTML={{
                     __html: truncateContent(blog?.content),
                   }}

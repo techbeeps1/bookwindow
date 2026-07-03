@@ -47,6 +47,7 @@ export function OtherBookOffers({ description, similarProducts, onItemsCountUpda
        
           <Typography
             variant="lead"
+            as="div"
             className="w-full text-gray-600"
             dangerouslySetInnerHTML={{ __html: description}}
             {...({} as React.ComponentProps<typeof Typography>)}

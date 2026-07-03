@@ -92,6 +92,7 @@ export default function BlogDetail({ params }: any) {
             <Typography
               className="w-full text-gray-600 p-4"
               variant="lead"
+              as="div"
               dangerouslySetInnerHTML={{ __html: blogData?.content }}
               {...({} as React.ComponentProps<typeof Typography>)}
             ></Typography>

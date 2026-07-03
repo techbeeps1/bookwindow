@@ -61,6 +61,7 @@ export default function ReturnPolicy() {
               className="w-full text-gray-600"
               dangerouslySetInnerHTML={{ __html: returnPolicyData?.content }}
               variant="lead"
+              as="div"
               {...({} as React.ComponentProps<typeof Typography>)}
             ></Typography>
           </>

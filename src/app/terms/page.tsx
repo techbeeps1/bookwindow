@@ -85,6 +85,7 @@ export default function Terms() {
             <Typography
               className="w-full text-gray-600 leading-relaxed"
               variant="lead"
+              as="div"
               dangerouslySetInnerHTML={{ __html: termsContent }}
               {...({} as React.ComponentProps<typeof Typography>)}
             />

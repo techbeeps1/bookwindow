@@ -3,9 +3,6 @@ const nextConfig = {
   // distDir: "build",
   reactStrictMode: true,
 
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
 
   images: {
     // images.domains is deprecated, so you can remove it
