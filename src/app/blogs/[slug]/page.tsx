@@ -4,10 +4,13 @@ import { Navbar, Footer } from "@/components";
 import React from "react";
 import config from "@/app/config";
 import axios from "axios";
-import Image from "next/image";
+import { use } from "react";
+import Link from "next/link";
 
-export default function BlogDetail({ params }: any) {
-  const slug = params.slug;
+export default function BlogDetail({ params }:  {
+  params: Promise<{ slug: string }>;
+}) {
+   const { slug } = use(params);
   const [blogData, setBlogData] = React.useState([] as any);
   const [loading, setLoading] = React.useState(true);
 
@@ -42,63 +45,78 @@ export default function BlogDetail({ params }: any) {
   return (
     <>
       <Navbar />
-            <section className="container min-h-screen mx-auto px-4 mb-4 mt-10 shadow-xl">
-        {loading ? (
-          <div
-            role="status"
-            className="space-y-8 animate-pulse md:space-y-0 md:space-x-8 rtl:space-x-reverse md:flex flex-col md:items-center min-h-screen"
+      
+      <div className="min-h-screen bg-slate-50/50 pb-16">
+        {/* Breadcrumb section */}
+        <div className="container mx-auto px-4 pt-8 max-w-4xl">
+          <Link
+            href="/blogs"
+            className="inline-flex items-center text-sm font-semibold text-slate-500 hover:text-black transition-colors mb-6 group"
           >
-            <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[480px] mb-2.5"></div>
-            <div className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-48 mb-4"></div>
-            <div className="flex items-center justify-center w-full h-[25rem] bg-gray-300 rounded-sm sm:w-96 dark:bg-gray-700">
-              <svg
-                className="w-10 h-10 text-gray-200 dark:text-gray-600"
-                aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="currentColor"
-                viewBox="0 0 20 18"
-              >
-                <path d="M18 0H2a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2Zm-5.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Zm4.376 10.481A1 1 0 0 1 16 15H4a1 1 0 0 1-.895-1.447l3.5-7A1 1 0 0 1 7.468 6a.965.965 0 0 1 .9.5l2.775 4.757 1.546-1.887a1 1 0 0 1 1.618.1l2.541 4a1 1 0 0 1 .028 1.011Z" />
-              </svg>
-            </div>
-            <div className="w-full">
-              <div className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-48 mb-4"></div>
-              <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[480px] mb-2.5"></div>
-              <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 mb-2.5"></div>
-              <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[440px] mb-2.5"></div>
-              <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[460px] mb-2.5"></div>
-              <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[360px]"></div>
+            <span className="mr-2 transform transition-transform group-hover:-translate-x-1 duration-200">&larr;</span>
+            Back to Blogs
+          </Link>
+        </div>
+
+        {loading ? (
+          <div className="container mx-auto px-4 max-w-4xl bg-white rounded-3xl border border-gray-100 p-6 md:p-12 shadow-[0_4px_30px_rgba(0,0,0,0.02)] animate-pulse">
+            <div className="h-4 bg-gray-200 rounded w-24 mb-6"></div>
+            <div className="h-10 bg-gray-200 rounded w-5/6 mb-4"></div>
+            <div className="h-10 bg-gray-200 rounded w-2/3 mb-8"></div>
+            <div className="w-full h-[250px] md:h-[450px] bg-gray-200 rounded-2xl mb-8"></div>
+            <div className="space-y-4">
+              <div className="h-4 bg-gray-200 rounded w-full"></div>
+              <div className="h-4 bg-gray-200 rounded w-[95%]"></div>
+              <div className="h-4 bg-gray-200 rounded w-[98%]"></div>
+              <div className="h-4 bg-gray-200 rounded w-[90%]"></div>
+              <div className="h-4 bg-gray-200 rounded w-[93%]"></div>
             </div>
             <span className="sr-only">Loading...</span>
           </div>
         ) : (
-          <>
+          <article className="container mx-auto px-4 max-w-4xl bg-white rounded-3xl border border-gray-100 shadow-[0_4px_30px_rgba(0,0,0,0.03)] p-6 md:p-12 mb-16">
+            <div className="flex items-center gap-2 mb-4 text-xs font-semibold uppercase tracking-wider text-slate-400">
+              <span>Article</span>
+              <span className="w-1 h-1 rounded-full bg-slate-300"></span>
+              <span>Published Post</span>
+            </div>
+
             <Typography
-              color="black"
-              variant="h2"
-              className="mb-4 text-center"
+              as="h1"
+              className="mb-6 text-3xl md:text-5xl font-extrabold text-slate-900 tracking-tight leading-tight"
               {...({} as React.ComponentProps<typeof Typography>)}
             >
               {blogData?.title}
             </Typography>
-            <hr className="border border-b border-green-800 w-[200px] mx-auto" />
-            <img
-              src={`${config.apiUrl}storage/app/public/${blogData?.image}`}
-              alt={blogData?.title}
-              className="w-full h-[25rem] object-contain mb-4 mt-4"
-              width={768}
-              height={768}
-            />
-            <Typography
-              className="w-full text-gray-600 p-4"
-              variant="lead"
-              as="div"
+
+            <div className="w-20 h-1 bg-black rounded mb-8" />
+
+            {blogData?.image && (
+              <div className="relative w-full h-[250px] md:h-[450px] overflow-hidden rounded-2xl mb-8 bg-slate-100 shadow-sm">
+                <img
+                  src={`${config.apiUrl}storage/app/public/${blogData?.image}`}
+                  alt={blogData?.title}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            )}
+
+            <div
+              className="w-full text-slate-700 text-base md:text-lg leading-relaxed space-y-6 
+                [&_p]:mb-4 [&_p]:leading-relaxed
+                [&_h2]:text-2xl [&_h2]:font-bold [&_h2]:text-slate-900 [&_h2]:mt-8 [&_h2]:mb-4
+                [&_h3]:text-xl [&_h3]:font-bold [&_h3]:text-slate-900 [&_h3]:mt-6 [&_h3]:mb-3
+                [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:mb-4
+                [&_ol]:list-decimal [&_ol]:pl-6 [&_ol]:mb-4
+                [&_li]:mb-2
+                [&_strong]:font-semibold [&_strong]:text-slate-900
+                [&_a]:text-black [&_a]:underline hover:[&_a]:text-slate-700"
               dangerouslySetInnerHTML={{ __html: blogData?.content }}
-              {...({} as React.ComponentProps<typeof Typography>)}
-            ></Typography>
-          </>
+            />
+          </article>
         )}
-      </section>
+      </div>
+
       <Footer />
     </>
   );

@@ -1526,7 +1526,7 @@ export default function ShoppingCart() {
 
             <h2 className="text-2xl font-semibold text-gray-700">
               Your Cart is{" "}
-              <span className="text-red-800 font-bold">Empty!</span>
+              <span className="text-black font-bold">Empty!</span>
             </h2>
 
             <p className="text-gray-500 mt-2">
@@ -1534,7 +1534,7 @@ export default function ShoppingCart() {
             </p>
 
             <Link
-              className="mt-6 px-6 py-3 rounded-full shadow-lg flex bg-red-800"
+              className="mt-6 px-6 py-3 rounded-full shadow-lg flex bg-black hover:bg-neutral-850 transition-colors"
               href={"/all-products"}
               // onClick={() => router.push("/all-products")}
               // {...({} as React.ComponentProps<typeof Button>)}

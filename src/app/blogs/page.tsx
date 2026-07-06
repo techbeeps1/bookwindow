@@ -108,7 +108,7 @@ export default function Blogs() {
                   <Typography
                     as="a"
                     href={`blogs/${blog?.slug}`}
-                    className="mb-4 text-base font-bold text-slate-800 hover:text-primary transition-colors duration-200 line-clamp-2 leading-snug block"
+                    className="mb-4 text-base font-bold text-slate-800 hover:text-black transition-colors duration-200 line-clamp-2 leading-snug block"
                     {...({} as React.ComponentProps<typeof Typography>)}
                   >
                     {blog?.title}
@@ -116,7 +116,7 @@ export default function Blogs() {
                 </div>
                 <a
                   href={`blogs/${blog?.slug}`}
-                  className="inline-flex items-center text-sm font-semibold text-slate-500 hover:text-primary transition-colors duration-200 mt-auto"
+                  className="inline-flex items-center text-sm font-semibold text-slate-500 hover:text-black transition-colors duration-200 mt-auto"
                 >
                   Read More
                   <span className="ml-1.5 transform transition-transform group-hover:translate-x-1 duration-200">

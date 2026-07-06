@@ -224,10 +224,10 @@ export function Navbar({ items_count, customerData, isCartEmpty }: any) {
                             />
                           </div>
                           <div className="flex-1 min-w-0">
-                            <h4 className="font-semibold text-xs text-gray-800 hover:text-[#A9001F] transition-colors truncate">
+                            <h4 className="font-semibold text-xs text-gray-800 hover:text-black transition-colors truncate">
                               {product?.name}
                             </h4>
-                            <div className="text-xs font-bold text-[#A9001F] mt-1">
+                            <div className="text-xs font-bold text-black mt-1">
                               ₹{product?.price}
                             </div>
                           </div>
@@ -267,7 +267,7 @@ export function Navbar({ items_count, customerData, isCartEmpty }: any) {
                       <div className="bg-white border border-gray-200 text-gray-800 shadow-2xl p-2 rounded-2xl">
                         <Link
                           href="/my-account"
-                          className="block hover:bg-gray-50 text-gray-700 hover:text-[#A9001F] rounded-xl transition-colors py-2.5 px-4 text-xs font-semibold"
+                          className="block hover:bg-gray-50 text-gray-700 hover:text-black rounded-xl transition-colors py-2.5 px-4 text-xs font-semibold"
                         >
                           My Account
                         </Link>
@@ -340,7 +340,7 @@ export function Navbar({ items_count, customerData, isCartEmpty }: any) {
                               <Link
                                 key={child?.id || cidx}
                                 href={`/category/${child.url}`}
-                                className="block hover:bg-gray-50 text-gray-700 hover:text-[#A9001F] rounded-xl transition-colors py-2.5 px-4 text-xs font-semibold"
+                                className="block hover:bg-gray-50 text-gray-700 hover:text-black rounded-xl transition-colors py-2.5 px-4 text-xs font-semibold"
                               >
                                 {child.name}
                               </Link>
@@ -459,7 +459,7 @@ export function Navbar({ items_count, customerData, isCartEmpty }: any) {
                 fill="none"
                 viewBox="0 0 24 24"
                 strokeWidth="1.8"
-                stroke="#333333"
+                stroke="#ffffffff"
                 className="w-4 h-4"
               >
                 <path
@@ -475,7 +475,7 @@ export function Navbar({ items_count, customerData, isCartEmpty }: any) {
               placeholder="What are you looking for?"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full bg-white text-gray-900 placeholder-gray-500 text-sm border border-transparent rounded-full py-2 pl-10 pr-10 transition-all focus:outline-none focus:shadow-md focus:bg-white"
+              className="w-full text-white bg-transparent placeholder-white border border-white rounded-full py-2.5 pl-11 pr-11 transition-all focus:outline-none"
             />
 
             {/* Mic Icon */}
@@ -485,7 +485,7 @@ export function Navbar({ items_count, customerData, isCartEmpty }: any) {
                 fill="none"
                 viewBox="0 0 24 24"
                 strokeWidth="1.8"
-                stroke="#333333"
+                stroke="#ffffffff"
                 className="w-4 h-4"
               >
                 <path
@@ -519,7 +519,7 @@ export function Navbar({ items_count, customerData, isCartEmpty }: any) {
                       <h4 className="font-semibold text-xs text-gray-800 truncate">
                         {product?.name}
                       </h4>
-                      <div className="text-xs font-bold text-[#A9001F] mt-0.5">
+                      <div className="text-xs font-bold text-black mt-0.5">
                         ₹{product?.price}
                       </div>
                     </div>

@@ -361,7 +361,7 @@ export default function SignIn() {
                 />
               </div>
               <Typography
-                className="mt-4 text-center text-red-600 font-normal cursor-pointer"
+                className="mt-4 text-center text-gray-800 hover:text-black font-normal cursor-pointer transition-colors"
                 {...({} as React.ComponentProps<typeof Typography>)}
                 onClick={() => setIsModalOpen(true)}
               >

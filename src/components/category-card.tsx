@@ -32,7 +32,7 @@ function CategoryCard({
           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 16vw"
         />
       </div>
-      <h3 className="text-center mt-3 font-semibold text-gray-800 text-sm md:text-[15px] group-hover:text-[#A9001F] transition-colors duration-300">
+      <h3 className="text-center mt-3 font-semibold text-gray-800 text-sm md:text-[15px] group-hover:text-black transition-colors duration-300">
         {cat_title}
       </h3>
     </Link>
