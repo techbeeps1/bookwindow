@@ -185,7 +185,7 @@ export function Navbar({ items_count, customerData, isCartEmpty }: any) {
                       fill="none"
                       viewBox="0 0 24 24"
                       strokeWidth="1.8"
-                      stroke="#333333"
+                      stroke="#ffffffff"
                       className="w-4 h-4"
                     >
                       <path
@@ -201,7 +201,7 @@ export function Navbar({ items_count, customerData, isCartEmpty }: any) {
                     placeholder="What are you looking for?"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full bg-white text-gray-900 placeholder-gray-500 text-sm border border-transparent rounded-full py-2.5 pl-11 pr-11 transition-all focus:outline-none focus:shadow-md focus:bg-white"
+                    className="w-full text-white bg-transparent placeholder-white border border-white rounded-full py-2.5 pl-11 pr-11 transition-all focus:outline-none"
                   />
 
                   {/* Dropdown popup */}

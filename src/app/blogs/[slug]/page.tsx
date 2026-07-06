@@ -82,8 +82,8 @@ export default function BlogDetail({ params }: any) {
               {blogData?.title}
             </Typography>
             <hr className="border border-b border-green-800 w-[200px] mx-auto" />
-            <Image
-              src={`${config.apiUrl}storage/${blogData?.image}`}
+            <img
+              src={`${config.apiUrl}storage/app/public/${blogData?.image}`}
               alt={blogData?.title}
               className="w-full h-[25rem] object-contain mb-4 mt-4"
               width={768}
