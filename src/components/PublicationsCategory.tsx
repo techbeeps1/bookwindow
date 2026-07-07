@@ -50,7 +50,7 @@ export function PublicationsCategory({
   return (
     <section className="container mx-auto px-8">
       {/* Header */}
-      <div className="mb-12 grid place-items-center text-center">
+      <div className="mb-6 grid place-items-center text-center">
         <motion.h2
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}

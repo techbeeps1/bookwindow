@@ -11,7 +11,7 @@ import {
   Tab,
   Checkbox,
 } from "@material-tailwind/react";
-import { Navbar, Footer } from "@/components";
+
 import config from "../config";
 import { useState, useRef, useEffect, FormEvent } from "react";
 import { useRouter } from "next/navigation";
@@ -101,10 +101,9 @@ export default function SignIn() {
   useEffect(() => {
     if (
       typeof window !== "undefined" &&
-      customerData?.access_token &&
       customerData?.customer
     ) {
-      localStorage.setItem("access_token", customerData.access_token);
+      
       localStorage.setItem("customer", JSON.stringify(customerData.customer));
     }
   }, [customerData]);
@@ -255,7 +254,7 @@ export default function SignIn() {
 
   return (
     <>
-      <Navbar />
+
             <Card
         color="transparent"
         shadow={false}
@@ -563,7 +562,7 @@ export default function SignIn() {
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
         <ForgotPassword />
       </Modal>
-      <Footer />
+
     </>
   );
 }

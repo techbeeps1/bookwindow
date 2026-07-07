@@ -154,9 +154,9 @@ export function BestSubjects({
   };
 
   return (
-    <section className="w-full py-20 overflow-hidden">
+    <section className="w-full py-[50px] overflow-hidden">
       {/* Header (Aligned with container) */}
-      <div className="container mx-auto px-8 mb-12 grid place-items-center text-center">
+      <div className="container mx-auto px-8 mb-6 grid place-items-center text-center">
         <motion.h2
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}

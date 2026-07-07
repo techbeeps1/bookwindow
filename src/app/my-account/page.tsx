@@ -1,8 +1,6 @@
 "use client";
 
-// components/AccountPage.tsx
-import Footer from "@/components/footer";
-import Navbar from "@/components/navbar";
+
 import axios from "axios";
 import { FormEvent, useEffect, useState } from "react";
 import config from "../config";
@@ -34,7 +32,7 @@ const tabs: TabItem[] = [
 
 export default function AccountPage() {
   const [activeTab, setActiveTab] = useState<AccountTab>("dashboard");
-  const [access_token, setAccessToken] = useState<string | null>(null);
+
   const [customer, setCustomer] = useState<any>(null);
   const [userOrders, setUserOrders] = useState([] as any);
   const router = useRouter();
@@ -43,10 +41,10 @@ export default function AccountPage() {
   }, []);
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const token = localStorage.getItem("access_token");
+
       const customerData = localStorage.getItem("customer");
-      if (customerData && token) {
-        setAccessToken(token);
+      if (customerData ) {
+
         setCustomer(customerData ? JSON.parse(customerData) : null);
       } else {
         router.push("/");
@@ -56,7 +54,7 @@ export default function AccountPage() {
 
   const logout = () => {
     if (typeof window !== "undefined") {
-      localStorage.removeItem("access_token");
+
       localStorage.removeItem("customer");
       localStorage.clear();
       window.location.reload();
@@ -108,7 +106,7 @@ export default function AccountPage() {
 
   return (
     <>
-      <Navbar />
+
             <div className="container mx-auto md:flex  min-h-screen max-w-screen-xl px-2 pt-8 2xl:px-0 shadow-xl">
         <aside className="w-64 border-r p-4">
           <nav className="space-y-2">
@@ -132,7 +130,7 @@ export default function AccountPage() {
         </aside>
         <main className="flex-1 p-6">{renderTabContent()}</main>
       </div>
-      <Footer />
+
     </>
   );
 }

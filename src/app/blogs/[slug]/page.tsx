@@ -1,6 +1,6 @@
 "use client";
 import { Typography } from "@material-tailwind/react";
-import { Navbar, Footer } from "@/components";
+
 import React from "react";
 import config from "@/app/config";
 import axios from "axios";
@@ -44,7 +44,7 @@ export default function BlogDetail({ params }:  {
 
   return (
     <>
-      <Navbar />
+
       
       <div className="min-h-screen bg-slate-50/50 pb-16">
         {/* Breadcrumb section */}
@@ -117,7 +117,6 @@ export default function BlogDetail({ params }:  {
         )}
       </div>
 
-      <Footer />
     </>
   );
 }

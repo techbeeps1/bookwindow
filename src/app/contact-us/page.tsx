@@ -2,7 +2,7 @@
 
 import React, { FormEvent } from "react";
 import { Alert } from "@material-tailwind/react";
-import { Navbar, Footer } from "@/components";
+
 import config from "../config";
 import axios from "axios";
 import Image from "next/image";
@@ -111,7 +111,7 @@ export default function ContactSection() {
 
   return (
     <>
-      <Navbar />
+
 
       {/* Banner Section */}
       <section className="relative w-full h-[50vh] flex items-center justify-center bg-gray-900 overflow-hidden">
@@ -335,7 +335,7 @@ export default function ContactSection() {
         )}
       </div>
 
-      <Footer />
+
     </>
   );
 }

@@ -3,15 +3,16 @@
   "version": "1.0.0",
   "private": true,
   "author": "Techbeeps Services",
-"scripts": {
-  "dev": "next dev",
-  "build": "next build",
-  "start": "next start",
-  "lint": "eslint ."
-},
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint ."
+  },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
     "@material-tailwind/react": "^2.1.10",
+    "@reduxjs/toolkit": "^2.12.0",
     "axios": "^1.18.1",
     "framer-motion": "^12.42.2",
     "iron-session": "^8.0.4",
@@ -20,6 +21,8 @@
     "razorpay": "^2.9.6",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
+    "react-icons": "^5.7.0",
+    "react-redux": "^9.3.0",
     "react-spinners": "^0.17.0",
     "uuid": "^14.0.1"
   },

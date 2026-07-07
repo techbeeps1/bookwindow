@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Navbar, Footer } from "@/components";
+
 import config from "@/app/config";
 import axios from "axios";
 
@@ -51,7 +51,7 @@ export default function ShoppingCart() {
 
   return (
     <>
-      <Navbar />
+
 
       <section className="bg-white py-8 md:py-16 mb-4">
         <div className="mx-auto max-w-screen-xl px-4 2xl:px-0">
@@ -160,7 +160,7 @@ export default function ShoppingCart() {
         </div>
       </section>
 
-      <Footer />
+
     </>
   );
 }

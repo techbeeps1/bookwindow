@@ -20,16 +20,8 @@ export default function Checkout({
   onCustomerData,
   shippingData,
 }: CheckoutProps) {
-  // console.log(formData)
-  interface CartItem {
-    product_id: number;
-    product_name: string;
-    product_price: number;
-    quantity: number;
-    image: string;
-    subtotal?: number;
-    product_weight?: number | any;
-  }
+
+ 
   const initialFormValues = {
   email: "",
   first_name: "",
@@ -42,9 +34,8 @@ export default function Checkout({
   zip_code: "",
   country: "India",
 };
-  const [session, setSession] = useState("");
-  const [cartItems, setCartItems] = useState([] as CartItem[]);
-  const [items_count, setItemsCount] = useState(0);
+
+
   const [customerData, setCustomerData] = useState({} as any);
   const [customer, setCustomer] = useState<any>(null);
   const [isEdit, setIsEdit] = useState<boolean>(false);
@@ -58,7 +49,6 @@ export default function Checkout({
     null
   );
 
-  const [orderNumber, setOrderNumber] = useState<number>(0);
   const [open, setOpen] = React.useState(false);
   const errorPopup = () => setOpen(!open);
   const [isOpen, setIsOpen] = React.useState(false);
@@ -67,30 +57,17 @@ export default function Checkout({
   const [states, setStates] = useState([] as any);
   const [statesFeteched, setStatesFatched] = useState(false);
   const [filteredCities, setFilteredCities] = useState([]);
-  const [showCityError, setShowCityError] = useState(false);
+
   const [formValues, setFormValues] = useState(formData?.first_name ? formData : initialFormValues);
    const [isLoaded, setIsLoaded] = useState(false);
+ 
 
-  // Load values from localStorage once on mount
-  // useEffect(() => {
-  //   if (typeof window !== "undefined") {
-  //     const savedForm = localStorage.getItem("checkoutForm");
-  //     if (savedForm) {
-  //       try {
-  //         setFormValues(JSON.parse(savedForm));
-  //       } catch (e) {
-  //         console.error("Failed to parse stored form data", e);
-  //       }
-  //     }
-  //     setIsLoaded(true);
-  //   }
-  // }, []);
+
   useEffect(() => {
   if (typeof window === "undefined") return;
 
-  // If new customer data comes in, save it and use it
-  if (customerData?.access_token && customerData?.customer) {
-    localStorage.setItem("access_token", customerData.access_token);
+  if (  customerData?.customer) {
+
     localStorage.setItem("customer", JSON.stringify(customerData.customer));
     setCustomer(customerData.customer);
 
@@ -111,10 +88,10 @@ export default function Checkout({
     }));
   } else {
     // Try loading customer from localStorage
-    const token = localStorage.getItem("access_token");
+  
     const storedCustomer = localStorage.getItem("customer");
 
-    if (token && storedCustomer) {
+    if ( storedCustomer) {
       const parsedCustomer = JSON.parse(storedCustomer);
       setCustomer(parsedCustomer);
 
@@ -175,31 +152,6 @@ export default function Checkout({
 };
 
 
-  useEffect(() => {
-    const viewCart = async () => {
-      try {
-        const response = await axios({
-          method: "get",
-          url: `${config.apiUrl}api/cart/viewcart?session_id=${session}`,
-          responseType: "json",
-        });
-        const data = response?.data;
-        // console.log("checkout list", data);
-        setCartItems(data?.items);
-        setItemsCount(data?.items_count);
-      } catch (error) {
-        console.log("error", error);
-      } finally {
-        // console.log("An error occured");
-      }
-    };
-
-    viewCart();
-  }, [session]);
-
-
-
-  useEffect(() => {}, [session, cartItems, items_count]);
 
   useEffect(() => {
     const fetchStatesAndCities = async () => {
@@ -305,7 +257,7 @@ export default function Checkout({
       onCustomerData(data);
       // setPassword("");
       // setEmail("");
-      setItemsCount(0);
+      
     } else {
       const data = await response.json();
       console.error("Login failed", response.status);
@@ -313,22 +265,7 @@ export default function Checkout({
     }
   }
 
-  // useEffect(() => {
-  //   if (typeof window === "undefined") return;
 
-  //   if (customerData?.access_token && customerData?.customer) {
-  //     localStorage.setItem("access_token", customerData.access_token);
-  //     localStorage.setItem("customer", JSON.stringify(customerData.customer));
-  //     setCustomer(customerData.customer); // Optionally update state immediately
-  //   } else {
-  //     const token = localStorage.getItem("access_token");
-  //     const storedCustomer = localStorage.getItem("customer");
-
-  //     if (token && storedCustomer) {
-  //       setCustomer(JSON.parse(storedCustomer));
-  //     }
-  //   }
-  // }, [customerData]);
 
   useEffect(() => {
     const source =
@@ -356,81 +293,7 @@ export default function Checkout({
     });
   }, [shippingData, customer]);
 
-  // const handlePlaceOrder = async (event: FormEvent<HTMLFormElement>) => {
-  //   event.preventDefault();
-  //   try {
-  //     const form = event.currentTarget;
-  //     const formData = new FormData(event.currentTarget);
-  //     const first_name = formData.get("first_name")?.toString().trim() || "";
-  //     const last_name = formData.get("last_name")?.toString().trim() || "";
-  //     const phone = formData.get("phone")?.toString().trim() || "";
-  //     const city = formData.get("city")?.toString() || "";
-  //     const state = formData.get("state")?.toString() || "";
-  //     const country = formData.get("country")?.toString() || "";
-  //     const zip_code = formData.get("zip_code")?.toString() || "";
-  //     const address = formData.get("address")?.toString() || "";
-  //     const address_2 = formData.get("address_2")?.toString() || "";
 
-  //     const response = await fetch(`${config.apiUrl}api/cart/checkout`, {
-  //       method: "POST",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //       credentials: "include",
-  //       body: JSON.stringify({
-  //         session_id: session,
-  //         shipping_method: deliveryType,
-  //         address: address,
-  //         address_2: address_2,
-  //         email: email,
-  //         password: password ? password : "",
-  //         is_guest: userFound ? false : true,
-  //         phone: phone,
-  //         first_name: first_name,
-  //         last_name: last_name,
-  //         city: city,
-  //         state: state,
-  //         zip_code: zip_code,
-  //         country: country,
-  //       }),
-  //     });
-  //     const result = await response.json();
-  //     if (response.ok) {
-  //       console.log("Place order", result);
-  //       setOrderNumber(result?.order_number);
-  //       form.reset();
-  //     }
-  //     if (result.message == "Your cart is empty") {
-  //       setOpen(true);
-  //       // errorPopup();
-  //     }
-  //   } catch (error) {
-  //     setOpen(true);
-  //     // errorPopup();
-  //     console.log("Error in :", error);
-  //   }
-  // };
-
-  // const handleNext = (event: FormEvent<HTMLFormElement>) => {
-  //   event.preventDefault();
-
-  //   const requiredFields = ["first_name", "last_name", "phone", "address", "zip_code"];
-  //   for (const field of requiredFields) {
-  //     if (!formValues[field as keyof typeof formValues]?.trim()) {
-  //       alert(`${field} is required`);
-  //       return;
-  //     }
-  //   }
-
-  //   const data = {
-  //     ...formValues,
-  //     email: email || formData?.email,
-  //     password: password ? password : "",
-  //     is_guest: !password,
-  //   };
-
-  //   onNext(data); // Pass data to parent
-  // };
   const handleNext = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
@@ -473,7 +336,7 @@ export default function Checkout({
     <>
       <form
         className="container mx-auto p-6 grid grid-cols-1 gap-8 mb-8 mt-4 max-w-screen-md"
-        // onSubmit={handlePlaceOrder}
+
         onSubmit={handleNext}
       >
         <div className="bg-white p-6 rounded-lg shadow-lg">

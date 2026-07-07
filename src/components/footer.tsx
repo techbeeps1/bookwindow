@@ -7,25 +7,7 @@ import axios from "axios";
 import config from "@/app/config";
 import Link from "next/link";
 
-export function Footer() {
-  const [footerMenu, setFooterMenu] = React.useState([] as any);
-  
-  React.useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const response = await axios({
-          method: "get",
-          url: `${config.apiUrl}api/menus/Footer_Menu_1`,
-          responseType: "json",
-        });
-        setFooterMenu(response.data);
-      } catch (error) {
-        console.log("error", error);
-      }
-    };
-
-    fetchCategories();
-  }, []);
+export function Footer({menuData}:any) {
 
   function chunkArray(array: any[], size: number) {
     const result = [];
@@ -36,12 +18,10 @@ export function Footer() {
   }
 
   const chunkedMenu = chunkArray(
-    footerMenu?.data || [],
-    Math.ceil((footerMenu?.data?.length || 0) / 3)
+    menuData || [],
+    Math.ceil((menuData?.length || 0) / 3)
   );
-
-  const columnTitles = ["Customer Service", "Quick Links", "Our Policies"];
-
+  const columnTitles = ["Quick Links", "Services", "Policies"];
   return (
     <footer className="w-full bg-[#0a0908] text-white">
       {/* 1. Newsletter Section */}

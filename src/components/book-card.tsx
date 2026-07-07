@@ -11,6 +11,8 @@ import {
 import ProductDialog from "./product-detail-popup";
 import config from "@/app/config";
 import Link from "next/link";
+import { useAddToCartMutation } from "@/lib/api/cartApi";
+import { useSession } from "@/hooks/useSession";
 
 interface BookCardProps {
   img: string;
@@ -41,39 +43,24 @@ export function BookCard({
   mainCategoryName,
   onItemsCountUpdate,
 }: BookCardProps) {
+   const sessionId = useSession();
   const [showPopup, setShowPopup] = useState(false);
   const [open, setOpen] = React.useState(false);
   const popupRef = useRef(null as any);
   const handleOpen = () => setOpen(!open);
-  const [session, setSession] = useState("");
-  const [cartData, setCartData] = useState({} as any);
 
 
-  useEffect(() => {}, [session]);
-
+  const [addToCart, { isLoading }] = useAddToCartMutation();
   const handleAddToCart = async (productId: string, quantity: number) => {
     try {
-      const response = await fetch(`${config.apiUrl}api/cart/add`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({
-          product_id: productId,
-          quantity,
-          session_id: session, // pass it manually if backend accepts it
-        }),
-      });
-      const result = await response.json();
-      setCartData(result);
-      // 👇 Notify parent of updated items count
-      if (
-        onItemsCountUpdate &&
-        typeof result?.total_products_count === "number"
-      ) {
-        onItemsCountUpdate(result.total_products_count);
-      }
+
+     await addToCart({
+        session_id: sessionId,
+        product_id: productId,
+        quantity: quantity,
+      }).unwrap();
+     
+
       // console.log("Cart updated:", result);
     } catch (error) {
       console.error("Error adding to cart:", error);

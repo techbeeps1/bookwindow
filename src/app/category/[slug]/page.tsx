@@ -1,6 +1,6 @@
 "use client";
 
-import { Navbar, Footer } from "@/components";
+
 import BookCard from "@/components/book-card";
 import { useEffect, useState } from "react";
 import { use } from "react";
@@ -11,14 +11,11 @@ import CategoryPublicationSidebar from "@/components/category-publication-sideba
 export default function Category({ params }:  {
   params: Promise<{ slug: string }>;
 }) {
-  const [itemsCount, setItemsCount] = useState<number>(0);
+
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
 
-  // Callback function to receive data from child
-  const handleItemsCountUpdate = (count: number) => {
-    setItemsCount(count);
-  };
+
     const { slug } = use(params);
   const [products, setProducts] = useState([] as any);
   const [filteredProducts, setFilteredProducts] = useState<any[]>([]);
@@ -30,6 +27,8 @@ export default function Category({ params }:  {
   const [selectedPublicationIds, setSelectedPublicationIds] = useState<
     number[]
   >([]);
+
+  
   
  useEffect(() => {
     window.scrollTo(0, 0);
@@ -119,7 +118,7 @@ export default function Category({ params }:  {
 
   return (
     <>
-      <Navbar items_count={itemsCount} />
+
             <section className="container mx-auto mb-10 mt-10 md:flex shadow-lg border border-1">
         <CategoryPublicationSidebar
           onCategorySelect={handleCategorySelect}
@@ -180,7 +179,7 @@ export default function Category({ params }:  {
                 return (
                   <BookCard
                     key={product.id}
-                    img={`${config.apiUrl}storage/${product.image}`}
+                    img={`${config.apiUrl}storage/app/public/${product.image}`}
                     category={(product?.mrp && product?.price
                       ? ((product?.mrp - product?.price) / product?.mrp) * 100
                       : 0
@@ -192,7 +191,7 @@ export default function Category({ params }:  {
                     slug={product.slug}
                     id={product.id}
                     quantity={product.quantity}
-                    onItemsCountUpdate={handleItemsCountUpdate}
+                    onItemsCountUpdate={()=>{}}
                     subcategoryName={subcategory?.name}
                     mainCategoryName={"slug"}
                   />
@@ -235,7 +234,7 @@ export default function Category({ params }:  {
           </button>
         </div>
       )}
-      <Footer />
+
     </>
   );
 }

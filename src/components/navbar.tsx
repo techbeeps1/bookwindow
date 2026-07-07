@@ -1,119 +1,42 @@
-"use client";
-import React, { useState, useEffect } from "react";
+import  { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import axios from "axios";
+
 import config from "@/app/config";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
 import { XMarkIcon, Bars3Icon } from "@heroicons/react/24/solid";
 import logo from "../../public/logos/logo.svg";
+import { useAppDispatch } from "@/hooks/useStore";
+import { openCartDrawer } from "@/lib/slices/uiSlice";
+import { useCart } from "@/hooks/useCart";
+import { useViewProductsQuery } from "@/lib/api/productsApi";
 
-export function Navbar({ items_count, customerData, isCartEmpty }: any) {
-  const [access_token, setAccessToken] = useState<string | null>(null);
+
+export function Navbar({  menuData }: any) {
   const [customer, setCustomer] = useState<any>(null);
-  const [session, setSession] = useState("");
-  const [itemsCount, setItemsCount] = useState(items_count || 0);
   const [searchTerm, setSearchTerm] = useState("");
-  const [products, setProducts] = useState<any[]>([]);
+
   const [filteredProducts, setFilteredProducts] = useState<any[]>([]);
   const [open, setOpen] = useState(false);
-  const [headerMenu, setHeaderMenu] = useState([] as any);
   const [openMobileSubmenus, setOpenMobileSubmenus] = useState<Record<number, boolean>>({});
-  const router = useRouter();
+   const headerMenu =menuData;
+   const {data:productdatas} = useViewProductsQuery();
+   const products = productdatas;
 
-  // Sync customer details
-  useEffect(() => {
-    if (customerData) {
-      setCustomer(customerData.customer);
-      setAccessToken(customerData.access_token);
-    }
-  }, [customerData]);
+
+  const { data } = useCart();
+const dispatch = useAppDispatch();
+
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const token = localStorage.getItem("access_token");
       const customerDataVal = localStorage.getItem("customer");
-      setAccessToken(token);
       setCustomer(customerDataVal ? JSON.parse(customerDataVal) : null);
     }
   }, []);
 
-  // Check user session
-  const checkSession = async () => {
-    try {
-      const res = await fetch("/api/debug", {
-        method: "GET",
-        credentials: "include",
-      });
-      const data = await res.json();
-      setSession(data?.session_id);
-    } catch (error) {
-      console.log("error fetching session", error);
-    }
-  };
 
-  useEffect(() => {
-    checkSession();
-  }, []);
-
-  // Fetch cart data when session is active
-  useEffect(() => {
-    if (session) {
-      const viewCart = async () => {
-        try {
-          const response = await axios({
-            method: "get",
-            url: `${config.apiUrl}api/cart/viewcart?session_id=${session}`,
-            responseType: "json",
-          });
-          const data = response?.data;
-          setItemsCount(data?.items_count);
-        } catch (error) {
-          console.log("error viewing cart", error);
-        }
-      };
-      viewCart();
-    }
-  }, [session]);
-
-  // Fetch header menu items
-  useEffect(() => {
-    const fetchHeaderMenu = async () => {
-      try {
-        const response = await axios({
-          method: "get",
-          url: `${config.apiUrl}api/menus/header_menu`,
-          responseType: "json",
-        });
-        setHeaderMenu(response.data?.header || response.data?.data || []);
-      } catch (error) {
-        console.log("error fetching header menu", error);
-      }
-    };
-    fetchHeaderMenu();
-  }, []);
-
-  // Fetch all products for search autocomplete
-  useEffect(() => {
-    const fetchProductsForSearch = async () => {
-      try {
-        const res = await axios({
-          method: "get",
-          url: `${config.apiUrl}api/products`,
-          responseType: "json",
-        });
-        if (res.data) {
-          setProducts(res.data);
-        }
-      } catch (err) {
-        console.error("Error fetching products for search:", err);
-      }
-    };
-    fetchProductsForSearch();
-  }, []);
-
-  // Filter products as search term updates
+  
   useEffect(() => {
     if (!searchTerm.trim()) {
       setFilteredProducts([]);
@@ -147,7 +70,7 @@ export function Navbar({ items_count, customerData, isCartEmpty }: any) {
 
   const logout = () => {
     if (typeof window !== "undefined") {
-      localStorage.removeItem("access_token");
+ 
       localStorage.removeItem("customer");
       localStorage.clear();
       window.location.reload();
@@ -249,7 +172,7 @@ export function Navbar({ items_count, customerData, isCartEmpty }: any) {
               {/* Right Icons (Profile/Cart) */}
               <div className="flex-shrink-0 flex items-center gap-6">
                 {/* User Account Dropdown */}
-                {access_token && customer ? (
+                { customer ? (
                   <div className="relative group">
                     <button className="flex items-center gap-1 text-white hover:text-white/80 transition-colors focus:outline-none py-1">
                       <svg
@@ -305,11 +228,9 @@ export function Navbar({ items_count, customerData, isCartEmpty }: any) {
                       />
                     </svg>
                   </Link>
-                )}
-
-                {/* Shopping Bag / Cart */}
-                <Link href="/checkout" className="relative text-white hover:text-white/80 transition-colors">
-                  <svg
+                )}          
+                <button  className="relative text-white hover:text-white/80 transition-colors" onClick={() => dispatch(openCartDrawer())}>
+   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
                     viewBox="0 0 24 24"
@@ -323,10 +244,16 @@ export function Navbar({ items_count, customerData, isCartEmpty }: any) {
                       d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"
                     />
                   </svg>
-                  <span className="absolute -top-1.5 -right-1.5 bg-white text-black text-[9px] font-extrabold w-4 h-4 rounded-full flex items-center justify-center border border-black shadow-sm">
-                    {items_count || isCartEmpty ? items_count : itemsCount || 0}
+                 
+
+  {data?.items_count > 0 && (
+     <span className="absolute -top-1.5 -right-1.5 bg-white text-black text-[9px] font-extrabold w-4 h-4 rounded-full flex items-center justify-center border border-black shadow-sm">
+                   {data.items_count}
                   </span>
-                </Link>
+  )}
+</button>
+
+
               </div>
             </div>
 
@@ -397,17 +324,14 @@ export function Navbar({ items_count, customerData, isCartEmpty }: any) {
                 <Bars3Icon strokeWidth={2.5} className="h-5 w-5 text-white" />
               )}
             </button>
-          </div>
 
-          {/* Mobile Collapse Menu */}
-          {/* Mobile Collapse Menu */}
+          </div>   
           <div
             className={`lg:hidden transition-all duration-300 overflow-hidden ${
               open ? "max-h-[85vh] opacity-100 mt-4" : "max-h-0 opacity-0 pointer-events-none"
             }`}
           >
-            <div className="pt-4 border-t border-white/10 flex flex-col gap-4">
-              {/* Dynamic categories for mobile */}
+            <div className="pt-4 border-t border-white/10 flex flex-col gap-4">           
               <div className="flex flex-col">
                 <div className="text-[11px] font-semibold text-white/50 tracking-widest px-2 mb-2 uppercase border-b border-white/10 pb-2">
                   Categories
@@ -467,10 +391,10 @@ export function Navbar({ items_count, customerData, isCartEmpty }: any) {
     </nav>
 
     {/* ================= MOBILE BOTTOM NAVIGATION BAR ================= */}
-    <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-[#0c0c0e]/95 backdrop-blur-md border-t border-white/10 px-4 py-3 flex items-center justify-between gap-3 shadow-[0_-8px_30px_rgb(0,0,0,0.5)]">
-      {/* Left: User Account / Profile */}
+     <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-[#0c0c0e]/95 backdrop-blur-md border-t border-white/10 px-4 py-3 flex items-center justify-between gap-3 shadow-[0_-8px_30px_rgb(0,0,0,0.5)]">
+
       <div className="flex-shrink-0">
-        {access_token && customer ? (
+        {  customer ? (
           <Link href="/my-account" className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-tr from-amber-500 to-rose-500 text-white border border-white/20 shadow-md transform active:scale-95 transition-all">
             <span className="text-sm font-bold uppercase">
               {customer?.first_name ? customer.first_name[0] : "U"}
@@ -496,7 +420,6 @@ export function Navbar({ items_count, customerData, isCartEmpty }: any) {
         )}
       </div>
 
-      {/* Center: Search input */}
       <div className="flex-grow relative">
         <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
           <svg
@@ -540,7 +463,7 @@ export function Navbar({ items_count, customerData, isCartEmpty }: any) {
           </button>
         )}
 
-        {/* Autocomplete list - rendered above the bottom bar */}
+
         {searchTerm && filteredProducts.length > 0 && (
           <div className="absolute bottom-full mb-3 left-0 w-full z-50 bg-white border border-gray-200 rounded-2xl shadow-2xl max-h-72 overflow-y-auto p-1.5">
             {filteredProducts.map((product: any) => (
@@ -573,29 +496,34 @@ export function Navbar({ items_count, customerData, isCartEmpty }: any) {
         )}
       </div>
 
-      {/* Right: Cart */}
+
       <div className="flex-shrink-0">
-        <Link href="/checkout" className="relative flex items-center justify-center w-10 h-10 rounded-full bg-neutral-900 text-white border border-white/10 shadow-md hover:bg-neutral-800 transform active:scale-95 transition-all">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth="1.5"
-            stroke="currentColor"
-            className="w-5 h-5 text-white/90"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"
-            />
-          </svg>
-          <span className="absolute -top-1 -right-1 bg-white text-black text-[9px] font-extrabold w-4 h-4 rounded-full flex items-center justify-center border border-black shadow-sm">
-            {items_count || isCartEmpty ? items_count : itemsCount || 0}
-          </span>
-        </Link>
+                 <button  className="flex items-center justify-center w-10 h-10 rounded-full bg-neutral-900 text-white border border-white/10 shadow-md hover:bg-neutral-800 transform active:scale-95 transition-all " onClick={() => dispatch(openCartDrawer())}>
+   <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth="1.5"
+                    stroke="currentColor"
+                    className="w-5 h-5"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"
+                    />
+                  </svg>
+                 
+
+  {data?.items_count > 0 && (
+     <span className="absolute -top-1.5 -right-1.5 bg-white text-black text-[9px] font-extrabold w-4 h-4 rounded-full flex items-center justify-center border border-black shadow-sm">
+            {data.items_count}
+      </span>
+  )}
+</button>
+        
       </div>
-    </div>
+    </div> 
     </>
   );
 }

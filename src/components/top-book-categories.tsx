@@ -3,7 +3,7 @@
 import React from "react";
 import CategoryCard from "@/components/category-card";
 import { motion } from "framer-motion";
-import { Card, CardBody, Typography, Button } from "@material-tailwind/react";
+import {  Typography } from "@material-tailwind/react";
 
 
 
@@ -12,7 +12,7 @@ export function TopBookCategories({
   divRef,
   category_section,
 }: any) {
-  const sellingContent = category_section?.category_sections[0];
+
   return (
     <section
       ref={divRef}
@@ -25,14 +25,13 @@ export function TopBookCategories({
         {category_section ? (
           <>
             {" "}
-            <div className="mb-6 grid place-items-center text-center pt-20">
+            <div className="mb-6 grid place-items-center text-center pt-[50px]">
               <Typography
                 variant="h2"
                 color="blue-gray"
                 className=""
                 {...({} as React.ComponentProps<typeof Typography>)}
-              >
-                {/* Top Book Categories  */}
+              >               
                 {category_section?.cat_sec_title}
               </Typography>
               <Typography
@@ -42,7 +41,7 @@ export function TopBookCategories({
               >
     
                 <div
-                  className="my-3"
+                  className="mt-3"
                   dangerouslySetInnerHTML={{
                     __html: category_section?.cat_sec_description || "",
                   }}
