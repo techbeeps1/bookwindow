@@ -86,7 +86,7 @@ export function Navbar({ items_count, customerData, isCartEmpty }: any) {
           url: `${config.apiUrl}api/menus/header_menu`,
           responseType: "json",
         });
-        setHeaderMenu(response.data?.data || []);
+        setHeaderMenu(response.data?.header || response.data?.data || []);
       } catch (error) {
         console.log("error fetching header menu", error);
       }
@@ -132,10 +132,17 @@ export function Navbar({ items_count, customerData, isCartEmpty }: any) {
     const handleResize = () => {
       if (window.innerWidth >= 960) {
         setOpen(false);
+        document.body.style.paddingBottom = "0px";
+      } else {
+        document.body.style.paddingBottom = "76px";
       }
     };
+    handleResize();
     window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      document.body.style.paddingBottom = "0px";
+    };
   }, []);
 
   const logout = () => {
@@ -155,7 +162,8 @@ export function Navbar({ items_count, customerData, isCartEmpty }: any) {
   };
 
   return (
-    <nav className="sticky top-0 z-50 w-full bg-black border-b border-gray-900 py-4 px-4 md:px-8 transition-all duration-300">
+    <>
+      <nav className="sticky top-0 z-50 w-full bg-black border-b border-gray-900 py-4 px-4 md:px-8 transition-all duration-300">
       <div className="max-w-[1400px] mx-auto flex flex-col">
         {/* ================= DESKTOP VIEW ================= */}
         <div className="hidden lg:flex items-stretch w-full gap-10">
@@ -368,9 +376,17 @@ export function Navbar({ items_count, customerData, isCartEmpty }: any) {
         </div>
 
         {/* ================= MOBILE VIEW ================= */}
-        <div className="lg:hidden w-full flex flex-col">
-          {/* Header Row */}
+        <div className="lg:hidden w-full flex flex-col">          {/* Header Row */}
           <div className="flex items-center justify-between w-full text-white">
+            <Link href="/">
+              <Image
+                src={logo}
+                alt="Bookwindow Logo"
+                className="h-[42px] w-auto object-contain"
+                priority
+              />
+            </Link>
+
             <button
               onClick={handleOpen}
               className="text-white hover:bg-[#1a1a1a] p-2 rounded-lg focus:outline-none"
@@ -381,152 +397,6 @@ export function Navbar({ items_count, customerData, isCartEmpty }: any) {
                 <Bars3Icon strokeWidth={2.5} className="h-5 w-5 text-white" />
               )}
             </button>
-
-            <Link href="/">
-              <Image
-                src={logo}
-                alt="Bookwindow Logo"
-                className="h-[42px] w-auto object-contain"
-                priority
-              />
-            </Link>
-
-            <div className="flex items-center gap-4">
-              {/* User Account / Profile */}
-              {access_token && customer ? (
-                <Link href="/my-account" className="text-white hover:text-white/80 transition-colors">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth="1.5"
-                    stroke="currentColor"
-                    className="w-5 h-5"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"
-                    />
-                  </svg>
-                </Link>
-              ) : (
-                <Link href="/sign-in" className="text-white hover:text-white/80 transition-colors">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth="1.5"
-                    stroke="currentColor"
-                    className="w-5 h-5"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"
-                    />
-                  </svg>
-                </Link>
-              )}
-
-              {/* Shopping Bag / Cart */}
-              <Link href="/checkout" className="relative text-white hover:text-white/80 transition-colors">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth="1.5"
-                  stroke="currentColor"
-                  className="w-5 h-5"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"
-                  />
-                </svg>
-                <span className="absolute -top-1.5 -right-1.5 bg-white text-black text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center border border-black shadow-sm">
-                  {items_count || isCartEmpty ? items_count : itemsCount || 0}
-                </span>
-              </Link>
-            </div>
-          </div>          {/* Search Row */}
-          <div className="w-full mt-3 relative">
-            {/* Search Icon */}
-            <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth="1.8"
-                stroke="#ffffffff"
-                className="w-4 h-4"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
-                />
-              </svg>
-            </div>
-
-            <input
-              type="text"
-              placeholder="What are you looking for?"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full text-white bg-transparent placeholder-white border border-white rounded-full py-2.5 pl-11 pr-11 transition-all focus:outline-none"
-            />
-
-            {/* Mic Icon */}
-            <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth="1.8"
-                stroke="#ffffffff"
-                className="w-4 h-4"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M12 18.75a6 6 0 0 0 6-6v-1.5m-6 7.5a6 6 0 0 1-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 0 1-3-3V4.5a3 3 0 1 1 6 0v8.25a3 3 0 0 1-3 3Z"
-                />
-              </svg>
-            </div>
-
-            {/* Dropdown autocomplete for mobile */}
-            {searchTerm && filteredProducts.length > 0 && (
-              <div className="absolute top-full left-0 w-full z-50 bg-white border border-gray-200 rounded-2xl shadow-2xl max-h-72 overflow-y-auto mt-3 p-1.5">
-                {filteredProducts.map((product: any) => (
-                  <Link
-                    key={product?.id}
-                    href={`/product-detail/${product?.slug}`}
-                    onClick={() => setSearchTerm("")}
-                    className="flex gap-3 items-center px-3 py-2.5 hover:bg-gray-50 rounded-xl transition-colors border-b border-gray-100 last:border-b-0"
-                  >
-                    <div className="relative w-8 h-11 bg-gray-50 rounded-lg overflow-hidden flex-shrink-0 border border-gray-100">
-                      <Image
-                        src={`${config.apiUrl}storage/app/public/${product?.image}`}
-                        alt={product?.name || "Product"}
-                        className="object-cover"
-                        fill
-                        sizes="32px"
-                      />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h4 className="font-semibold text-xs text-gray-800 truncate">
-                        {product?.name}
-                      </h4>
-                      <div className="text-xs font-bold text-black mt-0.5">
-                        ₹{product?.price}
-                      </div>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            )}
           </div>
 
           {/* Mobile Collapse Menu */}
@@ -595,6 +465,138 @@ export function Navbar({ items_count, customerData, isCartEmpty }: any) {
         </div>
       </div>
     </nav>
+
+    {/* ================= MOBILE BOTTOM NAVIGATION BAR ================= */}
+    <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-[#0c0c0e]/95 backdrop-blur-md border-t border-white/10 px-4 py-3 flex items-center justify-between gap-3 shadow-[0_-8px_30px_rgb(0,0,0,0.5)]">
+      {/* Left: User Account / Profile */}
+      <div className="flex-shrink-0">
+        {access_token && customer ? (
+          <Link href="/my-account" className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-tr from-amber-500 to-rose-500 text-white border border-white/20 shadow-md transform active:scale-95 transition-all">
+            <span className="text-sm font-bold uppercase">
+              {customer?.first_name ? customer.first_name[0] : "U"}
+            </span>
+          </Link>
+        ) : (
+          <Link href="/sign-in" className="flex items-center justify-center w-10 h-10 rounded-full bg-neutral-900 text-white border border-white/10 shadow-md hover:bg-neutral-800 transform active:scale-95 transition-all">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth="1.5"
+              stroke="currentColor"
+              className="w-5 h-5 text-white/90"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"
+              />
+            </svg>
+          </Link>
+        )}
+      </div>
+
+      {/* Center: Search input */}
+      <div className="flex-grow relative">
+        <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth="1.8"
+            stroke="rgba(255,255,255,0.6)"
+            className="w-4 h-4"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
+            />
+          </svg>
+        </div>
+
+        <input
+          type="text"
+          placeholder="Search books..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          style={{ backgroundColor: '#18181b', color: '#ffffff' }}
+          className="w-full text-xs !text-white !bg-zinc-900 placeholder-white/50 border border-white/10 rounded-full py-2.5 pl-9 pr-9 transition-all focus:outline-none focus:border-white/30"
+        />
+
+        {searchTerm && (
+          <button
+            onClick={() => setSearchTerm("")}
+            className="absolute inset-y-0 right-3 flex items-center text-white/50 hover:text-white"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+              className="w-4.5 h-4.5"
+            >
+              <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z" />
+            </svg>
+          </button>
+        )}
+
+        {/* Autocomplete list - rendered above the bottom bar */}
+        {searchTerm && filteredProducts.length > 0 && (
+          <div className="absolute bottom-full mb-3 left-0 w-full z-50 bg-white border border-gray-200 rounded-2xl shadow-2xl max-h-72 overflow-y-auto p-1.5">
+            {filteredProducts.map((product: any) => (
+              <Link
+                key={product?.id}
+                href={`/product-detail/${product?.slug}`}
+                onClick={() => setSearchTerm("")}
+                className="flex gap-3 items-center px-3 py-2.5 hover:bg-gray-50 rounded-xl transition-colors border-b border-gray-100 last:border-b-0"
+              >
+                <div className="relative w-8 h-11 bg-gray-50 rounded-lg overflow-hidden flex-shrink-0 border border-gray-100">
+                  <Image
+                    src={`${config.apiUrl}storage/app/public/${product?.image}`}
+                    alt={product?.name || "Product"}
+                    className="object-cover"
+                    fill
+                    sizes="32px"
+                  />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h4 className="font-semibold text-xs text-gray-800 truncate text-left">
+                    {product?.name}
+                  </h4>
+                  <div className="text-xs font-bold text-black mt-0.5 text-left">
+                    ₹{product?.price}
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Right: Cart */}
+      <div className="flex-shrink-0">
+        <Link href="/checkout" className="relative flex items-center justify-center w-10 h-10 rounded-full bg-neutral-900 text-white border border-white/10 shadow-md hover:bg-neutral-800 transform active:scale-95 transition-all">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth="1.5"
+            stroke="currentColor"
+            className="w-5 h-5 text-white/90"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"
+            />
+          </svg>
+          <span className="absolute -top-1 -right-1 bg-white text-black text-[9px] font-extrabold w-4 h-4 rounded-full flex items-center justify-center border border-black shadow-sm">
+            {items_count || isCartEmpty ? items_count : itemsCount || 0}
+          </span>
+        </Link>
+      </div>
+    </div>
+    </>
   );
 }
 

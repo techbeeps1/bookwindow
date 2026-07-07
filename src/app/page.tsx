@@ -15,6 +15,7 @@ import config from "./config";
 import { BestSubjects } from "@/components/BestSubjects";
 import PublicationsCategory from "@/components/PublicationsCategory";
 import HobbyCategory from "@/components/HobbyCategory";
+import { ProductList } from "@/components/ProductList";
 
 export default function Campaign() {
   const [itemsCount, setItemsCount] = useState<number>(0);
@@ -127,7 +128,7 @@ export default function Campaign() {
           alt="Rare & Reloved Banner"
           className="w-full xl:h-[700px] lg:h-[580px] object-cover"
         />
-      </motion.div>
+      </motion.div>      
       <Footer />
     </>
   );
