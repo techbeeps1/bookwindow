@@ -167,7 +167,7 @@ export function BookCard({
               viewBox="0 0 24 24"
               strokeWidth="1.5"
               stroke="currentColor"
-              className="size-6 hover:border hover:border-red-600 cursor-pointer"
+              className="size-6 hover:border hover:border-black cursor-pointer"
             >
               <path
                 strokeLinecap="round"

@@ -103,7 +103,6 @@ export default function ProductDetail({ params }:{
 
   return (
     <>
-
             <div className="container mx-auto px-4 py-8 md:flex md:col-12">
         {loading ? (
           <FadeLoaderOverlay />
@@ -277,7 +276,7 @@ export default function ProductDetail({ params }:{
                   ></CartPopup>
                 )}
 
-                {/* <button className="bg-red-600 flex gap-2 items-center text-white px-6 py-2 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
+                <button className="bg-black flex gap-2 items-center text-white px-6 py-2 rounded-md hover:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
@@ -293,7 +292,7 @@ export default function ProductDetail({ params }:{
                     />
                   </svg>
                   By Now
-                </button> */}
+                </button> 
               </div>
 
               <div>
