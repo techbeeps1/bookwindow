@@ -7,6 +7,7 @@ import ReduxProvider from "@/lib/provider";
 import AppInitializer from "@/components/AppInitializer";
 import { Footer, Navbar } from "@/components";
 import config from "@/app/config";
+import CartDrawer from "@/components/cart/CartDrawer";
 
 async function getMenu() {
   const response = await fetch(`${config.apiUrl}api/menus/header_menu`, {
@@ -45,7 +46,7 @@ export default async function RootLayout({
           <Navbar menuData={menuData.header} />
 
           {children}
-
+  <CartDrawer/>
            <FixedPlugin />
           <Footer menuData={menuData.footer} />
         </ReduxProvider>
