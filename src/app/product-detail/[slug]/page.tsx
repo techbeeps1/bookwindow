@@ -1,8 +1,7 @@
 "use client";
-
+import { useSession } from "@/hooks/useSession";
 import { useState, useRef, useEffect } from "react";
-// components
-import { Navbar, Footer } from "@/components";
+
 import OtherBookOffers from "@/components/other-book-offers";
 import { CartPopup } from "@/components/cart-popup";
 import axios from "axios";
@@ -10,30 +9,37 @@ import config from "@/app/config";
 import Image from "next/image";
 import { use } from "react";
 import FadeLoaderOverlay from "@/components/loader";
+import { useCart } from "@/hooks/useCart";
+import { useAddToCartMutation } from "@/lib/api/cartApi";
 
 export default function ProductDetail({ params }:{
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = use(params);
+  const sessionId = useSession();
   const [mainImage, setMainImage] = useState("");
   const [showPopup, setShowPopup] = useState(false);
   const popupRef = useRef(null as any);
-  const [session, setSession] = useState("");
-  const [cartData, setCartData] = useState({} as any);
-  const [items_count, setItemsCount] = useState(0);
+
   const [loading, setLoading] = useState(true);
 
   const handleImageChange = (src: string) => {
     setMainImage(src);
   };
 
-  const [productData, setProductData] = useState([] as any);
-  const [similarProducts, setSimilarProducts] = useState([] as any);
-  // Callback function to receive data from child
-  const handleItemsCountUpdate = (count: number) => {
-    setItemsCount(count);
+   const handleItemsCountUpdate = (count: number) => {
+   // setItemsCount(count);
   };
 
+  const [productData, setProductData] = useState([] as any);
+  const [similarProducts, setSimilarProducts] = useState([] as any);
+
+
+   const [addToCart, { isLoading }] = useAddToCartMutation();
+
+  const { refetch } = useCart();
+  // Callback function to receive data from child
+  
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -60,7 +66,7 @@ export default function ProductDetail({ params }:{
   }, [slug]);
 
   useEffect(() => {
-    setMainImage(`${config.apiUrl}storage/${productData?.image}`);
+    setMainImage(`${config.apiUrl}storage/app/public/${productData?.image}`);
   }, [productData, similarProducts]);
 
   const [quantity, setQuantity] = useState(1);
@@ -80,22 +86,16 @@ export default function ProductDetail({ params }:{
 
   const handleAddToCart = async (productId: string, quantity: number) => {
     try {
-      const response = await fetch(`${config.apiUrl}api/cart/add`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({
-          product_id: productId,
-          quantity,
-          session_id: session, // pass it manually if backend accepts it
-        }),
-      });
-      const result = await response.json();
-      setCartData(result);
-      setItemsCount(result?.total_products_count);
-      // console.log("Cart updated:", result);
+      
+
+
+      await addToCart({
+        session_id: sessionId,
+        product_id: productId,
+        quantity: quantity,
+      }).unwrap();
+
+
     } catch (error) {
       console.error("Error adding to cart:", error);
     }
@@ -103,7 +103,7 @@ export default function ProductDetail({ params }:{
 
   return (
     <>
-      <Navbar items_count={items_count} />
+
             <div className="container mx-auto px-4 py-8 md:flex md:col-12">
         {loading ? (
           <FadeLoaderOverlay />
@@ -154,7 +154,7 @@ export default function ProductDetail({ params }:{
               {/* gallary image */}
               <div className="flex gap-4 py-4 justify-center overflow-x-auto">
                 {productData.gallery?.map((img: string, index: number) => {
-                  const imgSrc = `${config.apiUrl}storage/${img}`;
+                  const imgSrc = `${config.apiUrl}storage/app/public/${img}`;
                   return (
                     <Image
                       key={index}
@@ -246,7 +246,6 @@ export default function ProductDetail({ params }:{
                 <button
                   onClick={() => {
                     setShowPopup(true);
-                    // postToSession();
                     handleAddToCart(productData?.id, quantity);
                   }}
                   className="bg-indigo-600 flex gap-2 items-center text-white px-6 py-2 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
@@ -278,7 +277,7 @@ export default function ProductDetail({ params }:{
                   ></CartPopup>
                 )}
 
-                <button className="bg-red-600 flex gap-2 items-center text-white px-6 py-2 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
+                {/* <button className="bg-red-600 flex gap-2 items-center text-white px-6 py-2 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
@@ -294,7 +293,7 @@ export default function ProductDetail({ params }:{
                     />
                   </svg>
                   By Now
-                </button>
+                </button> */}
               </div>
 
               <div>
@@ -326,7 +325,7 @@ export default function ProductDetail({ params }:{
         similarProducts={similarProducts}
         onItemsCountUpdate={handleItemsCountUpdate}
       />
-      <Footer />
+
     </>
   );
 }

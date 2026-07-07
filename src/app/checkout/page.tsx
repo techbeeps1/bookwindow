@@ -3,17 +3,20 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 // components
-import { Navbar, Footer } from "@/components";
+
 import { useRouter } from "next/navigation";
 import config from "@/app/config";
 import axios from "axios";
-import { Button, Input, Typography } from "@material-tailwind/react";
+
 import Checkout from "@/components/Checkout";
 import { ThankYouDialog } from "@/components/thank-you-popup";
 import { NotificationDialog } from "@/components/notification";
 import { CheckIcon } from "@heroicons/react/24/solid";
 import Link from "next/link";
 import FadeLoaderOverlay from "@/components/loader";
+import { useCart } from "@/hooks/useCart";
+import { useRemoveCartMutation, useUpdateCartMutation } from "@/lib/api/cartApi";
+import { useSession } from "@/hooks/useSession";
 
 interface CartItem {
   product_id: number;
@@ -31,10 +34,10 @@ const steps = ["cart", "shipping", "order"];
 
 export default function ShoppingCart() {
   const router = useRouter();
-
+   const sessionId = useSession();
   const initialStep =  "cart";
   const [cartFetched, setCartFetched] = useState(false);
-  const [session, setSession] = useState("");
+
   const [cartItems, setCartItems] = useState([] as CartItem[] | any[]);
   const [items_count, setItemsCount] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -62,8 +65,11 @@ export default function ShoppingCart() {
   const [couponData, setCouponData] = useState({} as any);
   const [mainCategories, setMainCategories] = useState([] as any);
   const [isCartEmpty, setIsCartEmpty] = useState(false);
-  // console.log("viewcart customer",customerData);
 
+    const { data } = useCart();
+   const [updateCart, { isLoading: updating }] = useUpdateCartMutation();
+   const [removeCart, { isLoading: removing }] = useRemoveCartMutation();
+ 
   useEffect(() => {
     window.scrollTo(0, 0);
     setActiveTab("cart");
@@ -105,7 +111,6 @@ export default function ShoppingCart() {
     const currentIndex = steps.indexOf(activeTab);
     const nextStep = steps[currentIndex + 1];
     if (nextStep) {
-      // nextStep === "order" ? setShowCoupon(false) : setShowCoupon(true);
       setCompletedSteps((prev) =>
         prev.includes(activeTab) ? prev : [...prev, activeTab]
       );
@@ -121,70 +126,40 @@ export default function ShoppingCart() {
   };
   
 
-  const checkSession = async () => {
-    const res = await fetch("/api/debug", {
-      method: "GET",
-      credentials: "include",
-    });
-    const data = await res.json();
-    setSession(data?.session_id);
-    // console.log("Session info:", data);
-  };
+
 
   useEffect(() => {
     const viewCart = async () => {
       setLoading(true);
- 
       try {
-        const response = await axios({
-          method: "get",
-          url: `${config.apiUrl}api/cart/viewcart?session_id=${session}`,
-          responseType: "json",
-        });
-        const data = response?.data;
         setCartItems(data?.items || []);
         setItemsCount(data?.items_count || 0);
-        setCartFetched(true); // ✅ mark cart as ready
+        setCartFetched(true); 
       } catch (error) {
         console.error("Error loading cart:", error);
         setCartItems([]);
         setItemsCount(0);
-        setCartFetched(true); // ✅ mark cart as ready even on failure
+        setCartFetched(true); 
       } finally {
         setLoading(false);
       }
     };
-    if (session) {
+    if (sessionId) {
       viewCart();
     }
-  }, [session]);
+  }, [sessionId,data]);
 
-  useEffect(() => {
-    checkSession();
-  }, []);
 
-  useEffect(() => {}, [session, cartItems, items_count, router]);
-
+ 
+ 
   const updateCartQuantity = async (productId: number, quantity: number) => {
     try {
-      const response = await fetch(`${config.apiUrl}api/cart/cartupdate`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({
-          product_id: productId,
-          session_id: session,
-          quantity_change: quantity,
-        }),
-      });
-      const result = await response.json();
-      // setCartData(result);
-      // console.log("updated:", result);
-      if (result?.message == "Quantity cannot be less than 1") {
-        removeItem(productId);
-      }
+         updateCart({
+      product_id: productId,
+      session_id: sessionId,
+      quantity_change: quantity,
+    });
+
     } catch (error) {
       console.error("Error adding to cart:", error);
     }
@@ -192,23 +167,10 @@ export default function ShoppingCart() {
 
   const removeCartItem = async (productId: number) => {
     try {
-      const response = await fetch(`${config.apiUrl}api/cart/remove`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({
-          product_id: productId,
-          session_id: session,
-        }),
-      });
-      const result = await response.json();
-      if (result?.success) {
-        // setItemsCount(items_count - 1);
-      }
-      // setCartData(result);
-      // console.log("remove:", result);
+         removeCart({
+      product_id: productId,
+      session_id: sessionId,
+    });
     } catch (error) {
       console.error("Error adding to cart:", error);
     }
@@ -216,25 +178,25 @@ export default function ShoppingCart() {
 
   const updateQuantity = (id: number, action: "increment" | "decrement") => {
     updateCartQuantity(id, action === "increment" ? +1 : -1);
-    if (couponError) {
-      setCouponError("");
-    }
-    action === "increment"
-      ? setItemsCount(items_count + 1)
-      : setItemsCount(items_count - 1);
-    setCartItems((prev) =>
-      prev.map((item) =>
-        item.product_id === id
-          ? {
-              ...item,
-              quantity:
-                action === "increment"
-                  ? item.quantity + 1
-                  : Math.max(1, item.quantity - 1),
-            }
-          : item
-      )
-    );
+    // if (couponError) {
+    //   setCouponError("");
+    // }
+    // action === "increment"
+    //   ? setItemsCount(items_count + 1)
+    //   : setItemsCount(items_count - 1);
+    // setCartItems((prev) =>
+    //   prev.map((item) =>
+    //     item.product_id === id
+    //       ? {
+    //           ...item,
+    //           quantity:
+    //             action === "increment"
+    //               ? item.quantity + 1
+    //               : Math.max(1, item.quantity - 1),
+    //         }
+    //       : item
+    //   )
+    // );
   };
 
   // const removeItem = (id: number) => {
@@ -406,7 +368,7 @@ export default function ShoppingCart() {
         credentials: "include",
         body: JSON.stringify({
           ...shippingData,
-          session_id: session,
+          session_id:   sessionId,
           shipping_method: deliveryType,
           payment_method: payment_method,
           coupon_code:
@@ -538,11 +500,7 @@ export default function ShoppingCart() {
 
   return (
     <>
-      <Navbar
-        items_count={items_count}
-        customerData={customerData || {}}
-        isCartEmpty={isCartEmpty}
-      />
+
             <section className="bg-white py-8 md:py-16 mb-4 min-h-screen">
         {!cartFetched ? (
           <FadeLoaderOverlay />
@@ -647,7 +605,7 @@ export default function ShoppingCart() {
                                 {" "}
                                 <Image
                                   className="h-40 w-40 object-contain rounded-lg"
-                                  src={`${config.apiUrl}storage/${item.image}`}
+                                  src={`${config.apiUrl}storage/app/public/${item.image}`}
                                   alt={item.product_name}
                                   width={150}
                                   height={200}
@@ -1036,16 +994,14 @@ export default function ShoppingCart() {
               <Checkout
                 shippingData={shippingData}
                 onBack={() => {
-                  // Just navigating back — formValues should already be in state
                   setActiveTab("cart");
                 }}
                 onNext={(data: any) => {
-                  setShippingData(data); // store validated form data
-                  // console.log("data on next", data)
+                  setShippingData(data); 
                   setActiveTab("order");
                 }}
                 onCustomerData={(customerData: any) => {
-                  setCustomerData(customerData); // Capture data from child
+                  setCustomerData(customerData); 
                 }}
                 formData={shippingData}
               />
@@ -1060,12 +1016,8 @@ export default function ShoppingCart() {
                     <div className="mx-auto w-full flex-none lg:max-w-2xl xl:max-w-2xl p-4">
                       <div className="space-y-6">
                         {cartItems?.map((item) => {
-                          const mainCategory = mainCategories?.find(
-                            (main: any) => main.id === item?.category_id
-                          );
-                          const subcategory = mainCategory.child?.find(
-                            (sub: any) => sub.id === item?.sub_category_id
-                          );
+                        
+                       
                           const couponCategories = couponData.category_id
                             ? JSON.parse(couponData.category_id)
                             : null;
@@ -1080,7 +1032,7 @@ export default function ShoppingCart() {
                                   {" "}
                                   <Image
                                     className="h-40 w-40 object-contain rounded-lg"
-                                    src={`${config.apiUrl}storage/${item.image}`}
+                                    src={`${config.apiUrl}storage/app/public/${item.image}`}
                                     alt={item.product_name}
                                     width={150}
                                     height={200}
@@ -1561,7 +1513,7 @@ export default function ShoppingCart() {
           </div>
         )}
       </section>
-      <Footer />
+
     </>
   );
 }

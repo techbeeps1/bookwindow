@@ -8,7 +8,7 @@ import {
   Textarea,
   Alert,
 } from "@material-tailwind/react";
-import { Navbar, Footer } from "@/components";
+
 import { FormEvent, useState } from "react";
 import Image from "next/image";
 import React from "react";
@@ -127,7 +127,7 @@ export default function RequestProduct() {
 
   return (
     <>
-      <Navbar />
+
             <Card
         color="transparent"
         shadow={false}
@@ -292,7 +292,7 @@ export default function RequestProduct() {
           </Alert>
         )}
       </Card>
-      <Footer />
+
     </>
   );
 }

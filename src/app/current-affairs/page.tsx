@@ -141,7 +141,7 @@ export default function CurrentAffairsPage() {
 
   return (
     <>
-      <Navbar />
+
             <section className="px-8 py-10 lg:py-28">
         <div className="container mx-auto">
           <Typography
@@ -289,7 +289,7 @@ export default function CurrentAffairsPage() {
           </Card>
         </div>
       </section>
-      <Footer />
+
     </>
   );
 }

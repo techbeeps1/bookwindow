@@ -1,7 +1,7 @@
 "use client";
 
 import config from "@/app/config";
-import { Navbar, Footer } from "@/components";
+
 import { Typography, Card, ListItem, List } from "@material-tailwind/react";
 import axios from "axios";
 import Link from "next/link";
@@ -59,7 +59,7 @@ export default function Detail({ params }: any) {
 
   return (
     <>
-      <Navbar />
+
             <section className="container mx-auto mb-10 mt-10 md:flex min-h-screen">
         {currentAffairsData && currentAffairsList?.length ? (
           <>
@@ -138,7 +138,7 @@ export default function Detail({ params }: any) {
           </div>
         )}
       </section>
-      <Footer />
+
     </>
   );
 }

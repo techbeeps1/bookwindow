@@ -1,7 +1,7 @@
 "use client";
 
 import config from "@/app/config";
-import { Footer, Navbar } from "@/components";
+
 import { Alert } from "@material-tailwind/react";
 import React, { FormEvent } from "react";
 import { useRouter } from "next/navigation";
@@ -84,7 +84,7 @@ const ResetPassword: React.FC = () => {
 
   return (
     <>
-      <Navbar />
+
             <main
         id="content"
         role="main"
@@ -165,7 +165,7 @@ const ResetPassword: React.FC = () => {
           </Alert>
         )}
       </main>
-      <Footer />
+
     </>
   );
 };

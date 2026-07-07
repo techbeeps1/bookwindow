@@ -1,4 +1,3 @@
-// lib/session.ts
 import { SessionOptions } from "iron-session";
 
 export const sessionOptions: SessionOptions = {
@@ -8,12 +7,11 @@ export const sessionOptions: SessionOptions = {
     secure: true,
   },
 };
-
 export type SessionData = {
-  count?: number;
   session_id?: string;
 };
 
 declare module "iron-session" {
   interface IronSessionData extends SessionData {}
 }
+ 

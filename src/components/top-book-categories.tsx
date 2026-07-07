@@ -3,7 +3,7 @@
 import React from "react";
 import CategoryCard from "@/components/category-card";
 import { motion } from "framer-motion";
-import { Card, CardBody, Typography, Button } from "@material-tailwind/react";
+import {  Typography } from "@material-tailwind/react";
 
 
 
@@ -12,7 +12,7 @@ export function TopBookCategories({
   divRef,
   category_section,
 }: any) {
-  const sellingContent = category_section?.category_sections[0];
+
   return (
     <section
       ref={divRef}

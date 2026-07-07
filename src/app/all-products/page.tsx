@@ -1,6 +1,6 @@
 "use client";
 
-import { Navbar, Footer } from "@/components";
+
 import BookCard from "@/components/book-card";
 import { useEffect, useState } from "react";
 import axios from "axios";
@@ -9,14 +9,11 @@ import CategoryPublicationSidebar from "@/components/category-publication-sideba
 import AllProductSidebar from "@/components/all-products-sidebar";
 
 export default function Category() {
-  const [itemsCount, setItemsCount] = useState<number>(0);
+
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
 
-  // Callback function to receive data from child
-  const handleItemsCountUpdate = (count: number) => {
-    setItemsCount(count);
-  };
+
   const [products, setProducts] = useState([] as any);
   const [filteredProducts, setFilteredProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -109,7 +106,7 @@ export default function Category() {
 
   return (
     <>
-      <Navbar items_count={itemsCount} />
+
             <section className="container mx-auto mb-10 mt-10 md:flex shadow-lg border border-1">
         <AllProductSidebar
           onCategorySelect={handleCategorySelect}
@@ -173,7 +170,7 @@ export default function Category() {
                   slug={product.slug}
                   id={product.id}
                   quantity={product.quantity}
-                  onItemsCountUpdate={handleItemsCountUpdate}
+                  onItemsCountUpdate={()=>{}}
                 />
               ))}
             </div>
@@ -213,7 +210,7 @@ export default function Category() {
           </button>
         </div>
       )}
-      <Footer />
+
     </>
   );
 }

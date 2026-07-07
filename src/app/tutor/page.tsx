@@ -9,7 +9,7 @@ import {
   Option,
   Alert,
 } from "@material-tailwind/react";
-import { Navbar, Footer } from "@/components";
+
 import React, { FormEvent } from "react";
 import config from "../config";
 
@@ -109,7 +109,7 @@ export default function Tutor() {
 
   return (
     <>
-      <Navbar />
+
             <Card
         color="transparent"
         shadow={false}
@@ -261,7 +261,7 @@ export default function Tutor() {
           </Alert>
         )}
       </Card>
-      <Footer />
+
     </>
   );
 }

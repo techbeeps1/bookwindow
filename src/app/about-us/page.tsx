@@ -1,6 +1,6 @@
 "use client";
 
-import { Navbar, Footer } from "@/components";
+
 import React from "react";
 import Image from "next/image";
 import config from "../config";
@@ -33,7 +33,7 @@ export default function AboutUs() {
 
   return (
     <>
-      <Navbar />
+
       
       {/* Banner Section */}
       <section className="relative w-full h-[50vh] flex items-center justify-center bg-gray-900 overflow-hidden">
@@ -88,7 +88,7 @@ export default function AboutUs() {
         )}
       </section>
 
-      <Footer />
+  
     </>
   );
 }
