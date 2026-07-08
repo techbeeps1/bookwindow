@@ -170,7 +170,7 @@ export default function Category({ params }:  {
           </div>
         ) : (
           <div className="col-8">
-            <div className="grid grid-cols-1 gap-10 md:grid-cols-2 xl:grid-cols-3 p-8">
+            <div className="grid grid-cols-2 gap-[15px] md:grid-cols-3 xl:grid-cols-4 p-8">
               {currentItems.map((product: any) => {
                 const subcategory = childCategory?.find(
                   (sub: any) => sub.id === product.sub_category_id

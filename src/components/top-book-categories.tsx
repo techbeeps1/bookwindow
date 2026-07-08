@@ -37,6 +37,7 @@ export function TopBookCategories({
               <div className="w-20 h-[2px] bg-black my-4 rounded-full" />
               <Typography
                 variant="lead"
+                as="div"
                 className="!text-gray-500 lg:w-6/12"
                 {...({} as React.ComponentProps<typeof Typography>)}
               >

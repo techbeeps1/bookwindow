@@ -77,6 +77,21 @@ const dispatch = useAppDispatch();
     }
   };
 
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      if (window.innerWidth < 960 && searchTerm.trim() !== "") {
+        document.body.style.overflow = "hidden";
+      } else {
+        document.body.style.overflow = "";
+      }
+    }
+    return () => {
+      if (typeof window !== "undefined") {
+        document.body.style.overflow = "";
+      }
+    };
+  }, [searchTerm]);
+
   const toggleMobileSubmenu = (index: number) => {
     setOpenMobileSubmenus((prev) => ({
       ...prev,
@@ -393,6 +408,80 @@ const dispatch = useAppDispatch();
       <p className="text-white text-center">“Test your limits. Discover your strengths.”</p>
     </div>
 
+    {/* ================= MOBILE SEARCH PANEL ================= */}
+    {searchTerm.trim() !== "" && (
+      <div className="lg:hidden fixed inset-x-0 top-[74px] bottom-[64px] z-40 bg-white flex flex-col shadow-inner">
+        {/* Header of Search Panel */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-gray-50/50">
+          <span className="text-sm font-semibold text-gray-850">
+            Search Results for "{searchTerm}"
+          </span>
+          <button
+            onClick={() => setSearchTerm("")}
+            className="p-1.5 rounded-full hover:bg-gray-100 text-gray-500 hover:text-gray-800 transition-colors"
+            aria-label="Close search"
+          >
+            <XMarkIcon className="w-5 h-5" />
+          </button>
+        </div>
+        
+        {/* Results list */}
+        <div className="flex-1 overflow-y-auto px-4 py-4">
+          {filteredProducts.length > 0 ? (
+            <div className="flex flex-col gap-3">
+              {filteredProducts.map((product: any) => (
+                <Link
+                  key={product?.id}
+                  href={`/product-detail/${product?.slug}`}
+                  onClick={() => setSearchTerm("")}
+                  className="flex gap-4 items-center p-3 hover:bg-gray-50 rounded-2xl transition-all border border-gray-100/50 hover:border-gray-200"
+                >
+                  <div className="relative w-12 h-16 bg-gray-50 rounded-xl overflow-hidden flex-shrink-0 border border-gray-100 shadow-sm">
+                    <Image
+                      src={`${config.apiUrl}storage/app/public/${product?.image}`}
+                      alt={product?.name || "Product"}
+                      className="object-cover"
+                      fill
+                      sizes="48px"
+                    />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-semibold text-xs text-gray-800 text-left truncate">
+                      {product?.name}
+                    </h4>
+                    <div className="text-xs font-bold text-black mt-1 text-left">
+                      ₹{product?.price}
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center py-16 text-center">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth="1.5"
+                stroke="currentColor"
+                className="w-12 h-12 text-gray-300 mb-3"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
+                />
+              </svg>
+              <p className="text-sm font-semibold text-gray-850">No results found</p>
+              <p className="text-xs text-gray-500 mt-1 px-4">
+                We couldn't find any books matching "{searchTerm}". Please try another search term.
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
+    )}
+
     {/* ================= MOBILE BOTTOM NAVIGATION BAR ================= */}
      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-[#0c0c0e]/95 backdrop-blur-md border-t border-white/10 px-4 py-3 flex items-center justify-between gap-3 shadow-[0_-8px_30px_rgb(0,0,0,0.5)]">
 
@@ -467,36 +556,7 @@ const dispatch = useAppDispatch();
         )}
 
 
-        {searchTerm && filteredProducts.length > 0 && (
-          <div className="absolute bottom-full mb-3 left-0 w-full z-50 bg-white border border-gray-200 rounded-2xl shadow-2xl max-h-72 overflow-y-auto p-1.5">
-            {filteredProducts.map((product: any) => (
-              <Link
-                key={product?.id}
-                href={`/product-detail/${product?.slug}`}
-                onClick={() => setSearchTerm("")}
-                className="flex gap-3 items-center px-3 py-2.5 hover:bg-gray-50 rounded-xl transition-colors border-b border-gray-100 last:border-b-0"
-              >
-                <div className="relative w-8 h-11 bg-gray-50 rounded-lg overflow-hidden flex-shrink-0 border border-gray-100">
-                  <Image
-                    src={`${config.apiUrl}storage/app/public/${product?.image}`}
-                    alt={product?.name || "Product"}
-                    className="object-cover"
-                    fill
-                    sizes="32px"
-                  />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <h4 className="font-semibold text-xs text-gray-800 truncate text-left">
-                    {product?.name}
-                  </h4>
-                  <div className="text-xs font-bold text-black mt-0.5 text-left">
-                    ₹{product?.price}
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
-        )}
+
       </div>
 
 

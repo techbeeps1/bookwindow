@@ -2,17 +2,13 @@
 import Image from "next/image";
 import whatsapp from "../../public/image/whatsapp.png";
 import { Button } from "@material-tailwind/react";
+import Link from "next/link";
 
 export function FixedPlugin() {
   return (
-    <a href="https://wa.me/+919602368227" target="_blank">
-      <Button       
-        size="sm"
-        className="!fixed bottom-4 bg-transparent bg-none right-4 items-center rounded-full z-50"
-        {...({} as React.ComponentProps<typeof Button>)}
-      >
+    <Link href="https://wa.me/+919602368227" target="_blank" className="!fixed md:bottom-4 bottom-[70px] bg-transparent bg-none right-4 items-center rounded-full z-50">       
         <Image src={whatsapp} className="w-[50px] h-[50px]" alt="whatsapp icon"/>
-      </Button>
-    </a>
+      
+    </Link>
   );
 }
