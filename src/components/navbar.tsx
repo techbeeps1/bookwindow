@@ -86,7 +86,7 @@ const dispatch = useAppDispatch();
 
   return (
     <>
-      <nav className="sticky top-0 z-50 w-full bg-black border-b border-gray-900 py-4 px-4 md:px-8 transition-all duration-300">
+    <nav className="sticky top-0 z-50 w-full bg-black py-4 px-4 md:px-8 transition-all duration-300">
       <div className="max-w-[1400px] mx-auto flex flex-col">
         {/* ================= DESKTOP VIEW ================= */}
         <div className="hidden lg:flex items-stretch w-full gap-10">
@@ -258,7 +258,7 @@ const dispatch = useAppDispatch();
             </div>
 
             {/* Bottom Row: Categories Menu */}
-            <div className="border-t border-white/20 mt-3 pt-2 flex justify-center">
+            <div className="border-t border-white/20 mt-3 pt-3 flex justify-center">
               <div className="flex justify-center items-center text-[13px] text-white font-semibold tracking-wider space-x-8">              
                 {headerMenu?.map((item: any, index: number) => {
                   const hasChildren = item.children && item.children.length > 0;
@@ -389,6 +389,9 @@ const dispatch = useAppDispatch();
         </div>
       </div>
     </nav>
+    <div className="p-4 bg-black border-t border-white/20">
+      <p className="text-white text-center">“Test your limits. Discover your strengths.”</p>
+    </div>
 
     {/* ================= MOBILE BOTTOM NAVIGATION BAR ================= */}
      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-[#0c0c0e]/95 backdrop-blur-md border-t border-white/10 px-4 py-3 flex items-center justify-between gap-3 shadow-[0_-8px_30px_rgb(0,0,0,0.5)]">

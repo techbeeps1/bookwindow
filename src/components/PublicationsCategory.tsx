@@ -41,6 +41,11 @@ const DEFAULT_PUBLICATIONS: Publication[] = [
     image: "/image/book-5.jpg",
     link: "/category",
   },  
+  {
+    name: "Class notes",
+    image: "/image/class-notes.webp",
+    link: "/category",
+  },
 ];
 
 export function PublicationsCategory({
@@ -60,10 +65,11 @@ export function PublicationsCategory({
         >
           {title}
         </motion.h2>
+        <div className="w-20 h-[2px] bg-black my-4 rounded-full" />
       </div>
 
       {/* Grid Container (5 columns on desktop) */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
         {publications.map((pub, index) => (
           <motion.div
             key={index}
@@ -88,8 +94,8 @@ export function PublicationsCategory({
             <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/45 to-transparent transition-opacity duration-300 group-hover:from-black/90 group-hover:via-black/50 pointer-events-none" />
 
             {/* Text Content at the bottom */}
-            <div className="absolute bottom-0 inset-x-0 p-6 flex flex-col items-center justify-end text-center pointer-events-none">
-              <h3 className="text-white font-semibold text-base md:text-xl  font-sans">
+            <div className="absolute bottom-0 inset-x-0 p-4 flex flex-col items-center justify-end text-center pointer-events-none">
+              <h3 className="text-white font-semibold text-base md:text-lg  font-sans">
                 {pub.name}
               </h3>
             </div>

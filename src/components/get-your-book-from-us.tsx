@@ -40,6 +40,7 @@ export function GetYourBookFromUs(feature_sections:any) {
           {/* Get your book from us! */}
           {featureData?.feature_title}
         </Typography>
+        <div className="w-20 h-[2px] bg-black my-4 rounded-full mx-auto" />
         <Typography
           variant="lead"
           className="mx-auto w-full px-4 !text-gray-500 lg:w-5/12"

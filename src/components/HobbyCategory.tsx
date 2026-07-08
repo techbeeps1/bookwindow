@@ -35,19 +35,22 @@ export function HobbyCategory({
   items = DEFAULT_ITEMS,
 }: HobbyCategoryProps) {
   return (
-    <section className="container mx-auto px-8 py-[50px]">
+    <section className="py-[50px] mt-[50px] bg-[#F8F8F8]">
       {/* Header */}
-      <div className="mb-6 grid place-items-center text-center">
-        <motion.h2
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, ease: "easeOut" }}
-          viewport={{ once: true }}
-          className="block antialiased tracking-normal font-sans text-4xl font-semibold leading-[1.3] text-blue-gray-900"
-        >
-          {title}
-        </motion.h2>
-      </div>
+      <div className="container mx-auto px-8">
+        <div className="mb-6 grid place-items-center text-center">
+            <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+            viewport={{ once: true }}
+            className="block antialiased tracking-normal font-sans text-4xl font-semibold leading-[1.3] text-blue-gray-900"
+            >
+              {title}
+          </motion.h2>
+          <div className="w-20 h-[2px] bg-black my-4 rounded-full" />
+        </div>
+      
 
       {/* Grid Layout (2 columns centered) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
@@ -96,6 +99,7 @@ export function HobbyCategory({
             </Link>
           </motion.div>
         ))}
+      </div>
       </div>
     </section>
   );

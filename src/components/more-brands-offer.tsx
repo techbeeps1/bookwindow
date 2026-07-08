@@ -152,6 +152,7 @@ export function MoreBrandsOffer({
         >
           {title}
         </motion.h2>
+        <div className="w-20 h-[2px] bg-black my-4 rounded-full" />
       </div>
 
       {/* Slider Container */}

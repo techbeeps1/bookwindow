@@ -148,6 +148,7 @@ export default function ContactSection() {
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4 tracking-tight">
               You can ask us questions !
             </h2>
+            <div className="w-20 h-[2px] bg-black mb-6 rounded-full" />
             <p className="text-gray-500 text-sm md:text-base leading-relaxed mb-8">
               We're always happy to hear from you! Whether you have a question or need support, just drop us a message and our friendly team will get back to you soon.
             </p>

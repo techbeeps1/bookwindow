@@ -62,7 +62,7 @@ const DEFAULT_BRANDS: Brand[] = [
 ];
 
 export function BestSubjects({
-  title = "Best Subjects",  
+  title = "Mock Test & Practice Sets",  
   brands = DEFAULT_BRANDS,
 }: BrandsCategoryProps) {
   const sliderRef = useRef<HTMLDivElement>(null);
@@ -154,7 +154,7 @@ export function BestSubjects({
   };
 
   return (
-    <section className="w-full py-[50px] overflow-hidden">
+    <section className="w-full py-[50px] my-[50px] bg-[#F8F8F8] overflow-hidden">
       {/* Header (Aligned with container) */}
       <div className="container mx-auto px-8 mb-6 grid place-items-center text-center">
         <motion.h2
@@ -166,6 +166,7 @@ export function BestSubjects({
         >
           {title}
         </motion.h2> 
+        <div className="w-20 h-[2px] bg-black my-4 rounded-full" />
       </div>
 
       {/* Full-width Slider Container */}

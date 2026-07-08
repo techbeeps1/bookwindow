@@ -44,6 +44,7 @@ export function OtherBookOffers({ description, similarProducts, onItemsCountUpda
         >
           About this product
         </Typography>
+        <div className="w-20 h-[2px] bg-black my-4 rounded-full" />
        
           <Typography
             variant="lead"
@@ -78,14 +79,17 @@ export function OtherBookOffers({ description, similarProducts, onItemsCountUpda
         //   </>
         // )
         }
-        {similarProducts && similarProducts.length &&( <Typography
-          variant="h2"
-          color="blue-gray"
-          className="mt-8"
-          {...({} as React.ComponentProps<typeof Typography>)}
-        >
-          Similar Products of This Category
-        </Typography>)}
+        {similarProducts && similarProducts.length &&( <>
+          <Typography
+            variant="h2"
+            color="blue-gray"
+            className="mt-8"
+            {...({} as React.ComponentProps<typeof Typography>)}
+          >
+            Similar Products of This Category
+          </Typography>
+          <div className="w-20 h-[2px] bg-black my-4 rounded-full" />
+        </>)}
        
       </div>
       <div className="container mx-auto grid grid-cols-1 items-start gap-x-6 gap-y-20 md:grid-cols-2 xl:grid-cols-4">

@@ -152,6 +152,7 @@ export default function CurrentAffairsPage() {
           >
             Measure twice, pay once
           </Typography>
+          <div className="w-20 h-[2px] bg-black my-4 rounded-full" />
           <Typography
             variant="lead"
             className="max-w-3xl !text-gray-500 mb-10 lg:mb-20"

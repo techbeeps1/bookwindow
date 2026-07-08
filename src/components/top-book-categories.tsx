@@ -34,6 +34,7 @@ export function TopBookCategories({
               >               
                 {category_section?.cat_sec_title}
               </Typography>
+              <div className="w-20 h-[2px] bg-black my-4 rounded-full" />
               <Typography
                 variant="lead"
                 className="!text-gray-500 lg:w-6/12"
