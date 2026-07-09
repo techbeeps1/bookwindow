@@ -123,16 +123,16 @@ const dispatch = useAppDispatch();
             <div className="flex items-center justify-between gap-8 w-full">
               {/* Centered Search Bar */}
               <div className="flex-grow flex justify-center">
-                <div className="relative w-full max-w-3xl">
+                <div className="relative w-full max-w-3xl group">
                   {/* Search icon */}
                   <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
                       viewBox="0 0 24 24"
-                      strokeWidth="1.8"
-                      stroke="#ffffffff"
-                      className="w-4 h-4"
+                      strokeWidth="2"
+                      stroke="rgba(255,255,255,0.45)"
+                      className="w-4 h-4 transition-colors group-focus-within:stroke-purple-400"
                     >
                       <path
                         strokeLinecap="round"
@@ -147,20 +147,38 @@ const dispatch = useAppDispatch();
                     placeholder="What are you looking for?"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full text-white bg-transparent placeholder-white border border-white rounded-full py-2.5 pl-11 pr-11 transition-all focus:outline-none"
+                    className="w-full text-sm text-white bg-white/5 hover:bg-white/10 focus:bg-zinc-950/80 placeholder-white/35 border border-white/15 rounded-full py-2.5 pl-11 pr-12 transition-all duration-300 focus:outline-none focus:border-purple-500/80 focus:ring-4 focus:ring-purple-500/10 shadow-inner"
                   />
+
+                  {/* Clear Search Button */}
+                  {searchTerm && (
+                    <button
+                      onClick={() => setSearchTerm("")}
+                      className="absolute inset-y-0 right-4 flex items-center text-white/40 hover:text-white transition-colors"
+                      aria-label="Clear search"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                        className="w-4.5 h-4.5"
+                      >
+                        <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z" />
+                      </svg>
+                    </button>
+                  )}
 
                   {/* Dropdown popup */}
                   {searchTerm && filteredProducts.length > 0 && (
-                    <div className="absolute top-full left-0 w-full z-50 bg-white border border-gray-200 rounded-2xl shadow-2xl max-h-96 overflow-y-auto mt-3 p-1.5">
+                    <div className="absolute top-full left-0 w-full z-50 bg-white/95 backdrop-blur-md border border-neutral-200/80 rounded-2xl shadow-2xl max-h-96 overflow-y-auto mt-3 p-2 flex flex-col gap-1">
                       {filteredProducts.map((product: any) => (
                         <Link
                           key={product?.id}
                           href={`/product-detail/${product?.slug}`}
                           onClick={() => setSearchTerm("")}
-                          className="flex gap-4 items-center px-4 py-3 hover:bg-gray-50 rounded-xl transition-colors border-b border-gray-100 last:border-b-0"
+                          className="flex gap-4 items-center px-4 py-3 hover:bg-purple-50/60 rounded-xl transition-all duration-200 border-b border-neutral-100 last:border-b-0 text-left"
                         >
-                          <div className="relative w-10 h-14 bg-gray-50 rounded-lg overflow-hidden flex-shrink-0 border border-gray-100">
+                          <div className="relative w-10 h-14 bg-neutral-50 rounded-lg overflow-hidden flex-shrink-0 border border-neutral-200/50 shadow-sm">
                             <Image
                               src={`${config.apiUrl}storage/app/public/${product?.image}`}
                               alt={product?.name || "Product"}
@@ -169,11 +187,11 @@ const dispatch = useAppDispatch();
                               sizes="40px"
                             />
                           </div>
-                          <div className="flex-1 min-w-0">
-                            <h4 className="font-semibold text-xs text-gray-800 hover:text-black transition-colors truncate">
+                          <div className="flex-1 min-w-0 text-left">
+                            <h4 className="font-semibold text-xs text-neutral-850 hover:text-purple-650 transition-colors truncate">
                               {product?.name}
                             </h4>
-                            <div className="text-xs font-bold text-black mt-1">
+                            <div className="text-xs font-extrabold text-black mt-1">
                               ₹{product?.price}
                             </div>
                           </div>
@@ -434,9 +452,9 @@ const dispatch = useAppDispatch();
                   key={product?.id}
                   href={`/product-detail/${product?.slug}`}
                   onClick={() => setSearchTerm("")}
-                  className="flex gap-4 items-center p-3 hover:bg-gray-50 rounded-2xl transition-all border border-gray-100/50 hover:border-gray-200"
+                  className="flex gap-4 items-center p-3 hover:bg-purple-50/50 rounded-2xl transition-all border border-neutral-100 hover:border-purple-100/30"
                 >
-                  <div className="relative w-12 h-16 bg-gray-50 rounded-xl overflow-hidden flex-shrink-0 border border-gray-100 shadow-sm">
+                  <div className="relative w-12 h-16 bg-neutral-50 rounded-xl overflow-hidden flex-shrink-0 border border-neutral-200 shadow-sm">
                     <Image
                       src={`${config.apiUrl}storage/app/public/${product?.image}`}
                       alt={product?.name || "Product"}
@@ -446,10 +464,10 @@ const dispatch = useAppDispatch();
                     />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h4 className="font-semibold text-xs text-gray-800 text-left truncate">
+                    <h4 className="font-semibold text-xs text-neutral-850 hover:text-purple-650 transition-colors text-left truncate">
                       {product?.name}
                     </h4>
-                    <div className="text-xs font-bold text-black mt-1 text-left">
+                    <div className="text-xs font-extrabold text-neutral-900 mt-1 text-left">
                       ₹{product?.price}
                     </div>
                   </div>
@@ -512,15 +530,15 @@ const dispatch = useAppDispatch();
         )}
       </div>
 
-      <div className="flex-grow relative">
+      <div className="flex-grow relative group">
         <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
-            strokeWidth="1.8"
-            stroke="rgba(255,255,255,0.6)"
-            className="w-4 h-4"
+            strokeWidth="2"
+            stroke="rgba(255,255,255,0.4)"
+            className="w-4 h-4 transition-colors group-focus-within:stroke-purple-400"
           >
             <path
               strokeLinecap="round"
@@ -535,14 +553,13 @@ const dispatch = useAppDispatch();
           placeholder="Search books..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          style={{ backgroundColor: '#18181b', color: '#ffffff' }}
-          className="w-full text-xs !text-white !bg-zinc-900 placeholder-white/50 border border-white/10 rounded-full py-2.5 pl-9 pr-9 transition-all focus:outline-none focus:border-white/30"
+          className="w-full text-xs text-white bg-white/5 placeholder-white/35 border border-white/15 rounded-full py-2.5 pl-9 pr-9 transition-all duration-300 focus:outline-none focus:border-purple-500/80 focus:ring-2 focus:ring-purple-500/10 focus:bg-zinc-950"
         />
 
         {searchTerm && (
           <button
             onClick={() => setSearchTerm("")}
-            className="absolute inset-y-0 right-3 flex items-center text-white/50 hover:text-white"
+            className="absolute inset-y-0 right-3 flex items-center text-white/40 hover:text-white transition-colors"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -554,9 +571,6 @@ const dispatch = useAppDispatch();
             </svg>
           </button>
         )}
-
-
-
       </div>
 
 

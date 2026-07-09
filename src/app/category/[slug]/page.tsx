@@ -119,7 +119,7 @@ export default function Category({ params }:  {
   return (
     <>
 
-            <section className="container mx-auto mb-10 mt-10 md:flex shadow-lg border border-1">
+            <section className="container mx-auto mb-10 mt-10 md:flex border border-1">
         <CategoryPublicationSidebar
           onCategorySelect={handleCategorySelect}
           onPublicationSelect={handlePublicationSelect}

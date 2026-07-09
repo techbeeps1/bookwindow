@@ -52,9 +52,7 @@ export default function HomePage({homePageData}:any) {
           onButtonClick={handleButtonClick}
           bannerData={homePageData?.banner}
         />
-      </motion.div>
-
-      <ProductList/>     
+      </motion.div> 
       
       <motion.div
         initial={{ opacity: 0, y: 50 }}
