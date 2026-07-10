@@ -13,7 +13,6 @@ import { BestSubjects } from "@/components/BestSubjects";
 import PublicationsCategory from "@/components/PublicationsCategory";
 import HobbyCategory from "@/components/HobbyCategory";
 import config from "../app/config";
-import { ProductList } from "./ImageBook";
 
 export default function HomePage({homePageData}:any) {
 
