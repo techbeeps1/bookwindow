@@ -209,10 +209,9 @@ export default function ProductDetail({ params }:{
           <div className="flex flex-wrap">
             {/* Product Images */}
             <div className="w-full md:w-[45%] px-4 md:px-10 mb-8 flex flex-col gap-6">
-              {/* Main Product Image */}
-              <ImageBook src={mainImage} alt={"Product"} style="w-full"/>
+         
+              <ImageBook src={mainImage} alt={"Product"} size="large"/>
 
-              {/* Gallery thumbnails slider at the bottom */}
               {allImages.length > 0 && (
                 <div className="flex items-center justify-center w-full mt-2 gap-2">
                   {/* Left Scroll Button */}
