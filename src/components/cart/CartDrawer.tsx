@@ -2,7 +2,7 @@
 "use client";
 
 import Image from "next/image";
-import { FaMinus, FaPlus, FaRegWindowClose, FaShoppingBag } from "react-icons/fa";
+import { FaMinus, FaPlus, FaShoppingBag } from "react-icons/fa";
 import { CiTrash } from "react-icons/ci";
 import { useAppDispatch, useAppSelector } from "@/hooks/useStore";
 import { closeCartDrawer } from "@/lib/slices/uiSlice";
@@ -67,12 +67,48 @@ export default function CartDrawer() {
         }`}
       >
         <div className="flex items-center justify-between border-b px-5 py-4">
-          <h2 className="text-xl font-semibold">
-            Shopping Cart ({cart?.items_count ?? 0})
+          <h2 className="text-lg font-bold flex items-center gap-2">
+            <div className="relative flex items-center justify-center w-8 h-8">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={2}
+                stroke="currentColor"
+                className="w-5 h-5 text-black"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"
+                />
+              </svg>
+              <span className="absolute -top-1 -right-1 bg-black text-white text-[9px] font-bold w-4 h-4 flex items-center justify-center rounded-full">
+                {cart?.items_count ?? 0}
+              </span>
+            </div>
+            <span>Shopping Cart</span>
           </h2>
 
-          <button onClick={() => dispatch(closeCartDrawer())}>
-            <FaRegWindowClose size={24} />
+          <button
+            onClick={() => dispatch(closeCartDrawer())}
+            className="p-1 hover:bg-neutral-100 rounded-full transition-colors focus:outline-none"
+            aria-label="Close cart"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={2}
+              stroke="currentColor"
+              className="w-6 h-6 text-gray-500 hover:text-black transition-colors"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M6 18 18 6M6 6l12 12"
+              />
+            </svg>
           </button>
         </div>
 
@@ -104,39 +140,43 @@ export default function CartDrawer() {
                   />
 
                   <div className="flex-1">
-                    <h4 className="line-clamp-2 font-medium">
+                    <h4 className="line-clamp-2 font-medium text-sm text-neutral-800">
                       {item.product_name}
                     </h4>
 
-                    <p className="mt-2 font-bold text-red-600">
+                    <p className="mt-2 font-bold text-black text-sm">
                       ₹{item.product_price}
                     </p>
 
                     <div className="mt-3 flex items-center justify-between">
-                      <div className="flex items-center rounded border">
+                      <div className="flex items-center bg-[#f4f4f4] rounded-full p-1 border border-neutral-200">
                         <button
+                          type="button"
                           disabled={updating}
                           onClick={() => handleDecrease(item.product_id)}
-                          className="px-3 py-2 hover:bg-gray-100"
+                          className="w-8 h-8 flex items-center justify-center rounded-full text-gray-600 hover:bg-white hover:text-black hover:shadow-sm active:scale-95 transition-all duration-200 focus:outline-none disabled:opacity-50 shrink-0"
                         >
-                          <FaMinus size={12} />
+                          <FaMinus size={10} className="pointer-events-none" />
                         </button>
 
-                        <span className="px-4">{item.quantity}</span>
+                        <span className="w-10 text-center text-sm font-bold text-gray-900 select-none">
+                          {item.quantity}
+                        </span>
 
                         <button
+                          type="button"
                           disabled={updating}
                           onClick={() => handleIncrease(item.product_id)}
-                          className="px-3 py-2 hover:bg-gray-100"
+                          className="w-8 h-8 flex items-center justify-center rounded-full text-gray-600 hover:bg-white hover:text-black hover:shadow-sm active:scale-95 transition-all duration-200 focus:outline-none disabled:opacity-50 shrink-0"
                         >
-                          <FaPlus size={12} />
+                          <FaPlus size={10} className="pointer-events-none" />
                         </button>
                       </div>
 
                       <button
                         disabled={removing}
                         onClick={() => handleRemove(item.product_id)}
-                        className="text-red-600"
+                        className="text-neutral-400 hover:text-black transition-colors"
                       >
                         <CiTrash size={22} />
                       </button>

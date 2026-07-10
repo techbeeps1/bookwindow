@@ -50,22 +50,22 @@ export default function ProductDialog({ open, handleOpen, slug }: any) {
           style: {},
         } as any)}
       >
-        <DialogHeader
+        <div
           onClick={handleOpen}
-          className="cursor-pointer"
+          className="cursor-pointer flex justify-end items-center shrink-0 p-4 text-blue-gray-900 antialiased font-sans text-2xl font-semibold leading-snug cursor-pointer"
           {...({} as React.ComponentProps<typeof DialogHeader>)}
         >
           X
-        </DialogHeader>
+        </div>
         <DialogBody {...({} as React.ComponentProps<typeof DialogBody>)}>
           <div className="container px-4 pb-4 md:flex md:col-12 w-full h-[500px] overflow-auto overflow-y">
             <div className="flex flex-wrap">
               {/* Product Images */}
-              <div className="w-full md:w-1/2 px-4">
+              <div className="w-full md:w-1/2 px-4 bg-[#F8F8F8] rounded-[20px] flex items-center justify-center">
                 <Image
-                  src={`${config.apiUrl}storage/${productData?.image}`}
+                  src={`${config.apiUrl}storage/app/public/${productData?.image}`}
                   alt="Product"
-                  className="w-full h-80 rounded-lg shadow-md mb-4 scale-[1.1] object-contain"
+                  className=" h-[380px] rounded-lg object-contain"
                   width={768}
                   height={768}
                 />
@@ -73,21 +73,21 @@ export default function ProductDialog({ open, handleOpen, slug }: any) {
 
               {/* Product Details */}
               <div className="w-full md:w-1/2 px-4">
-                <h2 className="text-3xl font-bold mb-2">{productData?.name}</h2>
+                <h2 className="text-lg font-medium mb-2 text-black">{productData?.name}</h2>
                 <p className="text-gray-600">Model: {productData?.model}</p>
                 {/* <p className="text-gray-600">Author: {productData?.author}</p> */}
                 <p className="text-gray-600 mb-4">
                   Publication: {productData?.production?.name}
                 </p>
                 <div className="mb-4">
-                  <span className="text-2xl font-bold mr-2">
+                  <span className="text-2xl font-bold text-black mr-2">
                     {" "}
                     ₹{productData.price}
                   </span>
                 </div>
 
-                <div className="flex items-center mb-4">
-                  {/* Star Rating */}
+                {/* <div className="flex items-center mb-4">
+                
                   {[...Array(5)].map((_, index) => (
                     <svg
                       key={index}
@@ -104,12 +104,12 @@ export default function ProductDialog({ open, handleOpen, slug }: any) {
                     </svg>
                   ))}
                   <span className="ml-2 text-gray-600">4.5 (120 reviews)</span>
-                </div>
+                </div> */}
 
                 <div className="flex space-x-4 mb-6 relative">
                   <button
                     onClick={() => setShowPopup(true)}
-                    className="bg-indigo-600 flex gap-2 items-center text-white px-6 py-2 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                    className="bg-black h-[50px] flex gap-2 items-center text-white px-6 py-2 rounded-full focus:outline-none"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -139,7 +139,7 @@ export default function ProductDialog({ open, handleOpen, slug }: any) {
                   )}
                   <button
                     onClick={() => router.push(`/product-detail/${slug}`)}
-                    className="bg-black flex gap-2 items-center text-white px-6 py-2 rounded-md hover:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+                    className="bg-transparent border hover:bg-black hover:text-white duration-300 border-black flex gap-2 items-center text-black px-6 py-2 rounded-full focus:outline-none"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -160,10 +160,10 @@ export default function ProductDialog({ open, handleOpen, slug }: any) {
                 </div>
 
                 <div>
-                  <h3 className="text-lg font-semibold mb-2">Key Features:</h3>
+                  <h3 className="text-lg font-semibold text-black mb-2">Key Features:</h3>
                   <ul className="list-disc list-inside text-gray-700">
                     <li>Stock Quantity: {productData?.quantity}</li>
-                    <li>
+                    {/* <li>
                       Discount:{" "}
                       {(productData?.mrp && productData?.price
                         ? ((productData?.mrp - productData?.price) /
@@ -172,7 +172,7 @@ export default function ProductDialog({ open, handleOpen, slug }: any) {
                         : 0
                       ).toFixed(2)}{" "}
                       %
-                    </li>
+                    </li> */}
                     <li>Book Language: {productData?.book_language}</li>
                     <li>Number of Pages: {productData?.number_of_pages}</li>
                     <li>Publication Year: {productData?.published_at}</li>

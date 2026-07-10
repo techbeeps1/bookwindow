@@ -152,7 +152,7 @@ export default function CategoryPublicationSidebar({
                 placeholder="Search categories..."
                 value={catSearch}
                 onChange={(e) => setCatSearch(e.target.value)}
-                className="w-full text-xs bg-neutral-50/70 border border-neutral-200/60 rounded-xl py-2 pl-9 pr-3 focus:outline-none focus:border-purple-400 focus:bg-white focus:ring-2 focus:ring-purple-100 transition-all text-neutral-850"
+                className="w-full text-xs bg-neutral-50/70 border border-neutral-200/60 rounded-xl py-2 pl-9 pr-3 outline-none  transition-all text-neutral-850"
               />
             </div>
 
@@ -293,7 +293,7 @@ export default function CategoryPublicationSidebar({
                 placeholder="Search publications..."
                 value={pubSearch}
                 onChange={(e) => setPubSearch(e.target.value)}
-                className="w-full text-xs bg-neutral-50/70 border border-neutral-200/60 rounded-xl py-2 pl-9 pr-3 focus:outline-none focus:border-purple-400 focus:bg-white focus:ring-2 focus:ring-purple-100 transition-all text-neutral-850"
+                className="w-full text-xs bg-neutral-50/70 border border-neutral-200/60 rounded-xl py-2 pl-9 pr-3 outline-none   transition-all text-neutral-850"
               />
             </div>
 

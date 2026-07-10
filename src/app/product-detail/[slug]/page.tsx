@@ -12,14 +12,68 @@ import FadeLoaderOverlay from "@/components/loader";
 import { useCart } from "@/hooks/useCart";
 import { useAddToCartMutation } from "@/lib/api/cartApi";
 
+const parseGallery = (gallery: any): string[] => {
+  if (!gallery) return [];
+  if (typeof gallery === "string") {
+    if (!gallery.trim().startsWith("[") && !gallery.trim().startsWith("{")) {
+      return gallery.split(",").map(img => img.trim()).filter(Boolean);
+    }
+    try {
+      const parsed = JSON.parse(gallery);
+      return parseGallery(parsed);
+    } catch (e) {
+      return [gallery];
+    }
+  }
+  if (Array.isArray(gallery)) {
+    let list: string[] = [];
+    gallery.forEach((item) => {
+      if (!item) return;
+      if (typeof item === "string") {
+        if (item.trim().startsWith("[") || item.trim().startsWith("{")) {
+          try {
+            const parsedItem = JSON.parse(item);
+            list = list.concat(parseGallery(parsedItem));
+          } catch (e) {
+            list.push(item);
+          }
+        } else {
+          list.push(item);
+        }
+      } else if (typeof item === "object") {
+        const path = item.image || item.file || item.url || item.path;
+        if (path) {
+          list.push(path);
+        }
+      }
+    });
+    return list;
+  }
+  return [];
+};
+
 export default function ProductDetail({ params }:{
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = use(params);
   const sessionId = useSession();
   const [mainImage, setMainImage] = useState("");
+
   const [showPopup, setShowPopup] = useState(false);
   const popupRef = useRef(null as any);
+  const thumbnailSliderRef = useRef<HTMLDivElement>(null);
+
+  const handleScrollLeft = () => {
+    if (thumbnailSliderRef.current) {
+      thumbnailSliderRef.current.scrollBy({ left: -102, behavior: "smooth" });
+    }
+  };
+
+  const handleScrollRight = () => {
+    if (thumbnailSliderRef.current) {
+      thumbnailSliderRef.current.scrollBy({ left: 102, behavior: "smooth" });
+    }
+  };
 
   const [loading, setLoading] = useState(true);
 
@@ -33,6 +87,17 @@ export default function ProductDetail({ params }:{
 
   const [productData, setProductData] = useState([] as any);
   const [similarProducts, setSimilarProducts] = useState([] as any);
+
+  const galleryImages = parseGallery(productData?.gallery);
+  const allImages: string[] = [];
+  if (productData?.image) {
+    allImages.push(productData.image);
+  }
+  galleryImages.forEach((img) => {
+    if (img !== productData?.image && !allImages.includes(img)) {
+      allImages.push(img);
+    }
+  });
 
 
    const [addToCart, { isLoading }] = useAddToCartMutation();
@@ -142,31 +207,114 @@ export default function ProductDetail({ params }:{
           // </div>
           <div className="flex flex-wrap">
             {/* Product Images */}
-            <div className="w-full md:w-1/2 px-10 mb-8">
-              <Image
-                src={mainImage}
-                alt="Product"
-                className="w-[40rem] h-80 rounded-lg shadow-md mb-4 object-contain"
-                width={768}
-                height={768}
-              />
-              {/* gallary image */}
-              <div className="flex gap-4 py-4 justify-center overflow-x-auto">
-                {productData.gallery?.map((img: string, index: number) => {
-                  const imgSrc = `${config.apiUrl}storage/app/public/${img}`;
-                  return (
-                    <Image
-                      key={index}
-                      src={imgSrc}
-                      alt={`Thumbnail ${index + 1}`}
-                      className="size-16 sm:size-20 object-contain rounded-md cursor-pointer opacity-60 hover:opacity-100 transition duration-300"
-                      onClick={() => handleImageChange(imgSrc)}
-                      width={150}
-                      height={200}
-                    />
-                  );
-                })}
+            <div className="w-full md:w-1/2 px-4 md:px-10 mb-8 flex flex-col gap-6">
+              {/* Main Product Image */}
+              <div className="w-full flex items-center justify-center bg-[#f4f4f4] rounded-lg p-6 md:p-12 border border-neutral-100/50 shadow-sm">
+                <div className="relative w-full aspect-[4/5] max-h-[350px]">
+                  <Image
+                    src={mainImage}
+                    alt="Product"
+                    className="object-contain w-full h-full"
+                    width={768}
+                    height={768}
+                    priority
+                  />
+                </div>
               </div>
+
+              {/* Gallery thumbnails slider at the bottom */}
+              {allImages.length > 0 && (
+                <div className="flex items-center justify-center w-full mt-2 gap-2">
+                  {/* Left Scroll Button */}
+                  {allImages.length > 5 && (
+                    <button
+                      onClick={handleScrollLeft}
+                      className="p-1.5 text-black hover:text-gray-600 transition-colors focus:outline-none shrink-0"
+                      aria-label="Scroll left"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth={2.5}
+                        stroke="currentColor"
+                        className="w-5 h-5"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M15.75 19.5 8.25 12l7.5-7.5"
+                        />
+                      </svg>
+                    </button>
+                  )}
+
+                  {/* Slider Wrapper: hides overflow, sets fixed max-width for 5 thumbnails */}
+                  <div className="w-full max-w-[498px] overflow-hidden">
+                    {/* Scrollable Track */}
+                    <div
+                      ref={thumbnailSliderRef}
+                      className={`flex gap-3 overflow-x-auto scroll-smooth py-1 px-2 no-scrollbar ${
+                        allImages.length <= 5 ? "justify-center" : "justify-start"
+                      }`}
+                      style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+                    >
+                      <style>{`
+                        .no-scrollbar::-webkit-scrollbar {
+                          display: none;
+                        }
+                      `}</style>
+                      {allImages.map((img: string, index: number) => {
+                        const imgSrc = `${config.apiUrl}storage/app/public/${img}`;
+                        const isCurrent = mainImage === imgSrc;
+                        return (
+                          <div
+                            key={index}
+                            onClick={() => handleImageChange(imgSrc)}
+                            className={`relative w-[90px] h-[90px] aspect-square bg-[#f4f4f4] rounded-lg flex items-center justify-center p-2.5 cursor-pointer transition-all duration-300 border shrink-0 ${
+                              isCurrent
+                                ? "border-black"
+                                : "border-transparent hover:border-black/50"
+                            }`}
+                          >
+                            <Image
+                              src={imgSrc}
+                              alt={`Thumbnail ${index + 1}`}
+                              className="object-contain w-full h-full"
+                              width={150}
+                              height={200}
+                            />
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Right Scroll Button */}
+                  {allImages.length > 5 && (
+                    <button
+                      onClick={handleScrollRight}
+                      className="p-1.5 text-black hover:text-gray-600 transition-colors focus:outline-none shrink-0"
+                      aria-label="Scroll right"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth={2.5}
+                        stroke="currentColor"
+                        className="w-5 h-5"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="m8.25 4.5 7.5 7.5-7.5 7.5"
+                        />
+                      </svg>
+                    </button>
+                  )}
+                </div>
+              )}
             </div>
 
             {/* Product Details */}
@@ -181,22 +329,22 @@ export default function ProductDetail({ params }:{
                 <span className="text-2xl font-bold mr-2">
                   ₹{productData.price}
                 </span>
-                <span className="text-sm font-small mr-2">
+                {/* <span className="text-sm font-small mr-2">
                   {(productData?.mrp && productData?.price
                     ? ((productData?.mrp - productData?.price) /
                         productData?.mrp) *
                       100
                     : 0
                   ).toFixed(2)}{" "}
-                  % off
-                </span>
+                
+                </span> */}
                 <span className="text-gray-500 line-through">
                   ₹{productData.mrp}
                 </span>
               </div>
 
-              <div className="flex items-center mb-4">
-                {/* Star Rating */}
+              {/* <div className="flex items-center mb-4">
+         
                 {[...Array(5)].map((_, index) => (
                   <svg
                     key={index}
@@ -213,41 +361,70 @@ export default function ProductDetail({ params }:{
                   </svg>
                 ))}
                 <span className="ml-2 text-gray-600">4.5 (120 reviews)</span>
-              </div>
-
-              <div className="mb-6">
+              </div> */}
+              <div className="flex gap-4 items-end mb-6">
+                <div>
                 <label
                   htmlFor="quantity"
-                  className="block text-sm font-medium text-gray-700 mb-1"
+                  className="block text-sm font-semibold text-gray-800 mb-2 uppercase tracking-wider"
                 >
-                  Quantity: {quantity}
+                  Quantity
                 </label>
-                <div className="flex items-center space-x-2">
+                <div className="inline-flex items-center bg-[#f4f4f4] rounded-full p-1 border border-neutral-200">
                   <button
+                    type="button"
                     onClick={handleDecrease}
-                    className="w-8 h-8 bg-gray-300 rounded-full text-gray-800 hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500"
+                    className="w-10 h-10 flex items-center justify-center rounded-full text-gray-600 hover:bg-white hover:text-black hover:shadow-sm active:scale-95 transition-all duration-200 focus:outline-none"
+                    aria-label="Decrease quantity"
                   >
-                    -
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth={2.5}
+                      stroke="currentColor"
+                      className="w-4 h-4 pointer-events-none"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M5 12h14"
+                      />
+                    </svg>
                   </button>
-                  <span className="w-12 text-center text-lg font-semibold">
+                  <span className="w-14 text-center text-base font-bold text-gray-900 select-none">
                     {quantity}
                   </span>
                   <button
+                    type="button"
                     onClick={handleIncrease}
-                    className="w-8 h-8 bg-gray-300 rounded-full text-gray-800 hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500"
+                    className="w-10 h-10 flex items-center justify-center rounded-full text-gray-600 hover:bg-white hover:text-black hover:shadow-sm active:scale-95 transition-all duration-200 focus:outline-none"
+                    aria-label="Increase quantity"
                   >
-                    +
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth={2.5}
+                      stroke="currentColor"
+                      className="w-4 h-4 pointer-events-none"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M12 4.5v15m7.5-7.5h-15"
+                      />
+                    </svg>
                   </button>
                 </div>
               </div>
-
-              <div className="flex space-x-4 mb-6 relative">
+              <div className="flex space-x-4 relative">
                 <button
                   onClick={() => {
                     setShowPopup(true);
                     handleAddToCart(productData?.id, quantity);
                   }}
-                  className="bg-indigo-600 flex gap-2 items-center text-white px-6 py-2 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                  className="bg-black h-[50px]  flex gap-2 items-center text-white px-6 py-2 rounded-full  "
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -275,31 +452,15 @@ export default function ProductDetail({ params }:{
                     productImage={mainImage}
                   ></CartPopup>
                 )}
-
-                <button className="bg-black flex gap-2 items-center text-white px-6 py-2 rounded-md hover:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={1.5}
-                    stroke="currentColor"
-                    className="size-6"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"
-                    />
-                  </svg>
-                  By Now
-                </button> 
               </div>
+              </div>
+              
 
               <div>
                 <h3 className="text-lg font-semibold mb-2">Key Features:</h3>
                 <ul className="list-disc list-inside text-gray-700">
                   <li>Stock Quantity: {productData?.quantity}</li>
-                  <li>
+                  {/* <li>
                     Discount:{" "}
                     {(productData?.mrp && productData?.price
                       ? ((productData?.mrp - productData?.price) /
@@ -308,7 +469,7 @@ export default function ProductDetail({ params }:{
                       : 0
                     ).toFixed(2)}{" "}
                     %
-                  </li>
+                  </li> */}
                   <li>Book Language: {productData?.book_language}</li>
                   <li>Number of Pages: {productData?.number_of_pages}</li>
                   <li>Publication Year: {productData?.published_at}</li>

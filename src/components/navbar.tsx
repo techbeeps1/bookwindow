@@ -131,8 +131,8 @@ const dispatch = useAppDispatch();
                       fill="none"
                       viewBox="0 0 24 24"
                       strokeWidth="2"
-                      stroke="rgba(255,255,255,0.45)"
-                      className="w-4 h-4 transition-colors group-focus-within:stroke-purple-400"
+                      stroke="rgba(255, 255, 255, 1)"
+                      className="w-4 h-4 transition-colors"
                     >
                       <path
                         strokeLinecap="round"
@@ -147,7 +147,7 @@ const dispatch = useAppDispatch();
                     placeholder="What are you looking for?"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full text-sm text-white bg-white/5 hover:bg-white/10 focus:bg-zinc-950/80 placeholder-white/35 border border-white/15 rounded-full py-2.5 pl-11 pr-12 transition-all duration-300 focus:outline-none focus:border-purple-500/80 focus:ring-4 focus:ring-purple-500/10 shadow-inner"
+                    className="w-full text-sm text-white bg-white/5 placeholder-white border border-white rounded-full py-2.5 pl-11 pr-12 transition-all duration-300 outline-none"
                   />
 
                   {/* Clear Search Button */}
@@ -537,8 +537,8 @@ const dispatch = useAppDispatch();
             fill="none"
             viewBox="0 0 24 24"
             strokeWidth="2"
-            stroke="rgba(255,255,255,0.4)"
-            className="w-4 h-4 transition-colors group-focus-within:stroke-purple-400"
+            stroke="rgba(255, 255, 255, 1)"
+            className="w-4 h-4 transition-colors"
           >
             <path
               strokeLinecap="round"
@@ -553,7 +553,7 @@ const dispatch = useAppDispatch();
           placeholder="Search books..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full text-xs text-white bg-white/5 placeholder-white/35 border border-white/15 rounded-full py-2.5 pl-9 pr-9 transition-all duration-300 focus:outline-none focus:border-purple-500/80 focus:ring-2 focus:ring-purple-500/10 focus:bg-zinc-950"
+          className="w-full text-xs text-white bg-white/5 placeholder-white border border-white rounded-full py-2.5 pl-9 pr-9 transition-all duration-300 outline-none "
         />
 
         {searchTerm && (
