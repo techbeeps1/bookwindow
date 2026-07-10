@@ -46,7 +46,7 @@ export default async function RootLayout({
           <Navbar menuData={menuData.header} />
 
           {children}
-  <CartDrawer/>
+           <CartDrawer/>
            <FixedPlugin />
           <Footer menuData={menuData.footer} />
         </ReduxProvider>

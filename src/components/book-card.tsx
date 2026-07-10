@@ -13,6 +13,7 @@ import config from "@/app/config";
 import Link from "next/link";
 import { useAddToCartMutation } from "@/lib/api/cartApi";
 import { useSession } from "@/hooks/useSession";
+import { ImageBook } from "./ImageBook";
 
 interface BookCardProps {
   img: string;
@@ -43,23 +44,20 @@ export function BookCard({
   mainCategoryName,
   onItemsCountUpdate,
 }: BookCardProps) {
-   const sessionId = useSession();
+  const sessionId = useSession();
   const [showPopup, setShowPopup] = useState(false);
   const [open, setOpen] = React.useState(false);
   const popupRef = useRef(null as any);
   const handleOpen = () => setOpen(!open);
 
-
   const [addToCart, { isLoading }] = useAddToCartMutation();
   const handleAddToCart = async (productId: string, quantity: number) => {
     try {
-
-     await addToCart({
+      await addToCart({
         session_id: sessionId,
         product_id: productId,
         quantity: quantity,
       }).unwrap();
-     
 
       // console.log("Cart updated:", result);
     } catch (error) {
@@ -77,24 +75,17 @@ export function BookCard({
 
   return (
     <div className="relative flex flex-col bg-transparent text-gray-700  mb-4 border-1 overflow-hidden">
-        
-        <div className="relative p-[30px] bg-[#ededed] overflow-hidden rounded-[10px] mx-0 mt-0 mb-4">
-        <Link href={`/product-detail/${slug}`} className="flex justify-center items-center">
-          <Image
-            width={768}
-            height={768}
-            src={img}
-            alt={title}
-            className="h-auto w-[130px] scale-[1.1] object-contain object-center text-transparent select-none"
-          />
-        </Link>
-        </div>      
-      <div       
-        {...({} as React.ComponentProps<typeof CardBody>)}
-      > 
-        {price !== offPrice && <p className="text-xs uppercase bg-black py-[5px] px-5 w-fit text-white rounded-[4px] font-sans absolute top-[15px] left-[15px] ">Sale</p>}
 
-
+      <Link href={`/product-detail/${slug}`} className="">
+      <ImageBook src={img} alt={title}/>
+      </Link>
+      
+      <div {...({} as React.ComponentProps<typeof CardBody>)}>
+        {price !== offPrice && (
+          <p className="text-xs uppercase bg-black py-[5px] px-5 w-fit text-white rounded-[4px] font-sans absolute top-[15px] left-[15px] ">
+            Sale
+          </p>
+        )}
 
         <Link href={`/product-detail/${slug}`}>
           <Typography
@@ -145,24 +136,24 @@ export function BookCard({
           </div>
           <div className="flex gap-2 relative">
             <div className="">
-            <svg
-              onClick={() => {
-                setShowPopup(true);
-                handleAddToCart(id, 1);
-              }}
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth="1.5"
-              stroke="currentColor"
-              className="size-5 hover:border hover:border-black cursor-pointer"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"
-              />
-            </svg>
+              <svg
+                onClick={() => {
+                  setShowPopup(true);
+                  handleAddToCart(id, 1);
+                }}
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth="1.5"
+                stroke="currentColor"
+                className="size-5 hover:border hover:border-black cursor-pointer"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"
+                />
+              </svg>
             </div>
             {/* cart Popup */}
             {showPopup && (
@@ -205,7 +196,6 @@ export function BookCard({
           </div>
         </div>
       </div>
-    
     </div>
   );
 }
