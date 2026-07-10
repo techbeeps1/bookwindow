@@ -8,6 +8,7 @@ import axios from "axios";
 import config from "@/app/config";
 import Image from "next/image";
 import { IoClose } from "react-icons/io5";
+import { ImageBook } from "@/components/ImageBook";
 
 export default function ProductDialog({ open, handleOpen, slug }: any) {
   const router = useRouter();
@@ -61,16 +62,8 @@ export default function ProductDialog({ open, handleOpen, slug }: any) {
         <DialogBody {...({} as React.ComponentProps<typeof DialogBody>)}>
           <div className="container px-4 pb-4 md:flex md:col-12 w-full h-[500px] overflow-auto overflow-y">
             <div className="flex gap-[30px] flex-col lg:flex-row">
-              {/* Product Images */}
-              <div className="w-full bg-[#F8F8F8] py-[60px] px-[30] rounded-[20px] flex items-center justify-center">
-                <Image
-                  src={`${config.apiUrl}storage/app/public/${productData?.image}`}
-                  alt="Product"
-                  className=" h-[380px] rounded-lg object-contain"
-                  width={768}
-                  height={768}
-                />
-              </div>
+              {/* Product Images */}              
+                <ImageBook src={`${config.apiUrl}storage/app/public/${productData?.image}`} alt={"Product"} style="w-full"/>         
 
               {/* Product Details */}
               <div className="w-full">
@@ -107,7 +100,7 @@ export default function ProductDialog({ open, handleOpen, slug }: any) {
                   <span className="ml-2 text-gray-600">4.5 (120 reviews)</span>
                 </div> */}
 
-                <div className="flex space-x-4 mb-6 relative">
+                <div className="flex md:flex-row flex-col gap-4 mb-6 relative">
                   <button
                     onClick={() => setShowPopup(true)}
                     className="bg-black h-[50px] flex gap-2 items-center text-white px-6 py-2 rounded-full focus:outline-none"

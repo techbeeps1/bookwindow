@@ -202,35 +202,75 @@ export default function Category({ params }:  {
         )}
       </section>
       {totalPages > 1 && (
-        <div className="flex justify-center mt-8 items-center space-x-4 shadow-lg pb-8">
+        <div className="flex justify-center mt-12 mb-12 items-center space-x-6">
+          {/* Previous Button */}
           <button
-            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            type="button"
+            onClick={() => {
+              setCurrentPage((prev) => Math.max(prev - 1, 1));
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            }}
             disabled={currentPage === 1}
-            className={`px-4 py-2 border rounded ${
+            className={`flex items-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-full border transition-all duration-200 active:scale-95 ${
               currentPage === 1
-                ? "bg-gray-200 text-gray-500 cursor-not-allowed"
-                : "bg-white text-black"
+                ? "bg-[#f5f5f5] text-neutral-400 border-transparent cursor-not-allowed opacity-60"
+                : "bg-white text-black border-neutral-300 hover:bg-neutral-50 hover:border-neutral-400 hover:shadow-sm"
             }`}
           >
-            Previous
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={2.5}
+              stroke="currentColor"
+              className="w-4 h-4 pointer-events-none"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M15.75 19.5 8.25 12l7.5-7.5"
+              />
+            </svg>
+            <span>Previous</span>
           </button>
 
-          <span className="text-lg font-semibold">
-            Page {currentPage} of {totalPages}
-          </span>
+          {/* Page Info */}
+          <div className="flex items-center bg-[#f4f4f4] px-4 py-2 rounded-full border border-neutral-200">
+            <span className="text-sm font-bold text-neutral-800">
+              Page <span className="text-black">{currentPage}</span> of{" "}
+              <span className="text-black">{totalPages}</span>
+            </span>
+          </div>
 
+          {/* Next Button */}
           <button
-            onClick={() =>
-              setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-            }
+            type="button"
+            onClick={() => {
+              setCurrentPage((prev) => Math.min(prev + 1, totalPages));
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            }}
             disabled={currentPage === totalPages}
-            className={`px-4 py-2 border rounded ${
+            className={`flex items-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-full border transition-all duration-200 active:scale-95 ${
               currentPage === totalPages
-                ? "bg-gray-200 text-gray-500 cursor-not-allowed"
-                : "bg-white text-black"
+                ? "bg-[#f5f5f5] text-neutral-400 border-transparent cursor-not-allowed opacity-60"
+                : "bg-white text-black border-neutral-300 hover:bg-neutral-50 hover:border-neutral-400 hover:shadow-sm"
             }`}
           >
-            Next
+            <span>Next</span>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={2.5}
+              stroke="currentColor"
+              className="w-4 h-4 pointer-events-none"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="m8.25 4.5 7.5 7.5-7.5 7.5"
+              />
+            </svg>
           </button>
         </div>
       )}
