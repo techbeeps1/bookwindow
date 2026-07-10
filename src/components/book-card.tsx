@@ -77,9 +77,9 @@ export function BookCard({
     <div className="relative flex flex-col bg-transparent text-gray-700  mb-4 border-1 overflow-hidden">
 
       <Link href={`/product-detail/${slug}`} className="">
-      <ImageBook src={img} alt={title}/>
+      <ImageBook src={img} alt={title} size="small" />
       </Link>
-      
+
       <div {...({} as React.ComponentProps<typeof CardBody>)}>
         {price !== offPrice && (
           <p className="text-xs uppercase bg-black py-[5px] px-5 w-fit text-white rounded-[4px] font-sans absolute top-[15px] left-[15px] ">
