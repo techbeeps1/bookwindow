@@ -7,6 +7,7 @@ import { CartPopup } from "@/components/cart-popup";
 import axios from "axios";
 import config from "@/app/config";
 import Image from "next/image";
+import { IoClose } from "react-icons/io5";
 
 export default function ProductDialog({ open, handleOpen, slug }: any) {
   const router = useRouter();
@@ -38,9 +39,9 @@ export default function ProductDialog({ open, handleOpen, slug }: any) {
   }, [productData]);
   return (
     <>
-      <Dialog
+      <Dialog 
         {...({
-          size: "xl",
+          size: "lg",
           open: open,
           handler: handleOpen,
           title: "Dialog Title",
@@ -52,16 +53,16 @@ export default function ProductDialog({ open, handleOpen, slug }: any) {
       >
         <div
           onClick={handleOpen}
-          className="cursor-pointer flex justify-end items-center shrink-0 p-4 text-blue-gray-900 antialiased font-sans text-2xl font-semibold leading-snug cursor-pointer"
+          className="cursor-pointer ms-auto mt-[10px] mr-[10px] duration-300 hover:bg-black hover:text-white h-[40px] w-[40px] border border-black  flex justify-center rounded-full  items-center shrink-0  text-blue-gray-900 antialiased font-sans text-2xl font-semibold leading-snug cursor-pointer"
           {...({} as React.ComponentProps<typeof DialogHeader>)}
         >
-          X
+          <IoClose size={20} />
         </div>
         <DialogBody {...({} as React.ComponentProps<typeof DialogBody>)}>
           <div className="container px-4 pb-4 md:flex md:col-12 w-full h-[500px] overflow-auto overflow-y">
-            <div className="flex flex-wrap">
+            <div className="flex gap-[30px] flex-col lg:flex-row">
               {/* Product Images */}
-              <div className="w-full md:w-1/2 px-4 bg-[#F8F8F8] rounded-[20px] flex items-center justify-center">
+              <div className="w-full bg-[#F8F8F8] py-[60px] px-[30px] rounded-[20px] flex items-center justify-center">
                 <Image
                   src={`${config.apiUrl}storage/app/public/${productData?.image}`}
                   alt="Product"
@@ -72,7 +73,7 @@ export default function ProductDialog({ open, handleOpen, slug }: any) {
               </div>
 
               {/* Product Details */}
-              <div className="w-full md:w-1/2 px-4">
+              <div className="w-full">
                 <h2 className="text-lg font-medium mb-2 text-black">{productData?.name}</h2>
                 <p className="text-gray-600">Model: {productData?.model}</p>
                 {/* <p className="text-gray-600">Author: {productData?.author}</p> */}
