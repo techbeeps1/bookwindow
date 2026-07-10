@@ -11,6 +11,7 @@ import { use } from "react";
 import FadeLoaderOverlay from "@/components/loader";
 import { useCart } from "@/hooks/useCart";
 import { useAddToCartMutation } from "@/lib/api/cartApi";
+import { ImageBook } from "@/components/ImageBook";
 
 const parseGallery = (gallery: any): string[] => {
   if (!gallery) return [];
@@ -209,18 +210,7 @@ export default function ProductDetail({ params }:{
             {/* Product Images */}
             <div className="w-full md:w-1/2 px-4 md:px-10 mb-8 flex flex-col gap-6">
               {/* Main Product Image */}
-              <div className="w-full flex items-center justify-center bg-[#f4f4f4] rounded-lg p-6 md:p-12 border border-neutral-100/50 shadow-sm">
-                <div className="relative w-full aspect-[4/5] max-h-[350px]">
-                  <Image
-                    src={mainImage}
-                    alt="Product"
-                    className="object-contain w-full h-full"
-                    width={768}
-                    height={768}
-                    priority
-                  />
-                </div>
-              </div>
+              <ImageBook src={mainImage} alt={"Product"} style="w-full"/>
 
               {/* Gallery thumbnails slider at the bottom */}
               {allImages.length > 0 && (

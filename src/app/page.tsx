@@ -21,6 +21,7 @@ export default async function Campaign() {
 
   return (
     <>
+
   <HomePage homePageData={homePageData} />
     </>
   );
