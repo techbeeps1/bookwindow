@@ -62,7 +62,7 @@ export default function ProductDialog({ open, handleOpen, slug }: any) {
           <div className="container px-4 pb-4 md:flex md:col-12 w-full h-[500px] overflow-auto overflow-y">
             <div className="flex gap-[30px] flex-col lg:flex-row">
               {/* Product Images */}
-              <div className="w-full bg-[#F8F8F8] py-[60px] px-[30px] rounded-[20px] flex items-center justify-center">
+              <div className="w-full bg-[#F8F8F8] py-[60px] px-[30] rounded-[20px] flex items-center justify-center">
                 <Image
                   src={`${config.apiUrl}storage/app/public/${productData?.image}`}
                   alt="Product"

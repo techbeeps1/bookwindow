@@ -4,10 +4,10 @@ import Image from "next/image";
 export function ImageBook({src,alt, style=""}:{src:string,alt:string,style?:string}) {
   return (
 
-    <div className="group relative block w-full h-full p-2 transition-all duration-300 hover:scale-[1.02]">
-          <div className="relative mb-4 bg-[#ededed]  p-10">
+    <div className="group relative block w-full h-full p-2 transition-all duration-300">
+          <div className="relative mb-4 bg-[#ededed] p-[70px]">
             <div className="relative">
-              <div className="relative">
+              <div className="relative aspect-[3/4]">
                 <div
                   className="absolute top-[1%] right-0 h-[96%] w-[111.25px] rounded-[2px_6px_6px_2px] border border-gray-400 bg-white"
                   style={{
@@ -17,7 +17,7 @@ export function ImageBook({src,alt, style=""}:{src:string,alt:string,style?:stri
                 />
 
                 <div
-                  className="relative cover cursor-pointer rounded-[2px_6px_6px_2px] transition-all duration-300 ease-in-out"
+                  className="relative h-full cover cursor-pointer rounded-[2px_6px_6px_2px] transition-all duration-300 ease-in-out"
                   style={{
                     boxShadow:
                       "6px 0 10px -2px rgba(0,0,0,.2),24px 28px 40px -6px rgba(0,0,0,.1)",
@@ -27,7 +27,7 @@ export function ImageBook({src,alt, style=""}:{src:string,alt:string,style?:stri
                     width={768}
                     height={768}
                     src={src}
-                    className={`${style} block h-auto w-[150px]`}
+                    className={`${style} block h-full w-full rounded-[0px_8px_8px_0px]`}
                     alt={alt}
                   />
                   <div

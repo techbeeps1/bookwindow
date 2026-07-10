@@ -208,7 +208,7 @@ export default function ProductDetail({ params }:{
           // </div>
           <div className="flex flex-wrap">
             {/* Product Images */}
-            <div className="w-full md:w-1/2 px-4 md:px-10 mb-8 flex flex-col gap-6">
+            <div className="w-full md:w-[45%] px-4 md:px-10 mb-8 flex flex-col gap-6">
               {/* Main Product Image */}
               <ImageBook src={mainImage} alt={"Product"} style="w-full"/>
 
@@ -308,7 +308,7 @@ export default function ProductDetail({ params }:{
             </div>
 
             {/* Product Details */}
-            <div className="w-full md:w-1/2 px-4">
+            <div className="w-full md:w-[55%] px-4">
               <h2 className="text-3xl font-bold mb-2">{productData?.name}</h2>
               <p className="text-gray-600">Model: {productData?.model}</p>
               {/* <p className="text-gray-600">Author: {productData?.author}</p> */}
