@@ -591,19 +591,37 @@ function OrdersTab({ userOrders }: any) {
               <h1 className="text-xl sm:text-2xl font-extrabold uppercase tracking-tight text-neutral-900">Order Details</h1>
               <p className="text-xs text-neutral-450 font-bold uppercase tracking-wider mt-0.5">Order #{selectedOrder?.order_details?.order_number}</p>
             </div>
-          </div>          <div className="bg-[#fbfbfb] border border-neutral-200/80 rounded-2xl p-5 mb-8 text-sm font-semibold text-neutral-700 leading-relaxed shadow-sm">
-            Order{" "}
-            <span className="bg-black text-white px-2.5 py-1 rounded-lg text-xs font-bold font-mono inline-block">
-              #{selectedOrder?.order_details?.order_number}
-            </span>{" "}
-            was placed on{" "}
-            <span className="bg-neutral-100 text-neutral-900 border border-neutral-200 px-2.5 py-1 rounded-lg text-xs font-bold inline-block">
-              {selectedOrder?.order_details?.created_at}
-            </span>{" "}
-            and is currently{" "}
-            <span className="bg-white text-black border border-black px-2.5 py-1 rounded-lg text-xs font-bold uppercase tracking-wider inline-block">
-              {selectedOrder?.order_details?.status}
-            </span>.
+          </div>          {/* Redesigned Order Meta Row */}
+          <div className="bg-[#fbfbfb] border border-neutral-200/80 rounded-2xl p-6 mb-8 shadow-sm">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 divide-y sm:divide-y-0 sm:divide-x divide-neutral-200/85">
+              {/* Order Number */}
+              <div className="flex flex-col gap-1.5 pb-4 sm:pb-0">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-400">Order Number</span>
+                <span className="text-base font-extrabold text-neutral-900 font-mono">#{selectedOrder?.order_details?.order_number}</span>
+              </div>
+              
+              {/* Placed On */}
+              <div className="flex flex-col gap-1.5 pt-4 sm:pt-0 sm:pl-6">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-400">Date Placed</span>
+                <span className="text-sm font-bold text-neutral-800">{selectedOrder?.order_details?.created_at}</span>
+              </div>
+              
+              {/* Status */}
+              <div className="flex flex-col gap-1.5 pt-4 sm:pt-0 sm:pl-6">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-400">Order Status</span>
+                <div>
+                  <span className={`inline-flex items-center px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider border ${
+                    ["delivered", "completed", "paid", "success"].some((s) => selectedOrder?.order_details?.status?.toLowerCase()?.includes(s))
+                      ? "bg-neutral-100 text-neutral-900 border-neutral-350"
+                      : ["cancelled", "failed", "refunded"].some((s) => selectedOrder?.order_details?.status?.toLowerCase()?.includes(s))
+                      ? "bg-red-50/60 text-red-700 border-red-100/80 line-through"
+                      : "bg-white text-black border-2 border-black"
+                  }`}>
+                    {selectedOrder?.order_details?.status}
+                  </span>
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* Ordered items */}
@@ -759,8 +777,8 @@ function PasswordTab({ customer }: any) {
           <label className="text-sm font-semibold text-neutral-800 uppercase tracking-wider">New Password</label>
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400">
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                <path fillRule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" clipRule="evenodd" />
               </svg>
             </div>
             <input
@@ -778,8 +796,8 @@ function PasswordTab({ customer }: any) {
           <label className="text-sm font-semibold text-neutral-800 uppercase tracking-wider">Confirm New Password</label>
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400">
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                <path fillRule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" clipRule="evenodd" />
               </svg>
             </div>
             <input
@@ -882,8 +900,8 @@ function AddressesTab({ customer }: any) {
               <label className="text-sm font-semibold text-neutral-800 uppercase tracking-wider">Address Line 1</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400">
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                    <path fillRule="evenodd" d="M11.54 22.351l.07.04.028.016a.76.76 0 00.723 0l.028-.015.071-.041a16.975 16.975 0 001.144-.742 19.58 19.58 0 002.683-2.282c1.944-1.99 3.963-4.98 3.963-8.827a8.25 8.25 0 00-16.5 0c0 3.846 2.02 6.837 3.963 8.827a19.58 19.58 0 002.682 2.282 16.975 16.975 0 001.145.742zM12 13.5a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd" />
                   </svg>
                 </div>
                 <input
@@ -901,8 +919,8 @@ function AddressesTab({ customer }: any) {
               <label className="text-sm font-semibold text-neutral-800 uppercase tracking-wider">Address Line 2</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400">
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                    <path fillRule="evenodd" d="M11.54 22.351l.07.04.028.016a.76.76 0 00.723 0l.028-.015.071-.041a16.975 16.975 0 001.144-.742 19.58 19.58 0 002.683-2.282c1.944-1.99 3.963-4.98 3.963-8.827a8.25 8.25 0 00-16.5 0c0 3.846 2.02 6.837 3.963 8.827a19.58 19.58 0 002.682 2.282 16.975 16.975 0 001.145.742zM12 13.5a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd" />
                   </svg>
                 </div>
                 <input
@@ -922,8 +940,8 @@ function AddressesTab({ customer }: any) {
                 <label className="text-sm font-semibold text-neutral-800 uppercase tracking-wider">Country</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400">
-                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 002 2h2m-4-7a1 1 0 00-1-1V2a1 1 0 00-1-1H9.5a1 1 0 00-1-1H9.5a1 1 0 00-1 1v1M12 21a9 9 0 100-18 9 9 0 000 18z" />
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                      <path fillRule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zM6.262 6.07a8.21 8.21 0 00-1.845 4.18c.115.045.233.089.352.132l1.61.577a1.5 1.5 0 001.902-.754l.544-1.223a1.5 1.5 0 00-.22-1.627L6.262 6.07zm9.93 1.528a1.5 1.5 0 00-1.06-.44H13.5a1.5 1.5 0 00-1.5 1.5v1.22c0 .414.336.75.75.75h1.22a1.5 1.5 0 001.06-.44l1.662-1.662a8.27 8.27 0 00-1.47-1.37zM4.103 12.24A8.254 8.254 0 0012 20.25a8.254 8.254 0 007.897-8.01c-.139-.057-.28-.112-.419-.165l-2.707-1.015a1.5 1.5 0 00-1.902.754l-.544 1.223a1.5 1.5 0 00.22 1.627l2.347 2.347c-.524.32-1.077.597-1.662.825l-.75-1.5a1.5 1.5 0 00-1.342-.83h-1.5a1.5 1.5 0 00-1.5 1.5v2.247a8.232 8.232 0 01-4.18-1.845l2.347-2.347a1.5 1.5 0 00-.44-2.56l-2.247-.75a1.5 1.5 0 00-1.627.22l-1.662 1.662z" clipRule="evenodd" />
                     </svg>
                   </div>
                   <select
@@ -942,8 +960,8 @@ function AddressesTab({ customer }: any) {
                 <label className="text-sm font-semibold text-neutral-800 uppercase tracking-wider">State</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400">
-                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                      <path fillRule="evenodd" d="M4.5 2.25a.75.75 0 000 1.5v16.5h-.75a.75.75 0 000 1.5h16.5a.75.75 0 000-1.5h-.75V3.75a.75.75 0 000-1.5h-15zM9 6a.75.75 0 01.75-.75h4.5a.75.75 0 01.75.75v12h-6V6zM9 12.75a.75.75 0 01.75-.75h1.5a.75.75 0 01.75.75v3h-3v-3z" clipRule="evenodd" />
                     </svg>
                   </div>
                   <select
@@ -967,8 +985,8 @@ function AddressesTab({ customer }: any) {
                 <label className="text-sm font-semibold text-neutral-800 uppercase tracking-wider">City</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400">
-                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                      <path fillRule="evenodd" d="M4.5 2.25a.75.75 0 000 1.5v16.5h-.75a.75.75 0 000 1.5h16.5a.75.75 0 000-1.5h-.75V3.75a.75.75 0 000-1.5h-15zM9 6a.75.75 0 01.75-.75h4.5a.75.75 0 01.75.75v12h-6V6zM9 12.75a.75.75 0 01.75-.75h1.5a.75.75 0 01.75.75v3h-3v-3z" clipRule="evenodd" />
                     </svg>
                   </div>
                   <select
@@ -989,8 +1007,8 @@ function AddressesTab({ customer }: any) {
                 <label className="text-sm font-semibold text-neutral-800 uppercase tracking-wider">Zipcode</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400">
-                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 20l-5.447-2.724A2 2 0 013 15.487V7.513a2 2 0 011.085-1.789L9 3.003l5.447 2.724A2 2 0 0115 7.513v7.974a2 2 0 01-1.085 1.789L9 20z" />
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                      <path fillRule="evenodd" d="M11.54 22.351l.07.04.028.016a.76.76 0 00.723 0l.028-.015.071-.041a16.975 16.975 0 001.144-.742 19.58 19.58 0 002.683-2.282c1.944-1.99 3.963-4.98 3.963-8.827a8.25 8.25 0 00-16.5 0c0 3.846 2.02 6.837 3.963 8.827a19.58 19.58 0 002.682 2.282 16.975 16.975 0 001.145.742zM12 13.5a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd" />
                     </svg>
                   </div>
                   <input
@@ -1051,8 +1069,8 @@ function AddressesTab({ customer }: any) {
             <div className="text-sm space-y-2.5 font-semibold text-neutral-600 leading-relaxed">
               <p className="font-bold text-neutral-900">{customer?.first_name} {customer?.last_name}</p>
               <p className="flex items-center gap-2">
-                <svg className="w-4 h-4 text-neutral-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                <svg className="w-4 h-4 text-neutral-400 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
+                  <path fillRule="evenodd" d="M11.54 22.351l.07.04.028.016a.76.76 0 00.723 0l.028-.015.071-.041a16.975 16.975 0 001.144-.742 19.58 19.58 0 002.683-2.282c1.944-1.99 3.963-4.98 3.963-8.827a8.25 8.25 0 00-16.5 0c0 3.846 2.02 6.837 3.963 8.827a19.58 19.58 0 002.682 2.282 16.975 16.975 0 001.145.742zM12 13.5a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd" />
                 </svg>
                 <span>{customer?.address || "No address specified"}</span>
               </p>
@@ -1150,8 +1168,8 @@ function AccountDetailsTab({ customer }: any) {
                 <label className="text-sm font-semibold text-neutral-800 uppercase tracking-wider">First Name</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400">
-                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                      <path fillRule="evenodd" d="M7.5 6a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM3.751 20.105a8.25 8.25 0 0116.498 0 .75.75 0 01-.437.695A18.683 18.683 0 0112 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 01-.437-.695z" clipRule="evenodd" />
                     </svg>
                   </div>
                   <input
@@ -1170,8 +1188,8 @@ function AccountDetailsTab({ customer }: any) {
                 <label className="text-sm font-semibold text-neutral-800 uppercase tracking-wider">Last Name</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-450">
-                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                      <path fillRule="evenodd" d="M7.5 6a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM3.751 20.105a8.25 8.25 0 0116.498 0 .75.75 0 01-.437.695A18.683 18.683 0 0112 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 01-.437-.695z" clipRule="evenodd" />
                     </svg>
                   </div>
                   <input
@@ -1190,8 +1208,8 @@ function AccountDetailsTab({ customer }: any) {
                 <label className="text-sm font-semibold text-neutral-800 uppercase tracking-wider">Phone</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400">
-                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.725.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                      <path fillRule="evenodd" d="M1.5 4.5a3 3 0 013-3h1.372c.86 0 1.61.586 1.819 1.42l.548 2.196a3 3 0 01-.973 2.985l-1.101.825a15.08 15.08 0 006.111 6.111l.825-1.101a3 3 0 012.985-.973l2.196.548a3 3 0 011.42 1.82V19.5a3 3 0 01-3 3h-2.25C8.552 22.5 1.5 15.448 1.5 6.75V4.5z" clipRule="evenodd" />
                     </svg>
                   </div>
                   <input
@@ -1210,8 +1228,8 @@ function AccountDetailsTab({ customer }: any) {
                 <label className="text-sm font-semibold text-neutral-800 uppercase tracking-wider">Date of Birth</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400">
-                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                      <path fillRule="evenodd" d="M6.75 2.25A.75.75 0 017.5 3v1.5h9V3A.75.75 0 0118 3v1.5h.75a3.003 3.003 0 013 3v11.25a3.003 3.003 0 01-3 3H5.25a3.003 3.003 0 01-3-3V7.5a3.003 3.003 0 013-3H6V3a.75.75 0 01.75-.75zm13.5 9H3.75v7.5a1.5 1.5 0 001.5 1.5h13.5a1.5 1.5 0 001.5-1.5v-7.5zm0-3H3.75V7.5a1.5 1.5 0 011.5-1.5h13.5a1.5 1.5 0 011.5 1.5v.75z" clipRule="evenodd" />
                     </svg>
                   </div>
                   <input
