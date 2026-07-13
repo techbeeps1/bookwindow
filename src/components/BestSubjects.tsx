@@ -61,10 +61,7 @@ const DEFAULT_BRANDS: Brand[] = [
   
 ];
 
-export function BestSubjects({
-  title = "Mock Test & Practice Sets",  
-  brands = DEFAULT_BRANDS,
-}: BrandsCategoryProps) {
+export function BestSubjects({data}: any) {
   const sliderRef = useRef<HTMLDivElement>(null);
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   const [showRightArrow, setShowRightArrow] = useState(true);
@@ -117,7 +114,7 @@ export function BestSubjects({
         slider.removeEventListener("scroll", checkScrollPosition);
       }
     };
-  }, [brands]);
+  }, [data]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -164,7 +161,7 @@ export function BestSubjects({
           viewport={{ once: true }}
           className="block antialiased tracking-normal font-sans text-2xl md:text-4xl font-semibold leading-[1.3] text-blue-gray-900"
         >
-          {title}
+          {data?.mock_subtitle}
         </motion.h2> 
         <div className="w-20 h-[2px] bg-black my-4 rounded-full" />
       </div>
@@ -203,7 +200,7 @@ export function BestSubjects({
           onMouseMove={handleMouseMove}
           className="flex gap-6 overflow-x-auto no-scrollbar px-8 md:px-16 lg:px-24 cursor-grab active:cursor-grabbing select-none"
         >
-          {brands.map((brand, index) => (
+          {data?.mock_test_category.map((brand:any, index:any) => (
             <motion.div
               key={index}
               initial={{ opacity: 0, scale: 0.95 }}
@@ -214,7 +211,7 @@ export function BestSubjects({
             >
               {/* Background Image */}
               <img
-                src={brand.image}
+                src={brand.cat_image}
                 alt={brand.name}
                 
                 sizes="(max-width: 768px) 75vw, (max-width: 1024px) 45vw, 30vw"

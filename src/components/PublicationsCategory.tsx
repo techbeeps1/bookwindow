@@ -10,10 +10,6 @@ export interface Publication {
   link?: string;
 }
 
-interface PublicationsCategoryProps {
-  title?: string;
-  publications?: Publication[];
-}
 
 const DEFAULT_PUBLICATIONS: Publication[] = [
   {
@@ -49,9 +45,8 @@ const DEFAULT_PUBLICATIONS: Publication[] = [
 ];
 
 export function PublicationsCategory({
-  title = "Publications",
-  publications = DEFAULT_PUBLICATIONS,
-}: PublicationsCategoryProps) {
+  data
+}: any) {
   return (
     <section className="container mx-auto px-8">
       {/* Header */}
@@ -63,14 +58,14 @@ export function PublicationsCategory({
           viewport={{ once: true }}
           className="block antialiased tracking-normal font-sans text-2xl md:text-4xl font-semibold leading-[1.3] text-blue-gray-900"
         >
-          {title}
+          {data?.publications_subtitle}
         </motion.h2>
         <div className="w-20 h-[2px] bg-black my-4 rounded-full" />
       </div>
 
       {/* Grid Container (5 columns on desktop) */}
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
-        {publications.map((pub, index) => (
+        {data?.publication.map((pub:any, index:number) => (
           <motion.div
             key={index}
             initial={{ opacity: 0, scale: 0.95 }}

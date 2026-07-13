@@ -16,7 +16,7 @@ import config from "../app/config";
 
 export default function HomePage({homePageData}:any) {
 
-
+console.log(homePageData);
   
   React.useEffect(() => {
     window.scrollTo(0, 0);
@@ -71,7 +71,8 @@ export default function HomePage({homePageData}:any) {
         transition={{ duration: 0.85, ease: "easeOut" }}
         viewport={{ once: true }}
       >
-        <BestSubjects/>
+        <BestSubjects data={homePageData?.mock_test_section }/>
+        
       </motion.div>
       <motion.div
         initial={{ opacity: 0, y: 50 }}
@@ -79,7 +80,7 @@ export default function HomePage({homePageData}:any) {
         transition={{ duration: 0.88, ease: "easeOut" }}
         viewport={{ once: true }}
       >
-        <PublicationsCategory />
+        <PublicationsCategory data={homePageData?.publication_section} />
       </motion.div>
       <motion.div
         initial={{ opacity: 0, y: 50 }}
@@ -87,7 +88,7 @@ export default function HomePage({homePageData}:any) {
         transition={{ duration: 0.9, ease: "easeOut" }}
         viewport={{ once: true }}
       >
-        <HobbyCategory />
+        <HobbyCategory data={ homePageData?.hobby_section} />
       </motion.div>
       <motion.div
         initial={{ opacity: 0, y: 50 }}

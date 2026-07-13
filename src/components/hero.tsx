@@ -55,29 +55,14 @@ function Hero({ onButtonClick, bannerData }: any) {
       image: bannerData?.images
         ? `${config.apiUrl}storage/app/public/${bannerData?.images}`
         : "/image/banner-img.jpg",
-      title: bannerData?.banner_title || "UP TO 50% OFF + 15% OFF",
-      description: bannerData?.banner_description || "Ace your exams with our expertly curated selection of competitive exam books.",
-      buttonText: bannerData?.banner_button_title || "DISCOVER",
+      title: bannerData?.banner_title || "",
+      description: bannerData?.banner_description || "",
+      buttonText: bannerData?.banner_button_title || "",
       logo: bannerData?.logo_img
         ? `${config.apiUrl}storage/app/public/${bannerData?.logo_img}`
         : null
     },
-    {
-      id: 2,
-      image: "/image/banner-img-2.jpg",
-      title: "READ MORE, LEARN MORE",
-      description: "Explore our diverse range of literature, research journals, and school textbooks.",
-      buttonText: "BROWSE NOW",
-      logo: null
-    },
-    {
-      id: 3,
-      image: "/image/banner-img.jpg",
-      title: "COMPETITIVE EXAM SPECIAL",
-      description: "Get all RAS class notes, reference materials, and exam guides at unbeatable prices.",
-      buttonText: "SHOP BESTSELLERS",
-      logo: null
-    }
+
   ];
 
   const nextSlide = () => {
