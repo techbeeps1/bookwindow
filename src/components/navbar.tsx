@@ -170,13 +170,13 @@ const dispatch = useAppDispatch();
 
                   {/* Dropdown popup */}
                   {searchTerm && filteredProducts.length > 0 && (
-                    <div className="absolute top-full left-0 w-full z-50 bg-white/95 backdrop-blur-md border border-neutral-200/80 rounded-2xl shadow-2xl max-h-96 overflow-y-auto mt-3 p-2 flex flex-col gap-1">
+                    <div className="absolute top-full left-0 w-full z-50 bg-white/95 backdrop-blur-md border border-neutral-200/80 rounded-2xl shadow-2xl max-h-96 overflow-y-auto mt-3 p-2 flex flex-col gap-1 custom-scrollbar">
                       {filteredProducts.map((product: any) => (
                         <Link
                           key={product?.id}
                           href={`/product-detail/${product?.slug}`}
                           onClick={() => setSearchTerm("")}
-                          className="flex gap-4 items-center px-4 py-3 hover:bg-purple-50/60 rounded-xl transition-all duration-200 border-b border-neutral-100 last:border-b-0 text-left"
+                          className="flex gap-4 items-center px-4 py-3 hover:bg-neutral-100/70 rounded-xl transition-all duration-200 border-b border-neutral-100 last:border-b-0 text-left"
                         >
                           <div className="relative w-10 h-14 bg-neutral-50 rounded-lg overflow-hidden flex-shrink-0 border border-neutral-200/50 shadow-sm">
                             <Image
@@ -188,7 +188,7 @@ const dispatch = useAppDispatch();
                             />
                           </div>
                           <div className="flex-1 min-w-0 text-left">
-                            <h4 className="font-semibold text-xs text-neutral-850 hover:text-purple-650 transition-colors truncate">
+                            <h4 className="font-semibold text-xs text-neutral-855 hover:text-black transition-colors truncate">
                               {product?.name}
                             </h4>
                             <div className="text-xs font-extrabold text-black mt-1">
@@ -444,7 +444,7 @@ const dispatch = useAppDispatch();
         </div>
         
         {/* Results list */}
-        <div className="flex-1 overflow-y-auto px-4 py-4">
+        <div className="flex-1 overflow-y-auto px-4 py-4 custom-scrollbar">
           {filteredProducts.length > 0 ? (
             <div className="flex flex-col gap-3">
               {filteredProducts.map((product: any) => (
@@ -452,7 +452,7 @@ const dispatch = useAppDispatch();
                   key={product?.id}
                   href={`/product-detail/${product?.slug}`}
                   onClick={() => setSearchTerm("")}
-                  className="flex gap-4 items-center p-3 hover:bg-purple-50/50 rounded-2xl transition-all border border-neutral-100 hover:border-purple-100/30"
+                  className="flex gap-4 items-center p-3 hover:bg-neutral-50 rounded-2xl transition-all border border-neutral-100 hover:border-neutral-200"
                 >
                   <div className="relative w-12 h-16 bg-neutral-50 rounded-xl overflow-hidden flex-shrink-0 border border-neutral-200 shadow-sm">
                     <Image
@@ -464,7 +464,7 @@ const dispatch = useAppDispatch();
                     />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h4 className="font-semibold text-xs text-neutral-850 hover:text-purple-650 transition-colors text-left truncate">
+                    <h4 className="font-semibold text-xs text-neutral-855 hover:text-black transition-colors text-left truncate">
                       {product?.name}
                     </h4>
                     <div className="text-xs font-extrabold text-neutral-900 mt-1 text-left">
