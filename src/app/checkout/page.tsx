@@ -500,94 +500,56 @@ export default function ShoppingCart() {
 
   return (
     <>
-
-            <section className="bg-white py-8 md:py-16 mb-4 min-h-screen">
+      <section className="bg-white py-8 md:py-16 mb-4 min-h-screen">
         {!cartFetched ? (
           <FadeLoaderOverlay />
         ) : cartItems?.length > 0 && items_count > 0 ? (
-          <div className="mx-auto container max-w-screen-xl p-4 2xl:px-0 bg-gray-100">
-            <div className="flex items-center justify-center bg-white mx-4 mb-4 py-4">
-              <div className="flex items-center w-full max-w-xl justify-between">
+          <div className="mx-auto container p-4 sm:p-6 lg:p-8 2xl:px-0">
+            {/* Step Progress Tracker (Centered, Clean Minimal Segment stepper) */}
+            <div className="flex w-full items-center justify-center border-b border-neutral-200/80 mb-12 max-w-4xl mx-auto pb-4">
+              <div className="flex w-full max-w-2xl justify-between text-center select-none font-bold uppercase tracking-wider text-xs sm:text-sm">
                 {steps.map((step, idx) => {
-                  const status = getStepStatus(step);
-                  const isLast = idx === steps.length - 1;
+                  const isCurrent = step === activeTab;
+                  const isDone = completedSteps.includes(step) || steps.indexOf(step) < steps.indexOf(activeTab);
 
                   return (
-                    <div key={step} className="flex items-center w-full">
-                      <div
-                        onClick={() => goToStep(step)}
-                        className={`flex items-center gap-2 ${
-                          status === "upcoming"
-                            ? "cursor-not-allowed"
-                            : "cursor-pointer"
-                        }`}
-                      >
-                        <div
-                          className={`w-6 h-6 flex items-center justify-center rounded-full border-2 ${
-                            status === "active"
-                              ? "border-black"
-                              : status === "completed"
-                              ? "border-green-600"
-                              : "border-gray-300"
-                          } bg-white`}
-                        >
-                          {status === "completed" ? (
-                            <CheckIcon className="w-4 h-4 text-green-600" />
-                          ) : (
-                            <div
-                              className={`w-2.5 h-2.5 rounded-full ${
-                                status === "active" ? "bg-black" : "bg-gray-300"
-                              }`}
-                            ></div>
-                          )}
-                        </div>
-                        <span
-                          className={`font-medium capitalize ${
-                            status === "active"
-                              ? "text-black"
-                              : status === "completed"
-                              ? "text-green-600"
-                              : "text-gray-500"
-                          }`}
-                        >
-                          {step}
-                        </span>
-                      </div>
-
-                      {!isLast && (
-                        <div className="flex-grow h-px border-t border-dotted border-gray-400 mx-2"></div>
-                      )}
+                    <div
+                      key={step}
+                      onClick={() => goToStep(step)}
+                      className={`pb-2 px-4 transition-all duration-300 border-b-2 cursor-pointer ${
+                        isCurrent
+                          ? "border-black text-black scale-105"
+                          : isDone
+                          ? "border-green-600 text-green-700"
+                          : "border-transparent text-neutral-300 hover:text-neutral-500"
+                      }`}
+                    >
+                      <span className="mr-1">{idx + 1}.</span> {step}
                     </div>
                   );
                 })}
               </div>
             </div>
 
+            {/* Cart Tab */}
             {activeTab === "cart" && (
               <>
-                <h2 className="text-xl font-semibold text-gray-900 sm:text-2xl flex ml-4">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="20"
-                    height="20"
-                    fill="currentColor"
-                    className="bi bi-bag mt-2 mr-2"
-                    viewBox="0 0 16 16"
-                  >
-                    <path d="M8 1a2.5 2.5 0 0 1 2.5 2.5V4h-5v-.5A2.5 2.5 0 0 1 8 1m3.5 3v-.5a3.5 3.5 0 1 0-7 0V4H1v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V4zM2 5h12v9a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1z" />
-                  </svg>{" "}
-                  My Cart - ({items_count} Items)
-                </h2>
-                <div className="mt-6 sm:mt-8 md:gap-6 lg:flex lg:items-start xl:gap-8">
-                  <div className="mx-auto w-full flex-none lg:max-w-2xl xl:max-w-2xl p-4">
-                    <div className="space-y-6">
+                {/* Title & subtitle */}
+                <div className="mb-8 pb-5 border-b border-neutral-100">
+                  <h1 className="text-3xl font-black text-neutral-900 tracking-tight">
+                    Shopping Cart
+                  </h1>
+                  <p className="text-sm text-neutral-400 font-bold mt-1">
+                    {items_count} {items_count === 1 ? "item" : "items"} in your cart
+                  </p>
+                </div>
+
+                <div className="mt-6 md:gap-8 lg:flex lg:items-start">
+                  {/* Left Column: Cart Items List */}
+                  <div className="mx-auto w-full flex-none lg:max-w-2xl xl:max-w-3xl p-4">
+                    {/* Cart Items List Container */}
+                    <div className="bg-white rounded-2xl border border-neutral-200/80 p-5 shadow-sm space-y-4">
                       {cartItems?.map((item) => {
-                        const mainCategory = mainCategories?.find(
-                          (main: any) => main.id === item?.category_id
-                        );
-                        const subcategory = mainCategory?.child?.find(
-                          (sub: any) => sub.id === item?.sub_category_id
-                        );
                         const couponCategories = couponData.category_id
                           ? JSON.parse(couponData.category_id)
                           : null;
@@ -595,401 +557,268 @@ export default function ShoppingCart() {
                         const isCategoryMatched =
                           !couponCategories ||
                           couponCategories.includes(String(item.category_id));
+
                         return (
                           <div
                             key={item.product_id}
-                            className="rounded-lg border border-gray-300 shadow-sm bg-white"
+                            className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-neutral-100 last:border-b-0 last:pb-0"
                           >
-                            <div className="flex flex-wrap items-center justify-between p-4 gap-2">
-                              <div>
-                                {" "}
+                            {/* Product Cover and Title */}
+                            <div className="flex items-center gap-4 flex-1">
+                              <div className="relative w-20 h-20 bg-neutral-50 border border-neutral-200/80 rounded-xl p-1.5 flex items-center justify-center flex-shrink-0">
                                 <Image
-                                  className="h-40 w-40 object-contain rounded-lg"
+                                  className="object-contain max-h-full max-w-full rounded-md"
                                   src={`${config.apiUrl}storage/app/public/${item.image}`}
                                   alt={item.product_name}
-                                  width={150}
-                                  height={200}
+                                  width={80}
+                                  height={80}
                                 />
-                                <div className="border border-1 px-4 mt-2 text-center">
-                                  <p className="text-sm text-gray-900">
-                                    Quantity - {item.quantity}
-                                  </p>
-                                  <div className="flex items-center gap-2 ml-4">
-                                    <button
-                                      onClick={() =>
-                                        updateQuantity(
-                                          item.product_id,
-                                          "decrement"
-                                        )
-                                      }
-                                      className="text-sm cursor-pointer"
-                                    >
-                                      <svg
-                                        className="w-4 h-4 text-gray-600 dark:text-white"
-                                        aria-hidden="true"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                      >
-                                        <path
-                                          stroke="currentColor"
-                                          strokeLinecap="round"
-                                          strokeLinejoin="round"
-                                          strokeWidth="2"
-                                          d="M5 12h14"
-                                        />
-                                      </svg>
-                                    </button>
-                                    <span className="w-10 text-center text-sm font-medium text-gray-900">
-                                      {item.quantity}
-                                    </span>
-                                    <button
-                                      onClick={() =>
-                                        updateQuantity(
-                                          item.product_id,
-                                          "increment"
-                                        )
-                                      }
-                                      className="text-sm cursor-pointer"
-                                    >
-                                      <svg
-                                        className="w-4 h-4 text-gray-600 dark:text-white"
-                                        aria-hidden="true"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                      >
-                                        <path
-                                          stroke="currentColor"
-                                          strokeLinecap="round"
-                                          strokeLinejoin="round"
-                                          strokeWidth="2"
-                                          d="M5 12h14m-7 7V5"
-                                        />
-                                      </svg>
-                                    </button>
-                                  </div>
-                                </div>
                               </div>
-
-                              <div className="w-full min-w-0 flex-1">
+                              <div className="flex flex-col">
                                 <Link
                                   href={`/product-detail/${item.product_slug}`}
-                                  className="text-sm font-[400] text-black"
+                                  className="text-sm sm:text-base font-bold text-neutral-800 hover:text-black line-clamp-2 transition-colors"
                                 >
                                   {item.product_name}
                                 </Link>
-                                {/* <Typography
-                                  color="blue"
-                                  className="text-xs !font-semibold"
-                                  {...({} as React.ComponentProps<
-                                    typeof Typography
-                                  >)}
-                                >
-                                  {subcategory?.name
-                                    ? `${mainCategory?.name}/${subcategory?.name}`
-                                    : `${mainCategory?.name || ""}`}
-                                </Typography> */}
-
-                                <div className="flex items-center justify-between gap-4 w-full border-t border-b py-1 mt-4">
-                                  <p className="text-sm text-gray-900">
-                                    Weight -{" "}
-                                    {item.product_weight * item.quantity}/kg
-                                  </p>
-
-                                  {/* Price aligned to the end/right */}
-                                  <div className="w-32 text-end">
-                                    {isCategoryMatched &&
-                                      isCouponApplied &&
-                                      couponSuccess && (
-                                        <p
-                                          className={`text-sm font-bold text-gray-900 line ${
-                                            isCategoryMatched
-                                              ? "line-through text-red-700"
-                                              : ""
-                                          }`}
-                                        >
-                                          ₹{item.product_price * item.quantity}
-                                        </p>
-                                      )}
-                                    <p className="text-base font-bold text-green-600">
-                                      ₹
-                                      {(() => {
-                                        const itemTotal =
-                                          item.product_price * item.quantity;
-                                        if (
-                                          isCouponApplied &&
-                                          couponData &&
-                                          couponSuccess
-                                        ) {
-                                          const couponCategories =
-                                            couponData.category_id
-                                              ? JSON.parse(
-                                                  couponData.category_id
-                                                )
-                                              : null;
-
-                                          const isCategoryMatch =
-                                            !couponCategories ||
-                                            couponCategories.includes(
-                                              String(item.category_id)
-                                            );
-
-                                          if (isCategoryMatch) {
-                                            return (
-                                              couponData.type === "fixed"
-                                                ? itemTotal -
-                                                  parseFloat(couponData.value)
-                                                : itemTotal -
-                                                  (itemTotal *
-                                                    parseFloat(
-                                                      couponData.value
-                                                    )) /
-                                                    100
-                                            ).toFixed(2);
-                                          }
-                                        }
-                                        return itemTotal.toFixed(2);
-                                      })()}
-                                    </p>
-                                  </div>
-                                </div>
-                                {isCouponApplied &&
-                                  couponData &&
-                                  couponSuccess && (
-                                    <span className="mt-4 bg-pink-50 text-sm">
-                                      {(() => {
-                                        const couponCategories =
-                                          couponData.category_id
-                                            ? JSON.parse(couponData.category_id)
-                                            : null;
-
-                                        const isCategoryMatch =
-                                          !couponCategories ||
-                                          couponCategories.includes(
-                                            String(item.category_id)
-                                          );
-
-                                        return isCategoryMatch
-                                          ? "Coupon Applied"
-                                          : "Coupon Not Applicable";
-                                      })()}
-                                    </span>
-                                  )}
+                                <span className="text-xs text-neutral-400 font-semibold mt-1">
+                                  ₹{item.product_price}
+                                </span>
                               </div>
                             </div>
-                            <div className="border border-top p-4 flex items-center justify-center">
-                              <svg
+
+                            {/* Adjuster, Price, Trash */}
+                            <div className="flex items-center justify-between sm:justify-end gap-6 w-full sm:w-auto border-t sm:border-t-0 pt-3 sm:pt-0">
+                              {/* Quantity selector */}
+                              <div className="flex items-center gap-1">
+                                <button
+                                  onClick={() => updateQuantity(item.product_id, "decrement")}
+                                  className="w-8 h-8 rounded border border-neutral-200 bg-white hover:bg-neutral-50 flex items-center justify-center text-neutral-500 font-bold text-sm cursor-pointer"
+                                >
+                                  -
+                                </button>
+                                <span className="w-10 h-8 flex items-center justify-center bg-neutral-100/80 rounded font-bold text-xs text-neutral-800">
+                                  {item.quantity}
+                                </span>
+                                <button
+                                  onClick={() => updateQuantity(item.product_id, "increment")}
+                                  className="w-8 h-8 rounded border border-neutral-200 bg-white hover:bg-neutral-50 flex items-center justify-center text-neutral-500 font-bold text-sm cursor-pointer"
+                                >
+                                  +
+                                </button>
+                              </div>
+
+                              {/* Subtotal */}
+                              <span className="text-sm sm:text-base font-black text-neutral-900 w-24 text-right">
+                                ₹
+                                {(() => {
+                                  const itemTotal = item.product_price * item.quantity;
+                                  if (isCouponApplied && couponData && couponSuccess) {
+                                    const couponCategories = couponData.category_id
+                                      ? JSON.parse(couponData.category_id)
+                                      : null;
+
+                                    const isCategoryMatch =
+                                      !couponCategories ||
+                                      couponCategories.includes(String(item.category_id));
+
+                                    if (isCategoryMatch) {
+                                      return (
+                                        couponData.type === "fixed"
+                                          ? itemTotal - parseFloat(couponData.value)
+                                          : itemTotal - (itemTotal * parseFloat(couponData.value)) / 100
+                                      ).toFixed(2);
+                                    }
+                                  }
+                                  return itemTotal.toFixed(2);
+                                })()}
+                              </span>
+
+                              {/* Delete */}
+                              <button
                                 onClick={() => removeItem(item.product_id)}
-                                xmlns="http://www.w3.org/2000/svg"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                strokeWidth="1.5"
-                                stroke="currentColor"
-                                className="size-6 text-gray-600 cursor-pointer"
+                                className="text-red-500 hover:text-red-700 transition-colors p-1 cursor-pointer"
+                                title="Remove Item"
                               >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"
-                                />
-                              </svg>
+                                <svg
+                                  className="w-5 h-5"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                  strokeWidth="2"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                                  />
+                                </svg>
+                              </button>
                             </div>
                           </div>
                         );
                       })}
                     </div>
+
+                    {/* Bottom Coupon code elements */}
+                    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-6">
+                      <div className="flex gap-2 w-full sm:w-auto">
+                        <input
+                          type="text"
+                          value={coupon_code}
+                          onChange={handleCouponChange}
+                          name="coupon_code"
+                          className="bg-white border border-neutral-300 text-neutral-850 text-xs rounded-lg px-4 py-2.5 focus:outline-none focus:border-black w-full sm:w-48 transition-colors"
+                          placeholder="Coupon code"
+                        />
+                        <button
+                          onClick={() => {
+                            couponValidation(
+                              couponData && couponData.max_cart_amount,
+                              couponData && couponData.min_cart_amount,
+                              cartItems?.reduce(
+                                (acc, item) => acc + item.product_price * item.quantity,
+                                0
+                              )
+                            );
+                            couponData && setIsCoupnApplied(true);
+                          }}
+                          className="bg-black hover:bg-neutral-850 text-white font-extrabold text-xs px-5 py-2.5 rounded-lg whitespace-nowrap cursor-pointer transition-colors"
+                        >
+                          Apply Coupon
+                        </button>
+                      </div>
+
+                      <button
+                        onClick={() => router.refresh()}
+                        className="text-xs font-bold text-neutral-400 hover:text-black transition-colors border-b border-neutral-300 hover:border-black cursor-pointer pb-0.5 uppercase tracking-wider"
+                      >
+                        Update Cart
+                      </button>
+                    </div>
+
+                    <div className="mt-2">
+                      {couponSuccess && isCouponApplied && couponData ? (
+                        (() => {
+                          const couponCategories = couponData.category_id
+                            ? JSON.parse(couponData.category_id)
+                            : null;
+
+                          const isCategoryMatch =
+                            !couponCategories ||
+                            cartItems?.some((item) =>
+                              couponCategories.includes(String(item.category_id))
+                            );
+                          return (
+                            isCategoryMatch && (
+                              <div className="inline-flex items-center gap-1 bg-green-50 text-green-800 px-3 py-1 rounded-lg text-xs font-bold border border-green-150 shadow-sm mt-1">
+                                <span>Code: {couponData?.code}</span>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setIsCoupnApplied(false);
+                                    setCouponError("");
+                                    setCouponSuccess("");
+                                  }}
+                                  className="p-0.5 hover:bg-green-100 rounded-full transition-colors text-green-600 hover:text-green-900 cursor-pointer"
+                                >
+                                  <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    viewBox="0 0 20 20"
+                                    fill="currentColor"
+                                    className="w-3.5 h-3.5"
+                                  >
+                                    <path d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z" />
+                                  </svg>
+                                </button>
+                              </div>
+                            )
+                          );
+                        })()
+                      ) : (
+                        couponError && (
+                          <p className="text-red-700 text-xs font-bold pl-1 mt-1">{couponError}</p>
+                        )
+                      )}
+                    </div>
                   </div>
 
-                  {/* Order Summary */}
-                  <div className="min-w-4xl flex-1 p-4">
-                    <div className="space-y-4 border border-gray-300  p-4 shadow-sm sm:p-6 bg-white rounded-xl">
-                      <p className="text-xl font-semibold text-gray-900 whitespace-nowrap">
-                        Order Summary
-                      </p>
-                      <div className="flex justify-between">
-                        <p className="font-medium text-gray-900">
-                          Add a coupon
-                        </p>
-                        <svg
-                          onClick={() => setShowCoupon(!showCoupon)}
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          strokeWidth="1.5"
-                          stroke="currentColor"
-                          className="size-6 cursor-pointer"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="m19.5 8.25-7.5 7.5-7.5-7.5"
-                          />
-                        </svg>
-                      </div>
-                      {showCoupon && (
-                        <>
-                          <div className="flex justify-between">
-                            <div className="w-full">
-                              <input
-                                type="text"
-                                value={coupon_code}
-                                onChange={handleCouponChange}
-                                name="coupon_code"
-                                className="bg-gray-50 border border-gray-600 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                placeholder="Enter code"
-                              />
-                            </div>
-                            <button
-                              onClick={() => {
-                                couponValidation(
-                                  couponData && couponData.max_cart_amount,
-                                  couponData && couponData.min_cart_amount,
-                                  cartItems?.reduce(
-                                    (acc, item) =>
-                                      acc + item.product_price * item.quantity,
-                                    0
-                                  )
-                                ),
-                                  couponData && setIsCoupnApplied(true);
-                              }}
-                              className="rounded-lg bg-gray-800 px-5 py-2 ml-4 text-white hover:bg-gray-900 whitespace-nowrap"
-                            >
-                              Apply
-                            </button>
-                          </div>
-                          <small>
-                            {couponSuccess && isCouponApplied && couponData ? (
-                              (() => {
-                                const couponCategories = couponData.category_id
-                                  ? JSON.parse(couponData.category_id)
-                                  : null;
-
-                                const isCategoryMatch =
-                                  !couponCategories ||
-                                  cartItems?.some((item) =>
-                                    couponCategories.includes(
-                                      String(item.category_id)
-                                    )
-                                  );
-                                return (
-                                  isCategoryMatch && (
-                                    <span className="border border-10 rounded-xl px-2 border-black flex mt-2 text-green-400 w-20">
-                                      {couponData?.code}
-                                      <svg
-                                        onClick={() => {
-                                          setIsCoupnApplied(false),
-                                            setCouponError(""),
-                                            setCouponSuccess("");
-                                        }}
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                        strokeWidth="1.5"
-                                        stroke="currentColor"
-                                        className="size-5 cursor-pointer hover:bg-gray-300 rounded-xl"
-                                      >
-                                        <path
-                                          strokeLinecap="round"
-                                          strokeLinejoin="round"
-                                          d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-                                        />
-                                      </svg>
-                                    </span>
-                                  )
-                                );
-                              })()
-                            ) : (
-                              <span className="text-red-400">
-                                {couponError}
-                              </span>
-                            )}
-                          </small>
-                        </>
-                      )}
-                      <hr />
+                  {/* Right Column: Order Summary */}
+                  <div className="w-full lg:max-w-md flex-1 p-4">
+                    <div className="bg-neutral-50/50 border border-neutral-150/60 rounded-2xl p-6 sm:p-8 shadow-sm space-y-6 lg:sticky lg:top-8">
+                      <p className="text-lg font-bold text-neutral-900">Order Summary</p>
+                      
                       <div className="space-y-4">
-                        <dl className="flex justify-between gap-4">
-                          <dt className="text-base font-normal text-gray-500">
-                            Subtotal
-                          </dt>
-                          <dd className="text-base font-medium text-gray-900">
+                        <div className="flex justify-between items-center text-sm font-semibold text-neutral-600">
+                          <span>Subtotal</span>
+                          <span className="text-neutral-900 font-bold">
                             ₹
                             {cartItems?.reduce(
-                              (acc, item) =>
-                                acc + item.product_price * item.quantity,
+                              (acc, item) => acc + item.product_price * item.quantity,
                               0
                             )}
-                          </dd>
-                        </dl>
-                        <dl className="flex justify-between gap-4 border-t border-gray-200 pt-2">
-                          <dt className="text-sm text-gray-600">
-                            Discount <br></br>
-                          </dt>
-                          <dd className="text-base font-bold text-green-600">
+                          </span>
+                        </div>
+
+                        <div className="flex justify-between items-center text-sm font-semibold text-neutral-600">
+                          <span>Discount</span>
+                          <span className="text-green-700 font-bold">
+                            - ₹
                             {isCouponApplied && couponData && couponSuccess
                               ? cartItems?.reduce(
-                                  (acc, item) =>
-                                    acc + item.product_price * item.quantity,
+                                  (acc, item) => acc + item.product_price * item.quantity,
                                   0
                                 ) - calculateTotal()
                               : 0}
-                          </dd>
-                        </dl>
-                        <dl className="flex justify-between gap-4">
-                          <dt className="text-base font-normal text-gray-500">
-                            Shipping
-                          </dt>
-                          <dd className="text-base font-medium text-gray-900">
+                          </span>
+                        </div>
+
+                        <div className="flex justify-between items-center text-sm font-semibold text-neutral-600">
+                          <span>Shipping</span>
+                          <span className="text-neutral-900 font-bold">
                             {calculateShipping(
                               totalWeight,
-                              cartItems?.reduce(
-                                (acc, item) => acc + item.quantity,
-                                0
-                              )
+                              cartItems?.reduce((acc, item) => acc + item.quantity, 0)
                             )}
-                          </dd>
-                        </dl>
-                        <dl className="flex justify-between gap-4 border-t border-gray-200 pt-2">
-                          <dt className="text-base font-bold text-gray-900">
-                            Total
-                          </dt>
-                          <dd className="text-base font-bold text-gray-900">
+                          </span>
+                        </div>
+
+                        <div className="flex justify-between items-baseline border-t border-neutral-200/60 pt-4">
+                          <span className="text-sm font-extrabold text-neutral-900 uppercase">Total</span>
+                          <span className="text-xl font-black text-neutral-950">
                             ₹
                             {calculateTotal() +
                               calculateShippingValue(
                                 totalWeight,
-                                cartItems?.reduce(
-                                  (acc, item) => acc + item.quantity,
-                                  0
-                                )
+                                cartItems?.reduce((acc, item) => acc + item.quantity, 0)
                               )}
-                          </dd>
-                        </dl>
+                          </span>
+                        </div>
                       </div>
-                      <br />
 
+                      {/* Action CTA Button */}
                       <button
-                        className="w-full rounded-lg bg-gray-800 px-5 py-2.5 text-white hover:bg-gray-900 whitespace-nowrap"
-                        // onClick={() => router.push("/checkout")}
                         onClick={handleNext}
+                        className="w-full py-4 bg-black hover:bg-neutral-900 text-white rounded-xl font-bold text-sm tracking-wider uppercase transition-all duration-200 shadow-md active:scale-98 flex items-center justify-center cursor-pointer"
                       >
-                        Proceed to Checkout
+                        Proceed To Checkout
                       </button>
-                      <br />
-                      <br />
 
-                      <a
-                        href="/all-products"
-                        className="text-center text-sm font-medium text-gray-900 underline"
-                      >
-                        Continue Shopping
-                      </a>
+                      <div className="text-center mt-4">
+                        <Link
+                          href="/all-products"
+                          className="inline-block text-sm font-semibold text-neutral-500 hover:text-black hover:underline transition-all"
+                        >
+                          Continue Shopping
+                        </Link>
+                      </div>
                     </div>
                   </div>
                 </div>
               </>
             )}
+
+            {/* Shipping Tab */}
             {activeTab === "shipping" && (
               <Checkout
                 shippingData={shippingData}
@@ -997,523 +826,299 @@ export default function ShoppingCart() {
                   setActiveTab("cart");
                 }}
                 onNext={(data: any) => {
-                  setShippingData(data); 
+                  setShippingData(data);
                   setActiveTab("order");
                 }}
                 onCustomerData={(customerData: any) => {
-                  setCustomerData(customerData); 
+                  setCustomerData(customerData);
                 }}
                 formData={shippingData}
               />
             )}
+
+            {/* Order Review Tab */}
             {activeTab === "order" && (
-              <div className="container mx-auto p-6 grid grid-cols-1 gap-8 mt-4 bg-gray-100">
-                <h2 className="text-xl font-semibold text-gray-900 sm:text-2xl flex ml-4">
-                  Your Order
-                </h2>
-                <div className="bg-white border border-1 rounded-lg shadow-lg">
-                  <div className="lg:flex lg:items-start xl:gap-8 ">
-                    <div className="mx-auto w-full flex-none lg:max-w-2xl xl:max-w-2xl p-4">
-                      <div className="space-y-6">
-                        {cartItems?.map((item) => {
-                        
-                       
-                          const couponCategories = couponData.category_id
-                            ? JSON.parse(couponData.category_id)
-                            : null;
+              <div className="mt-6 sm:mt-8">
+                <div className="mb-8 pb-5 border-b border-neutral-100">
+                  <h1 className="text-3xl font-black text-neutral-900 tracking-tight">
+                    Review & Order
+                  </h1>
+                  <p className="text-sm text-neutral-400 font-bold mt-1">
+                    Please review details and select delivery & payment options
+                  </p>
+                </div>
 
-                          const isCategoryMatched =
-                            !couponCategories ||
-                            couponCategories.includes(String(item.category_id));
-                          return (
-                            <div key={item.product_id} className=" bg-white">
-                              <div className="flex flex-wrap items-center justify-between p-4 gap-2">
-                                <div>
-                                  {" "}
-                                  <Image
-                                    className="h-40 w-40 object-contain rounded-lg"
-                                    src={`${config.apiUrl}storage/app/public/${item.image}`}
-                                    alt={item.product_name}
-                                    width={150}
-                                    height={200}
-                                  />
-                                  <div className="border border-1 px-4 mt-2 text-center">
-                                    <p className="text-sm text-gray-900">
-                                      Quantity - {item.quantity}
-                                    </p>
-                                    <div className="flex items-center gap-2 ml-4">
-                                      <button
-                                        onClick={() =>
-                                          updateQuantity(
-                                            item.product_id,
-                                            "decrement"
-                                          )
-                                        }
-                                        className="text-sm cursor-pointer"
-                                      >
-                                        <svg
-                                          className="w-4 h-4 text-gray-600 dark:text-white"
-                                          aria-hidden="true"
-                                          xmlns="http://www.w3.org/2000/svg"
-                                          fill="none"
-                                          viewBox="0 0 24 24"
-                                        >
-                                          <path
-                                            stroke="currentColor"
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            strokeWidth="2"
-                                            d="M5 12h14"
-                                          />
-                                        </svg>
-                                      </button>
-                                      <span className="w-10 text-center text-sm font-medium text-gray-900">
-                                        {item.quantity}
-                                      </span>
-                                      <button
-                                        onClick={() =>
-                                          updateQuantity(
-                                            item.product_id,
-                                            "increment"
-                                          )
-                                        }
-                                        className="text-sm cursor-pointer"
-                                      >
-                                        <svg
-                                          className="w-4 h-4 text-gray-600 dark:text-white"
-                                          aria-hidden="true"
-                                          xmlns="http://www.w3.org/2000/svg"
-                                          fill="none"
-                                          viewBox="0 0 24 24"
-                                        >
-                                          <path
-                                            stroke="currentColor"
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            strokeWidth="2"
-                                            d="M5 12h14m-7 7V5"
-                                          />
-                                        </svg>
-                                      </button>
-                                    </div>
-                                  </div>
-                                </div>
+                <div className="mt-6 md:gap-8 lg:flex lg:items-start">
+                  {/* Left Column: Order Items */}
+                  <div className="mx-auto w-full flex-none lg:max-w-2xl xl:max-w-3xl p-4">
+                    <div className="bg-white rounded-2xl border border-neutral-200/80 p-5 shadow-sm space-y-4">
+                      {cartItems?.map((item) => {
+                        const couponCategories = couponData.category_id
+                          ? JSON.parse(couponData.category_id)
+                          : null;
 
-                                <div className="w-full min-w-0 flex-1 space-y-4">
-                                  <Link
-                                    href={`/product-detail/${item.product_slug}`}
-                                    className="text-sm font-[400] text-black"
-                                  >
-                                    {item.product_name}
-                                  </Link>
-                                  <p className="text-sm text-gray-900">
-                                    Weight -{" "}
-                                    {item.product_weight * item.quantity}/kg
-                                  </p>
-                                  {isCategoryMatched &&
-                                    isCouponApplied &&
-                                    couponSuccess && (
-                                      <p
-                                        className={`text-sm font-bold text-gray-900 line ${
-                                          isCategoryMatched
-                                            ? "line-through text-red-700"
-                                            : ""
-                                        }`}
-                                      >
-                                        ₹{item.subtotal}
-                                      </p>
-                                    )}
-                                  <p className="text-base font-bold text-green-600">
-                                    {/* ₹{item.subtotal} */}₹
-                                    {(() => {
-                                      const itemTotal = item.subtotal;
-                                      if (
-                                        isCouponApplied &&
-                                        couponData &&
-                                        couponSuccess
-                                      ) {
-                                        const couponCategories =
-                                          couponData.category_id
-                                            ? JSON.parse(couponData.category_id)
-                                            : null;
+                        const isCategoryMatched =
+                          !couponCategories ||
+                          couponCategories.includes(String(item.category_id));
 
-                                        const isCategoryMatch =
-                                          !couponCategories ||
-                                          couponCategories.includes(
-                                            String(item.category_id)
-                                          );
-
-                                        if (isCategoryMatch) {
-                                          return (
-                                            couponData.type === "fixed"
-                                              ? itemTotal -
-                                                parseFloat(couponData.value)
-                                              : itemTotal -
-                                                (itemTotal *
-                                                  parseFloat(
-                                                    couponData.value
-                                                  )) /
-                                                  100
-                                          ).toFixed(2);
-                                        }
-                                      }
-                                      return itemTotal;
-                                    })()}
-                                  </p>
-                                  {isCouponApplied &&
-                                    couponData &&
-                                    couponSuccess && (
-                                      <span className="mt-4 bg-pink-50 text-sm">
-                                        {(() => {
-                                          const couponCategories =
-                                            couponData.category_id
-                                              ? JSON.parse(
-                                                  couponData.category_id
-                                                )
-                                              : null;
-
-                                          const isCategoryMatch =
-                                            !couponCategories ||
-                                            couponCategories.includes(
-                                              String(item.category_id)
-                                            );
-
-                                          return isCategoryMatch
-                                            ? "Coupon Applied"
-                                            : "Coupon Not Applicable";
-                                        })()}
-                                      </span>
-                                    )}
-                                </div>
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-
-                    {/* Order Summary */}
-                    <div className="w-full flex-1 p-4 max-w-4xl">
-                      <div className="space-y-4 ">
-                        <p className="text-xl font-semibold text-gray-900 whitespace-nowrap">
-                          Order Summary
-                        </p>
-                        <div className="flex justify-between">
-                          <p className="font-medium text-gray-900">
-                            Add a coupon
-                          </p>
-                          <svg
-                            onClick={() => setShowCoupon(!showCoupon)}
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            strokeWidth="1.5"
-                            stroke="currentColor"
-                            className="size-6 cursor-pointer"
+                        return (
+                          <div
+                            key={item.product_id}
+                            className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-neutral-100 last:border-b-0 last:pb-0"
                           >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              d="m19.5 8.25-7.5 7.5-7.5-7.5"
-                            />
-                          </svg>
-                        </div>
-                        {showCoupon && (
-                          <>
-                            <div className="flex justify-between">
-                              <div className="w-full">
-                                <input
-                                  type="text"
-                                  value={coupon_code}
-                                  onChange={handleCouponChange}
-                                  name="coupon_code"
-                                  className="bg-gray-50 border border-gray-600 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                  placeholder="Enter code"
+                            {/* Product Cover and details */}
+                            <div className="flex items-center gap-4 flex-1">
+                              <div className="relative w-20 h-20 bg-neutral-50 border border-neutral-200/80 rounded-xl p-1.5 flex items-center justify-center flex-shrink-0">
+                                <Image
+                                  className="object-contain max-h-full max-w-full rounded-md"
+                                  src={`${config.apiUrl}storage/app/public/${item.image}`}
+                                  alt={item.product_name}
+                                  width={80}
+                                  height={80}
                                 />
                               </div>
-                              <button
-                                onClick={() => {
-                                  couponValidation(
-                                    couponData && couponData.max_cart_amount,
-                                    couponData && couponData.min_cart_amount,
-                                    subtotal
-                                  ),
-                                    couponData && setIsCoupnApplied(true);
-                                }}
-                                className="rounded-lg bg-gray-800 px-5 py-2 ml-4 text-white hover:bg-gray-900 whitespace-nowrap"
-                              >
-                                Apply
-                              </button>
+                              <div className="flex flex-col">
+                                <Link
+                                  href={`/product-detail/${item.product_slug}`}
+                                  className="text-sm sm:text-base font-bold text-neutral-800 hover:text-black line-clamp-2 transition-colors"
+                                >
+                                  {item.product_name}
+                                </Link>
+                                <span className="text-xs text-neutral-400 font-semibold mt-1">
+                                  ₹{item.product_price}
+                                </span>
+                              </div>
                             </div>
-                            <small>
-                              {couponSuccess &&
-                              isCouponApplied &&
-                              couponData ? (
-                                (() => {
-                                  const couponCategories =
-                                    couponData.category_id
+
+                            {/* Adjuster, Price */}
+                            <div className="flex items-center justify-between sm:justify-end gap-6 w-full sm:w-auto border-t sm:border-t-0 pt-3 sm:pt-0">
+                              {/* Quantity selector */}
+                              <div className="flex items-center gap-1">
+                                <button
+                                  onClick={() => updateQuantity(item.product_id, "decrement")}
+                                  className="w-8 h-8 rounded border border-neutral-200 bg-white hover:bg-neutral-50 flex items-center justify-center text-neutral-500 font-bold text-sm cursor-pointer"
+                                >
+                                  -
+                                </button>
+                                <span className="w-10 h-8 flex items-center justify-center bg-neutral-100/80 rounded font-bold text-xs text-neutral-800">
+                                  {item.quantity}
+                                </span>
+                                <button
+                                  onClick={() => updateQuantity(item.product_id, "increment")}
+                                  className="w-8 h-8 rounded border border-neutral-200 bg-white hover:bg-neutral-50 flex items-center justify-center text-neutral-500 font-bold text-sm cursor-pointer"
+                                >
+                                  +
+                                </button>
+                              </div>
+
+                              {/* Subtotal */}
+                              <span className="text-sm sm:text-base font-black text-neutral-900 w-24 text-right">
+                                ₹
+                                {(() => {
+                                  const itemTotal = item.subtotal;
+                                  if (isCouponApplied && couponData && couponSuccess) {
+                                    const couponCategories = couponData.category_id
                                       ? JSON.parse(couponData.category_id)
                                       : null;
 
-                                  const isCategoryMatch =
-                                    !couponCategories ||
-                                    cartItems?.some((item) =>
-                                      couponCategories.includes(
-                                        String(item.category_id)
-                                      )
-                                    );
-                                  return (
-                                    isCategoryMatch && (
-                                      <span className="border border-10 rounded-xl px-2 border-black flex mt-2 text-green-400 w-20">
-                                        {couponData?.code}
-                                        <svg
-                                          onClick={() => {
-                                            setIsCoupnApplied(false),
-                                              setCouponError(""),
-                                              setCouponSuccess("");
-                                          }}
-                                          xmlns="http://www.w3.org/2000/svg"
-                                          fill="none"
-                                          viewBox="0 0 24 24"
-                                          strokeWidth="1.5"
-                                          stroke="currentColor"
-                                          className="size-5 cursor-pointer hover:bg-gray-300 rounded-xl"
-                                        >
-                                          <path
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-                                          />
-                                        </svg>
-                                      </span>
-                                    )
-                                  );
-                                })()
-                              ) : (
-                                <span className="text-red-400">
-                                  {couponError}
-                                </span>
-                              )}
-                            </small>
-                          </>
-                        )}
+                                    const isCategoryMatch =
+                                      !couponCategories ||
+                                      couponCategories.includes(String(item.category_id));
 
-                        <hr />
-                        <div className="space-y-4">
-                          <dl className="flex justify-between gap-4">
-                            <dt className="text-base font-normal text-gray-500">
-                              Subtotal
-                            </dt>
-                            <dd className="text-base font-medium text-gray-900">
-                              ₹{subtotal}
-                            </dd>
-                          </dl>
-                          <dl className="flex justify-between gap-4 border-t border-gray-200 pt-2">
-                            <dt className="text-sm text-gray-600">
-                              Discount <br></br>
-                              {isCouponApplied &&
-                                couponData &&
-                                couponSuccess && (
-                                  <span className="border border-10 rounded-xl px-2 border-black flex mt-2">
-                                    {couponData?.code}
-                                    <svg
-                                      onClick={() => setIsCoupnApplied(false)}
-                                      xmlns="http://www.w3.org/2000/svg"
-                                      fill="none"
-                                      viewBox="0 0 24 24"
-                                      strokeWidth="1.5"
-                                      stroke="currentColor"
-                                      className="size-5 ml-2 cursor-pointer hover:bg-gray-300 rounded-xl"
-                                    >
-                                      <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-                                      />
-                                    </svg>
-                                  </span>
-                                )}
-                            </dt>
-                            <dd className="text-base font-bold text-green-600">
-                              {isCouponApplied && couponData && couponSuccess
-                                ? cartItems?.reduce(
-                                    (acc, item) =>
-                                      acc + item.product_price * item.quantity,
-                                    0
-                                  ) - calculateTotal()
-                                : 0}
-                            </dd>
-                          </dl>
-                          <dl className="flex justify-between gap-4">
-                            <dt className="text-base font-normal text-gray-500">
-                              Shipping
-                            </dt>
-                            <dd className="text-base font-medium text-gray-900">
-                              {calculateShipping(
-                                totalWeight,
-                                cartItems?.reduce(
-                                  (acc, item) => acc + item.quantity,
-                                  0
-                                )
-                              )}
-                            </dd>
-                          </dl>
-
-                          <dl className="flex justify-between gap-4 border-t border-gray-200 pt-2">
-                            <dt className="text-base font-bold text-gray-900">
-                              Total
-                            </dt>
-                            <dd className="text-base font-bold text-gray-900">
-                              ₹
-                              {
-                                // deliveryType === "free"
-                                //   ? calculateTotal()
-                                //   :
-                                calculateTotal() +
-                                  calculateShippingValue(
-                                    totalWeight,
-                                    cartItems?.reduce(
-                                      (acc, item) => acc + item.quantity,
-                                      0
-                                    )
-                                  )
-                              }
-                            </dd>
-                          </dl>
-                        </div>
-                        {/* Delivery Type */}
-                        <div className="space-y-4">
-                          <h3 className="font-semibold">Delivery Type</h3>
-                          <div>
-                            <label className="block mb-2">
-                              <input
-                                type="radio"
-                                name="delivery"
-                                checked={deliveryType === "express"}
-                                onChange={() => setDeliveryType("express")}
-                              />{" "}
-                              Express Delivery
-                            </label>
-                            <label className="block">
-                              <input
-                                type="radio"
-                                name="delivery"
-                                checked={deliveryType === "standard"}
-                                onChange={() => setDeliveryType("standard")}
-                              />{" "}
-                              Standard Delivery
-                            </label>
+                                    if (isCategoryMatch) {
+                                      return (
+                                        couponData.type === "fixed"
+                                          ? itemTotal - parseFloat(couponData.value)
+                                          : itemTotal - (itemTotal * parseFloat(couponData.value)) / 100
+                                      ).toFixed(2);
+                                    }
+                                  }
+                                  return itemTotal;
+                                })()}
+                              </span>
+                            </div>
                           </div>
-                        </div>
-
-                        {/* Payment Method */}
-                        <div className="space-y-4">
-                          <h3 className="font-semibold">Payment Method</h3>
-                          <div>
-                            <label className="block mb-2">
-                              <input
-                                type="radio"
-                                name="payment"
-                                checked={payment_method === "cod"}
-                                onChange={() => setPaymentMethod("cod")}
-                              />{" "}
-                              Cash On Delivery
-                            </label>
-                            <label className="block">
-                              <input
-                                type="radio"
-                                name="payment"
-                                checked={payment_method === "razorpay"}
-                                onChange={() => setPaymentMethod("razorpay")}
-                              />{" "}
-                              Razorpay
-                            </label>
-                          </div>
-                        </div>
-                        {open && (
-                          <NotificationDialog
-                            open={open}
-                            handleOpen={errorPopup}
-                          ></NotificationDialog>
-                        )}
-                        {isOpen && (
-                          <ThankYouDialog
-                            open={isOpen}
-                            handleOpen={thankYouPopup}
-                            orderNumber={orderNumber}
-                          ></ThankYouDialog>
-                        )}
-                      </div>
+                        );
+                      })}
                     </div>
                   </div>
-                  <div className="flex justify-between p-4 gap-4">
-                    <button
-                      onClick={handleBack}
-                      className="w-80 bg-gray-800 text-white p-3 rounded hover:bg-gray-900"
-                    >
-                      Back
-                    </button>
-                    <button
-                      onClick={handlePlaceOrder}
-                      className="w-80 bg-gray-800 text-white p-3 rounded hover:bg-gray-900"
-                    >
-                      Place Order
-                    </button>
+
+                  {/* Right Column: Order summary and settings */}
+                  <div className="w-full lg:max-w-md flex-1 p-4">
+                    <div className="bg-neutral-50/50 border border-neutral-100 rounded-2xl p-6 shadow-sm space-y-6 lg:sticky lg:top-8">
+                      <p className="text-lg font-bold text-neutral-900">Order Summary</p>
+
+                      {/* Delivery Type Option Cards */}
+                      <div className="space-y-3">
+                        <p className="text-xs font-black uppercase text-neutral-400 tracking-wider">Delivery Type</p>
+                        <div className="grid grid-cols-2 gap-3">
+                          {/* Standard Delivery Option */}
+                          <div
+                            onClick={() => setDeliveryType("standard")}
+                            className={`flex flex-col p-4 rounded-2xl border-2 cursor-pointer transition-all ${
+                              deliveryType === "standard"
+                                ? "border-black bg-white"
+                                : "border-neutral-200 bg-white hover:border-neutral-300"
+                            }`}
+                          >
+                            <span className="text-xs font-bold uppercase tracking-wider text-neutral-850">Standard</span>
+                            <span className="text-[10px] text-neutral-400 font-bold mt-1">3-5 Days</span>
+                            <span className="text-xs font-black text-neutral-900 mt-2.5">₹49</span>
+                          </div>
+
+                          {/* Express Delivery Option */}
+                          <div
+                            onClick={() => setDeliveryType("express")}
+                            className={`flex flex-col p-4 rounded-2xl border-2 cursor-pointer transition-all ${
+                              deliveryType === "express"
+                                ? "border-black bg-white"
+                                : "border-neutral-200 bg-white hover:border-neutral-300"
+                            }`}
+                          >
+                            <span className="text-xs font-bold uppercase tracking-wider text-neutral-850">Express</span>
+                            <span className="text-[10px] text-neutral-400 font-bold mt-1">1-2 Days</span>
+                            <span className="text-xs font-black text-neutral-900 mt-2.5">₹125</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Payment Method Option Cards */}
+                      <div className="space-y-3">
+                        <p className="text-xs font-black uppercase text-neutral-400 tracking-wider">Payment Method</p>
+                        <div className="grid grid-cols-2 gap-3">
+                          {/* Cash On Delivery Option */}
+                          <div
+                            onClick={() => setPaymentMethod("cod")}
+                            className={`flex flex-col justify-between p-4 rounded-2xl border-2 cursor-pointer transition-all ${
+                              payment_method === "cod"
+                                ? "border-black bg-white"
+                                : "border-neutral-200 bg-white hover:border-neutral-300"
+                            }`}
+                          >
+                            <span className="text-xs font-bold uppercase tracking-wider text-neutral-855">COD</span>
+                            <span className="text-[10px] text-neutral-400 font-bold mt-1">Cash on delivery</span>
+                          </div>
+
+                          {/* Online Payment Option */}
+                          <div
+                            onClick={() => setPaymentMethod("razorpay")}
+                            className={`flex flex-col justify-between p-4 rounded-2xl border-2 cursor-pointer transition-all ${
+                              payment_method === "razorpay"
+                                ? "border-black bg-white"
+                                : "border-neutral-200 bg-white hover:border-neutral-300"
+                            }`}
+                          >
+                            <span className="text-xs font-bold uppercase tracking-wider text-neutral-850">Online</span>
+                            <span className="text-[10px] text-neutral-400 font-bold mt-1">Razorpay secure</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Prices breakdown list */}
+                      <div className="space-y-4 pt-4 border-t border-neutral-100">
+                        <div className="flex justify-between text-xs text-neutral-500 font-bold uppercase tracking-wider">
+                          <span>Subtotal</span>
+                          <span className="text-neutral-800 font-black">₹{subtotal}</span>
+                        </div>
+
+                        <div className="flex justify-between text-xs text-neutral-500 font-bold uppercase tracking-wider">
+                          <span>Discount</span>
+                          <span className="text-green-700 font-black">
+                            - ₹
+                            {isCouponApplied && couponData && couponSuccess
+                              ? cartItems?.reduce(
+                                  (acc, item) => acc + item.product_price * item.quantity,
+                                  0
+                                ) - calculateTotal()
+                              : 0}
+                          </span>
+                        </div>
+
+                        <div className="flex justify-between text-xs text-neutral-500 font-bold uppercase tracking-wider">
+                          <span>Shipping</span>
+                          <span className="text-neutral-800 font-black">
+                            {calculateShipping(
+                              totalWeight,
+                              cartItems?.reduce((acc, item) => acc + item.quantity, 0)
+                            )}
+                          </span>
+                        </div>
+
+                        <div className="flex justify-between items-baseline pt-4 border-t border-neutral-100">
+                          <span className="text-sm font-extrabold text-neutral-900 uppercase">Total</span>
+                          <span className="text-2xl font-black text-neutral-950">
+                            ₹
+                            {calculateTotal() +
+                              calculateShippingValue(
+                                totalWeight,
+                                cartItems?.reduce((acc, item) => acc + item.quantity, 0)
+                              )}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Dialogs */}
+                      {open && <NotificationDialog open={open} handleOpen={errorPopup} />}
+                      {isOpen && (
+                        <ThankYouDialog open={isOpen} handleOpen={thankYouPopup} orderNumber={orderNumber} />
+                      )}
+
+                      {/* Action buttons */}
+                      <div className="flex gap-4 pt-2">
+                        <button
+                          onClick={handleBack}
+                          className="flex-1 py-3.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-855 font-bold text-xs rounded-xl uppercase transition-all duration-200 cursor-pointer text-center"
+                        >
+                          Back
+                        </button>
+                        <button
+                          onClick={handlePlaceOrder}
+                          className="flex-1 py-3.5 bg-black hover:bg-neutral-900 text-white font-bold text-xs rounded-xl uppercase transition-all duration-200 shadow-md cursor-pointer text-center"
+                        >
+                          Place Order
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
             )}
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center min-h-[70vh] bg-white p-6 shadow-md rounded-xl">
-            <div className="mb-6">
-              <Image
-                src="/image/bag.png"
-                alt="Empty Cart"
-                width={768}
-                height={768}
-                className="h-80 w-80"
-              />
+          <div className="mx-auto container p-4 sm:p-6 lg:p-8 flex flex-col items-center justify-center min-h-[60vh] bg-white border border-neutral-200/50 rounded-3xl shadow-sm">
+            <div className="mb-6 p-5 bg-neutral-50 rounded-full border border-neutral-200/40 shadow-inner">
+              <svg
+                className="w-16 h-16 text-neutral-450"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                strokeWidth="1.5"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"
+                />
+              </svg>
             </div>
 
-            <h2 className="text-2xl font-semibold text-gray-700">
-              Your Cart is{" "}
-              <span className="text-black font-bold">Empty!</span>
+            <h2 className="text-xl font-black text-neutral-800 uppercase tracking-widest">
+              Your bag is empty
             </h2>
 
-            <p className="text-gray-500 mt-2">
-              Must add items on the cart before you proceed to check out.
+            <p className="text-neutral-500 text-sm text-center mt-2 max-w-xs font-semibold leading-relaxed">
+              Must add items to the cart before you proceed to check out.
             </p>
 
             <Link
-              className="mt-6 px-6 py-3 rounded-full shadow-lg flex bg-black hover:bg-neutral-850 transition-colors"
-              href={"/all-products"}
-              // onClick={() => router.push("/all-products")}
-              // {...({} as React.ComponentProps<typeof Button>)}
+              className="mt-6 px-8 py-4 rounded-2xl bg-black hover:bg-neutral-900 text-white font-black text-xs uppercase tracking-widest transition-all shadow-md hover:shadow-lg active:scale-95 flex items-center gap-2 cursor-pointer"
+              href="/all-products"
             >
-              <svg
-                className="w-6 h-6 text-white "
-                aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M5 4h1.5L9 16m0 0h8m-8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm-8.5-3h9.25L19 7H7.312"
-                />
-              </svg>
-              <p className="mt-1 text-white"> Return to Shop</p>
+              <span>Return to Shop</span>
             </Link>
           </div>
         )}
       </section>
-
     </>
   );
 }

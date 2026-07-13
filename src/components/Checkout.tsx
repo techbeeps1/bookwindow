@@ -21,20 +21,18 @@ export default function Checkout({
   shippingData,
 }: CheckoutProps) {
 
- 
   const initialFormValues = {
-  email: "",
-  first_name: "",
-  last_name: "",
-  phone: "",
-  address: "",
-  address_2: "",
-  state: "",
-  city: "",
-  zip_code: "",
-  country: "India",
-};
-
+    email: "",
+    first_name: "",
+    last_name: "",
+    phone: "",
+    address: "",
+    address_2: "",
+    state: "",
+    city: "",
+    zip_code: "",
+    country: "India",
+  };
 
   const [customerData, setCustomerData] = useState({} as any);
   const [customer, setCustomer] = useState<any>(null);
@@ -59,71 +57,66 @@ export default function Checkout({
   const [filteredCities, setFilteredCities] = useState([]);
 
   const [formValues, setFormValues] = useState(formData?.first_name ? formData : initialFormValues);
-   const [isLoaded, setIsLoaded] = useState(false);
- 
-
+  const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
-  if (typeof window === "undefined") return;
+    if (typeof window === "undefined") return;
 
-  if (  customerData?.customer) {
+    if (customerData?.customer) {
+      localStorage.setItem("customer", JSON.stringify(customerData.customer));
+      setCustomer(customerData.customer);
 
-    localStorage.setItem("customer", JSON.stringify(customerData.customer));
-    setCustomer(customerData.customer);
-
-    // Pre-fill form with customer data
-    const customer = customerData.customer;
-    setFormValues((prev:any) => ({
-      ...prev,
-      first_name: customer.first_name || "",
-      last_name: customer.last_name || "",
-      email: customer.email || "",
-      phone: customer.phone || "",
-      address: customer.address || "",
-      address_2: customer.address_2 || "",
-      city: customer.city || "",
-      state: customer.state || "",
-      zip_code: customer.zip_code || "",
-      country: customer.country || "India",
-    }));
-  } else {
-    // Try loading customer from localStorage
-  
-    const storedCustomer = localStorage.getItem("customer");
-
-    if ( storedCustomer) {
-      const parsedCustomer = JSON.parse(storedCustomer);
-      setCustomer(parsedCustomer);
-
-      setFormValues((prev:any) => ({
+      // Pre-fill form with customer data
+      const customer = customerData.customer;
+      setFormValues((prev: any) => ({
         ...prev,
-        first_name: parsedCustomer.first_name || "",
-        last_name: parsedCustomer.last_name || "",
-        email: parsedCustomer.email || "",
-        phone: parsedCustomer.phone || "",
-        address: parsedCustomer.address || "",
-        address_2: parsedCustomer.address_2 || "",
-        city: parsedCustomer.city || "",
-        state: parsedCustomer.state || "",
-        zip_code: parsedCustomer.zip_code || "",
-        country: parsedCustomer.country || "India",
+        first_name: customer.first_name || "",
+        last_name: customer.last_name || "",
+        email: customer.email || "",
+        phone: customer.phone || "",
+        address: customer.address || "",
+        address_2: customer.address_2 || "",
+        city: customer.city || "",
+        state: customer.state || "",
+        zip_code: customer.zip_code || "",
+        country: customer.country || "India",
       }));
     } else {
-      // Fallback to previously saved form data
-      const savedForm = localStorage.getItem("checkoutForm");
-      if (savedForm) {
-        try {
-          setFormValues(JSON.parse(savedForm));
-        } catch (e) {
-          console.error("Failed to parse stored form data", e);
+      // Try loading customer from localStorage
+      const storedCustomer = localStorage.getItem("customer");
+
+      if (storedCustomer) {
+        const parsedCustomer = JSON.parse(storedCustomer);
+        setCustomer(parsedCustomer);
+
+        setFormValues((prev: any) => ({
+          ...prev,
+          first_name: parsedCustomer.first_name || "",
+          last_name: parsedCustomer.last_name || "",
+          email: parsedCustomer.email || "",
+          phone: parsedCustomer.phone || "",
+          address: parsedCustomer.address || "",
+          address_2: parsedCustomer.address_2 || "",
+          city: parsedCustomer.city || "",
+          state: parsedCustomer.state || "",
+          zip_code: parsedCustomer.zip_code || "",
+          country: parsedCustomer.country || "India",
+        }));
+      } else {
+        // Fallback to previously saved form data
+        const savedForm = localStorage.getItem("checkoutForm");
+        if (savedForm) {
+          try {
+            setFormValues(JSON.parse(savedForm));
+          } catch (e) {
+            console.error("Failed to parse stored form data", e);
+          }
         }
       }
     }
-  }
 
-  setIsLoaded(true);
-}, [customerData]);
-
+    setIsLoaded(true);
+  }, [customerData]);
 
   // Update localStorage whenever formValues changes
   useEffect(() => {
@@ -133,8 +126,8 @@ export default function Checkout({
   }, [customer, formValues, isLoaded]);
 
   useEffect(() => {
-    if(formData?.first_name){
-    setFormValues(formData);
+    if (formData?.first_name) {
+      setFormValues(formData);
     }
   }, [formData]);
 
@@ -146,12 +139,10 @@ export default function Checkout({
   };
 
   const handleStateChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-  const { value } = e.target;
-  handleOptionClick(value);
-  setFormValues((prev: any) => ({ ...prev, state: value })); // Update form values
-};
-
-
+    const { value } = e.target;
+    handleOptionClick(value);
+    setFormValues((prev: any) => ({ ...prev, state: value })); // Update form values
+  };
 
   useEffect(() => {
     const fetchStatesAndCities = async () => {
@@ -162,11 +153,9 @@ export default function Checkout({
           responseType: "json",
         });
         setStates(response?.data);
-        setStatesFatched(true)
+        setStatesFatched(true);
       } catch (error) {
-        // setStatesFatched(true)
-      } finally {
-        // setLoading(false);
+        // error handling
       }
     };
     fetchStatesAndCities();
@@ -174,22 +163,13 @@ export default function Checkout({
 
   useEffect(() => {
     let allCities = [];
-    // if (selectedValue === "Select state") {
-    //   states.forEach((pub: any) => {
-    //     allCities.push(...(pub.cities || []));
-    //   });
-    // }
-    //  else {
     if (selectedState) {
       const selectedStateValue = states.find(
         (pub: any) => pub.name === selectedState
       );
       allCities = selectedStateValue?.cities || [];
     }
-    // }
-
-    const results = allCities;
-    setFilteredCities(results);
+    setFilteredCities(allCities);
   }, [selectedState, states]);
 
   const handleOptionClick = (value: string) => {
@@ -198,10 +178,10 @@ export default function Checkout({
 
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-     setFormValues((prev:any) => ({
-    ...prev,
-    email: value, // ✅ update formValues
-  }));
+    setFormValues((prev: any) => ({
+      ...prev,
+      email: value,
+    }));
     setEmail(value);
     setUserFound(null);
     setErrorMessage("");
@@ -213,12 +193,11 @@ export default function Checkout({
 
     const timeout = setTimeout(() => {
       checkUser(value);
-    }, 500); // 500ms delay after stop typing
+    }, 500);
 
     setDebounceTimeout(timeout);
   };
 
-  // API call
   const checkUser = async (emailToCheck: string) => {
     try {
       const response = await axios.post(`${config.apiUrl}api/v1/checkuser`, {
@@ -236,7 +215,6 @@ export default function Checkout({
       console.error("API error:", error);
       setUserFound(false);
       setErrorMessage("This email is not registered with us.");
-      // setErrorMessage('Something went wrong');
     } finally {
       setIsBuffering(false);
     }
@@ -244,7 +222,6 @@ export default function Checkout({
 
   async function handleLogin(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const form = event.currentTarget;
     const response = await fetch(`${config.apiUrl}api/v1/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -255,9 +232,6 @@ export default function Checkout({
       setUserFound(false);
       setCustomerData(data);
       onCustomerData(data);
-      // setPassword("");
-      // setEmail("");
-      
     } else {
       const data = await response.json();
       console.error("Login failed", response.status);
@@ -265,20 +239,16 @@ export default function Checkout({
     }
   }
 
-
-
   useEffect(() => {
     const source =
       shippingData && Object.keys(shippingData).length > 0
         ? shippingData
         : customer;
-    // console.log("source",source)
-    if (!source) return; // nothing to set
+    if (!source) return;
 
-    // Optional: Prevent overwriting form if already populated
     setFormValues((prev: any) => {
       const alreadyFilled = Object.keys(prev).some((key) => prev[key]);
-      if (alreadyFilled) return prev; // do not overwrite
+      if (alreadyFilled) return prev;
       return {
         ...prev,
         first_name: source.first_name || "",
@@ -292,7 +262,6 @@ export default function Checkout({
       };
     });
   }, [shippingData, customer]);
-
 
   const handleNext = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -329,95 +298,135 @@ export default function Checkout({
   };
 
   if (!isLoaded) {
-    return <div>Loading checkout form...</div>;
+    return (
+      <div className="flex justify-center items-center min-h-[40vh] text-neutral-450 font-semibold text-sm">
+        Loading checkout form...
+      </div>
+    );
   }
 
   return (
     <>
       <form
-        className="container mx-auto p-6 grid grid-cols-1 gap-8 mb-8 mt-4 max-w-screen-md"
-
+        className="container mx-auto p-4 md:p-6 grid grid-cols-1 gap-8 mb-8 mt-4 max-w-screen-md"
         onSubmit={handleNext}
       >
-        <div className="bg-white p-6 rounded-lg shadow-lg">
-          <div className="flex gap-2">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth="1.5"
-              stroke="currentColor"
-              className="size-6 cursor-pointer"
+        <div className="bg-white p-6 sm:p-8 rounded-2xl border border-neutral-200/80 shadow-sm space-y-6">
+          <div className="flex items-center gap-3 border-b border-neutral-100 pb-4 mb-6">
+            <button
+              type="button"
               onClick={() => setIsEdit(!isEdit)}
+              className="p-2 hover:bg-neutral-100 rounded-full transition-colors text-neutral-500 hover:text-black cursor-pointer"
+              title="Toggle Edit Mode"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3"
-              />
-            </svg>
-            <h1 className="text-2xl font-bold mb-4">Shipping Details</h1>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth="2.5"
+                stroke="currentColor"
+                className="w-4 h-4"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3"
+                />
+              </svg>
+            </button>
+            <h1 className="text-xl font-bold text-neutral-900 tracking-tight uppercase">Shipping Details</h1>
           </div>
+
           {!isEdit && customer ? (
-            <div className="text-sm space-y-1 leading-relaxed p-4 border border-1 border-yellow-900">
-              <p>
+            <div className="text-sm space-y-2.5 leading-relaxed p-6 border border-neutral-200 bg-neutral-50/40 rounded-xl">
+              <div className="font-bold text-neutral-900">
                 {shippingData?.first_name || customer?.first_name}{" "}
                 {shippingData?.last_name || customer?.last_name}
-              </p>
-              <p>{shippingData?.address || customer?.address}</p>
-              <p>{shippingData?.city || customer?.city}</p>
-              <p>{shippingData?.zip_code || customer?.zip_code}</p>
-              <p>{shippingData?.state || customer?.state}</p>
-              <p>{shippingData?.phone || customer?.phone}</p>
-              <div className="text-end">
+              </div>
+              <div className="text-neutral-600 space-y-0.5 font-medium">
+                <p>{shippingData?.address || customer?.address}</p>
+                {customer?.address_2 && <p>{shippingData?.address_2 || customer?.address_2}</p>}
+                <p>
+                  {shippingData?.city || customer?.city},{" "}
+                  {shippingData?.state || customer?.state} {shippingData?.zip_code || customer?.zip_code}
+                </p>
+                <p>Phone: {shippingData?.phone || customer?.phone}</p>
+              </div>
+              <div className="text-end pt-3 border-t border-neutral-200/60 mt-4">
                 <button
+                  type="button"
                   onClick={() => setIsEdit(true)}
-                  className="bg-transparent text-black p-2 rounded hover:border-yellow-900 mt-4 border border-1 border-gray-500"
+                  className="bg-black hover:bg-neutral-900 text-white text-xs font-bold px-4 py-2 rounded-lg transition-colors cursor-pointer"
                 >
-                  Edit 🖊️
+                  Edit Address 🖊️
                 </button>
               </div>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-5">
               {!customer && (
-                <input
-                  type="email"
-                  placeholder="Email Address"
-                  className="w-full border p-2 rounded border-gray-400 mb-2"
-                  required
-                  value={email || formValues.email}
-                  onChange={handleEmailChange}
-                />
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-semibold text-neutral-800 uppercase tracking-wider">
+                    Email Address
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400">
+                      <svg className="w-5 h-5 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                      </svg>
+                    </div>
+                    <input
+                      type="email"
+                      placeholder="name@mail.com"
+                      className="w-full pl-11 pr-4 py-3 text-sm text-black bg-[#f4f4f4] hover:bg-neutral-100/50 focus:bg-white border border-neutral-200/80 rounded-xl outline-none focus:border-black focus:ring-2 focus:ring-black/5 transition-all duration-200"
+                      required
+                      value={email || formValues.email}
+                      onChange={handleEmailChange}
+                    />
+                  </div>
+                </div>
               )}
 
               {/* Buffering Spinner */}
               {isBuffering && (
-                <p className="text-blue-500 text-sm mb-2">Checking email...</p>
+                <p className="text-blue-500 text-xs font-semibold mb-2">Checking email...</p>
               )}
 
-              {/* Error Message */}
+              {/* Error Message & Guest Mode */}
               {userFound === false && !isBuffering && (
-                <>
-                  <p className="text-gray-600 text-sm mb-2">{errorMessage}</p>
+                <div className="space-y-4 bg-neutral-50 p-5 rounded-2xl border border-neutral-250">
+                  <p className="text-neutral-500 text-xs font-bold uppercase tracking-wider">{errorMessage}</p>
                   {errorMessage && (
                     <>
-                      <input
-                        type="password"
-                        placeholder="Password"
-                        name="password"
-                        value={password}
-                        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                          setPassword(e.target.value)
-                        }
-                        className="w-full border p-2 rounded border-gray-400"
-                        required
-                      />
+                      <div className="flex flex-col gap-1.5">
+                        <label className="text-xs font-semibold text-neutral-800 uppercase tracking-wider">
+                          Password
+                        </label>
+                        <div className="relative">
+                          <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400">
+                            <svg className="w-5 h-5 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                            </svg>
+                          </div>
+                          <input
+                            type="password"
+                            placeholder="********"
+                            name="password"
+                            value={password}
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                              setPassword(e.target.value)
+                            }
+                            className="w-full pl-11 pr-4 py-3 text-sm text-black bg-[#f4f4f4] hover:bg-neutral-100/50 focus:bg-white border border-neutral-200/80 rounded-xl outline-none focus:border-black focus:ring-2 focus:ring-black/5 transition-all duration-200"
+                            required
+                          />
+                        </div>
+                      </div>
                       {!password && (
-                        <div className="flex gap-2 p-2 mt-2">
+                        <div className="flex gap-2">
                           <button
+                            type="button"
                             onClick={() => setErrorMessage("")}
-                            className="bg-gray-800 text-white p-3 rounded hover:bg-gray-900"
+                            className="bg-black hover:bg-neutral-900 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition-colors cursor-pointer"
                           >
                             Continue as guest
                           </button>
@@ -425,24 +434,36 @@ export default function Checkout({
                       )}
                     </>
                   )}
-                </>
+                </div>
               )}
 
-              {/* Password Input */}
+              {/* Password Input / Login */}
               {userFound === true && !isBuffering && (
-                <>
-                  <input
-                    type="password"
-                    placeholder="Password"
-                    name="password"
-                    value={password}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                      setPassword(e.target.value)
-                    }
-                    className="w-full border p-2 rounded border-gray-400"
-                    required
-                  />
-                  <div className="flex gap-2 p-2 mt-2">
+                <div className="space-y-4 bg-neutral-50 p-5 rounded-2xl border border-neutral-250">
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-xs font-semibold text-neutral-800 uppercase tracking-wider">
+                      Password
+                    </label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400">
+                        <svg className="w-5 h-5 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                        </svg>
+                      </div>
+                      <input
+                        type="password"
+                        placeholder="********"
+                        name="password"
+                        value={password}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                          setPassword(e.target.value)
+                        }
+                        className="w-full pl-11 pr-4 py-3 text-sm text-black bg-[#f4f4f4] hover:bg-neutral-100/50 focus:bg-white border border-neutral-200/80 rounded-xl outline-none focus:border-black focus:ring-2 focus:ring-black/5 transition-all duration-200"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
                     <button
                       type="button"
                       onClick={(e) => {
@@ -455,148 +476,268 @@ export default function Checkout({
 
                         handleLogin(fakeFormEvent);
                       }}
-                      className="bg-gray-800 text-white p-3 rounded hover:bg-gray-900"
+                      className="bg-black hover:bg-neutral-900 text-white text-xs font-bold px-5 py-2.5 rounded-lg transition-colors cursor-pointer"
                     >
                       Login
                     </button>
                     <button
+                      type="button"
                       onClick={() => setUserFound(false)}
-                      className="bg-gray-800 text-white p-3 rounded hover:bg-gray-900"
+                      className="bg-neutral-250 hover:bg-neutral-300 text-neutral-800 text-xs font-bold px-5 py-2.5 rounded-lg transition-colors cursor-pointer"
                     >
                       Continue as guest
                     </button>
                   </div>
-                </>
+                </div>
               )}
-              <div className="grid grid-cols-2 gap-4">
-                <input
-                  type="text"
-                  placeholder="First Name"
-                  name="first_name"
-                  value={formValues.first_name}
-                  onChange={handleInputChange}
-                  className="border p-2 rounded border-gray-400"
-                  required
-                />
-                <input
-                  type="text"
-                  placeholder="Last Name"
-                  name="last_name"
-                  value={formValues.last_name}
-                  onChange={handleInputChange}
-                  className="border p-2 rounded border-gray-400"
-                  required
-                />
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-semibold text-neutral-800 uppercase tracking-wider">
+                    First Name
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400">
+                      <svg className="w-5 h-5 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                      </svg>
+                    </div>
+                    <input
+                      type="text"
+                      placeholder="First Name"
+                      name="first_name"
+                      value={formValues.first_name}
+                      onChange={handleInputChange}
+                      className="w-full pl-11 pr-4 py-3 text-sm text-black bg-[#f4f4f4] hover:bg-neutral-100/50 focus:bg-white border border-neutral-200/80 rounded-xl outline-none focus:border-black focus:ring-2 focus:ring-black/5 transition-all duration-200"
+                      required
+                    />
+                  </div>
+                </div>
+                
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-semibold text-neutral-800 uppercase tracking-wider">
+                    Last Name
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400">
+                      <svg className="w-5 h-5 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                      </svg>
+                    </div>
+                    <input
+                      type="text"
+                      placeholder="Last Name"
+                      name="last_name"
+                      value={formValues.last_name}
+                      onChange={handleInputChange}
+                      className="w-full pl-11 pr-4 py-3 text-sm text-black bg-[#f4f4f4] hover:bg-neutral-100/50 focus:bg-white border border-neutral-200/80 rounded-xl outline-none focus:border-black focus:ring-2 focus:ring-black/5 transition-all duration-200"
+                      required
+                    />
+                  </div>
+                </div>
               </div>
-              <input
-                type="tel"
-                placeholder="Phone Number"
-                name="phone"
-                value={formValues.phone}
-                onChange={handleInputChange}
-                className="w-full border p-2 rounded border-gray-400"
-                required
-              />
-              <input
-                type="text"
-                placeholder="Address 1"
-                name="address"
-                value={formValues.address}
-                onChange={handleInputChange}
-                className="w-full border p-2 rounded border-gray-400"
-                required
-              />
-              <input
-                type="text"
-                placeholder="Address 2 (Optional)"
-                name="address_2"
-                value={formValues.address_2}
-                onChange={handleInputChange}
-                className="w-full border p-2 rounded border-gray-400"
-              />
-              <div className="grid grid-cols-3 gap-4">
-                <select
-                  className="border p-2 rounded w-full border-gray-400"
-                  name="state"
-                  value={formValues.state}
-                  onChange={handleStateChange}
-                >
-                  <option defaultValue={customer?.state || ""}>
-                    {customer?.state || "Select state"}
-                  </option>
-                  {!statesFeteched? (<option className="text-sm text-red-400" disabled>
-                    states are loading ↻◌◌◌
-                  </option>):( states?.map((state: any) => (
-                    <option
-                      value={state?.name}
-                      className="px-4 py-2 text-gray-600 hover:bg-gray-50 text-sm cursor-pointer"
-                      key={state?.id}
-                    >
-                      {state?.name}
-                    </option>
-                  )))}
-                </select>
-                <select
-                  className="border p-2 rounded w-full border-gray-400"
-                  name="city"
-                  value={formValues.city}
-                  onChange={handleInputChange}
-                  disabled={!selectedState}
-                >
-                  <option defaultValue={formValues.city || ""}>
-                    {selectedState ? "Select city" : formValues.city || "Select city"}
-                  </option>
-                  {filteredCities?.map((city: any) => (
-                    <option
-                      value={city?.name}
-                      className="px-4 py-2 text-gray-600 hover:bg-gray-50 text-sm cursor-pointer"
-                      key={city?.id}
-                    >
-                      {city?.name}
-                    </option>
-                  ))}
-                </select>
-                {/* {!selectedState && (
-    <p className="text-red-500 text-sm mt-2 absolute top-full">
-      Please select the state first.
-    </p>
-  )} */}
-                <input
-                  type="text"
-                  placeholder="Postcode"
-                  name="zip_code"
-                  value={formValues.zip_code}
-                  onChange={handleInputChange}
-                  className="border p-2 rounded border-gray-400"
-                  required
-                />
+
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-semibold text-neutral-800 uppercase tracking-wider">
+                  Phone Number
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400">
+                    <svg className="w-5 h-5 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.725.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                    </svg>
+                  </div>
+                  <input
+                    type="tel"
+                    placeholder="Phone Number"
+                    name="phone"
+                    value={formValues.phone}
+                    onChange={handleInputChange}
+                    className="w-full pl-11 pr-4 py-3 text-sm text-black bg-[#f4f4f4] hover:bg-neutral-100/50 focus:bg-white border border-neutral-200/80 rounded-xl outline-none focus:border-black focus:ring-2 focus:ring-black/5 transition-all duration-200"
+                    required
+                  />
+                </div>
               </div>
-              <select
-                className="border p-2 rounded w-full border-gray-400"
-                name="country"
-                value={formValues.country}
-                onChange={handleInputChange}
-              >
-                <option defaultValue="India">India</option>
-              </select>
+
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-semibold text-neutral-800 uppercase tracking-wider">
+                  Address 1
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400">
+                    <svg className="w-5 h-5 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                  </div>
+                  <input
+                    type="text"
+                    placeholder="Address 1"
+                    name="address"
+                    value={formValues.address}
+                    onChange={handleInputChange}
+                    className="w-full pl-11 pr-4 py-3 text-sm text-black bg-[#f4f4f4] hover:bg-neutral-100/50 focus:bg-white border border-neutral-200/80 rounded-xl outline-none focus:border-black focus:ring-2 focus:ring-black/5 transition-all duration-200"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-semibold text-neutral-800 uppercase tracking-wider">
+                  Address 2 (Optional)
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400">
+                    <svg className="w-5 h-5 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                  </div>
+                  <input
+                    type="text"
+                    placeholder="Address 2 (Optional)"
+                    name="address_2"
+                    value={formValues.address_2}
+                    onChange={handleInputChange}
+                    className="w-full pl-11 pr-4 py-3 text-sm text-black bg-[#f4f4f4] hover:bg-neutral-100/50 focus:bg-white border border-neutral-200/80 rounded-xl outline-none focus:border-black focus:ring-2 focus:ring-black/5 transition-all duration-200"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-semibold text-neutral-800 uppercase tracking-wider">
+                    State
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400">
+                      <svg className="w-5 h-5 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                      </svg>
+                    </div>
+                    <select
+                      className="w-full pl-11 pr-4 py-3 text-sm text-black bg-[#f4f4f4] hover:bg-neutral-100/50 focus:bg-white border border-neutral-200/80 rounded-xl outline-none focus:border-black focus:ring-2 focus:ring-black/5 transition-all duration-200 cursor-pointer"
+                      name="state"
+                      value={formValues.state}
+                      onChange={handleStateChange}
+                    >
+                      <option defaultValue={customer?.state || ""}>
+                        {customer?.state || "Select state"}
+                      </option>
+                      {!statesFeteched ? (
+                        <option className="text-sm text-red-400" disabled>
+                          loading ↻
+                        </option>
+                      ) : (
+                        states?.map((state: any) => (
+                          <option
+                            value={state?.name}
+                            className="px-4 py-2 text-gray-600 hover:bg-gray-50 text-sm cursor-pointer"
+                            key={state?.id}
+                          >
+                            {state?.name}
+                          </option>
+                        ))
+                      )}
+                    </select>
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-semibold text-neutral-800 uppercase tracking-wider">
+                    City
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400">
+                      <svg className="w-5 h-5 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                      </svg>
+                    </div>
+                    <select
+                      className="w-full pl-11 pr-4 py-3 text-sm text-black bg-[#f4f4f4] hover:bg-neutral-100/50 focus:bg-white border border-neutral-200/80 rounded-xl outline-none focus:border-black focus:ring-2 focus:ring-black/5 transition-all duration-200 cursor-pointer disabled:bg-neutral-100 disabled:cursor-not-allowed"
+                      name="city"
+                      value={formValues.city}
+                      onChange={handleInputChange}
+                      disabled={!selectedState}
+                    >
+                      <option defaultValue={formValues.city || ""}>
+                        {selectedState ? "Select city" : formValues.city || "Select city"}
+                      </option>
+                      {filteredCities?.map((city: any) => (
+                        <option
+                          value={city?.name}
+                          className="px-4 py-2 text-gray-600 hover:bg-gray-50 text-sm cursor-pointer"
+                          key={city?.id}
+                        >
+                          {city?.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-semibold text-neutral-800 uppercase tracking-wider">
+                    Postcode
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400">
+                      <svg className="w-5 h-5 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h.01M16 12h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </div>
+                    <input
+                      type="text"
+                      placeholder="Postcode"
+                      name="zip_code"
+                      value={formValues.zip_code}
+                      onChange={handleInputChange}
+                      className="w-full pl-11 pr-4 py-3 text-sm text-black bg-[#f4f4f4] hover:bg-neutral-100/50 focus:bg-white border border-neutral-200/80 rounded-xl outline-none focus:border-black focus:ring-2 focus:ring-black/5 transition-all duration-200"
+                      required
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-semibold text-neutral-800 uppercase tracking-wider">
+                  Country
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400">
+                    <svg className="w-5 h-5 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 002 2h2a2.5 2.5 0 002.5-2.5V9a2 2 0 00-2-2h-1.03a3.374 3.374 0 00-3-3V3.545M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <select
+                    className="w-full pl-11 pr-4 py-3 text-sm text-black bg-[#f4f4f4] hover:bg-neutral-100/50 focus:bg-white border border-neutral-200/80 rounded-xl outline-none focus:border-black focus:ring-2 focus:ring-black/5 transition-all duration-200 cursor-pointer"
+                    name="country"
+                    value={formValues.country}
+                    onChange={handleInputChange}
+                  >
+                    <option defaultValue="India">India</option>
+                  </select>
+                </div>
+              </div>
             </div>
           )}
-          <div className="flex justify-between gap-4">
+          
+          <div className="flex justify-between gap-4 mt-6 pt-4 border-t border-neutral-100">
             <button
+              type="button"
               onClick={onBack}
-              className="w-60 bg-gray-800 text-white p-3 rounded hover:bg-gray-900 mt-4"
+              className="w-full sm:w-48 py-3.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-800 font-bold text-xs rounded-xl uppercase tracking-wider transition-colors cursor-pointer text-center"
             >
               Back
             </button>
             <button
               type="submit"
-              className="w-60 bg-gray-800 text-white p-3 rounded hover:bg-gray-900 mt-4"
+              className="w-full sm:w-48 py-3.5 bg-black hover:bg-neutral-900 text-white font-bold text-xs rounded-xl uppercase tracking-wider transition-colors cursor-pointer text-center shadow-md active:scale-98"
             >
               Next
             </button>
           </div>
         </div>
-        {/* order summary section was here */}
       </form>
     </>
   );

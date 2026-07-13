@@ -107,7 +107,7 @@ export default function Category() {
   return (
     <>
 
-            <section className="container mx-auto mb-10 mt-10 md:flex shadow-lg border border-1">
+            <section className="container mx-auto mb-10 mt-10 md:flex border border-1">
         <AllProductSidebar
           onCategorySelect={handleCategorySelect}
           onPublicationSelect={handlePublicationSelect}
@@ -154,7 +154,7 @@ export default function Category() {
           </div>
         ) : (
           <div className="col-8">
-            <div className="grid grid-cols-1 gap-10 md:grid-cols-2 xl:grid-cols-3 p-8">
+            <div className="grid grid-cols-2 gap-[15px] md:grid-cols-3 xl:grid-cols-4 p-8">
               {currentItems.map((product: any) => (
                 <BookCard
                   key={product.id}
