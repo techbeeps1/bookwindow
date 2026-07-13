@@ -36,7 +36,7 @@ export function GetYourBookFromUs(feature_sections:any) {
   return (
     <section className="px-8 pb-8">
       <div className="container mx-auto mb-16 text-center">
-        <Typography variant="h2" color="blue-gray" className="mb-4" {...({} as React.ComponentProps<typeof Typography>)}>
+        <Typography variant="h2" color="blue-gray" className="text-2xl md:text-4xl mb-4" {...({} as React.ComponentProps<typeof Typography>)}>
           {/* Get your book from us! */}
           {featureData?.feature_title}
         </Typography>

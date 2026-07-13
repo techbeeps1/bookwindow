@@ -44,7 +44,7 @@ export function HobbyCategory({
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: "easeOut" }}
             viewport={{ once: true }}
-            className="block antialiased tracking-normal font-sans text-4xl font-semibold leading-[1.3] text-blue-gray-900"
+            className="block antialiased tracking-normal font-sans text-2xl md:text-4xl font-semibold leading-[1.3] text-blue-gray-900"
             >
               {title}
           </motion.h2>

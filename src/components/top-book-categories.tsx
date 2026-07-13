@@ -29,7 +29,7 @@ export function TopBookCategories({
               <Typography
                 variant="h2"
                 color="blue-gray"
-                className=""
+                className="text-2xl md:text-4xl"
                 {...({} as React.ComponentProps<typeof Typography>)}
               >               
                 {category_section?.cat_sec_title}
@@ -43,7 +43,7 @@ export function TopBookCategories({
               >
     
                 <div
-                  className="mt-3"
+                  className="mt-3 md:text-lg text-base"
                   dangerouslySetInnerHTML={{
                     __html: category_section?.cat_sec_description || "",
                   }}

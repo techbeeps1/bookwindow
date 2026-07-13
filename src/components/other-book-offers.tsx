@@ -39,7 +39,7 @@ export function OtherBookOffers({ description, similarProducts, onItemsCountUpda
         <Typography
           variant="h2"
           color="blue-gray"
-          className="mb-2"
+          className="text-2xl md:text-4xl mb-2"
           {...({} as React.ComponentProps<typeof Typography>)}
         >
           About this product
@@ -83,7 +83,7 @@ export function OtherBookOffers({ description, similarProducts, onItemsCountUpda
           <Typography
             variant="h2"
             color="blue-gray"
-            className="mt-8"
+            className="text-2xl md:text-4xl mt-8"
             {...({} as React.ComponentProps<typeof Typography>)}
           >
             Similar Products of This Category
