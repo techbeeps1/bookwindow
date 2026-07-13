@@ -1,14 +1,12 @@
 "use client";
 
 import config from "@/app/config";
-import { Alert } from "@material-tailwind/react";
 import React, { FormEvent } from "react";
 
 const ForgotPassword: React.FC = () => {
   const [alertMessage, setAlertMessage] = React.useState("");
-  const [alertType, setAlertType] = React.useState<"error" | "success" | "">(
-    ""
-  );
+  const [alertType, setAlertType] = React.useState<"error" | "success" | "">("");
+
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = event.currentTarget;
@@ -20,9 +18,7 @@ const ForgotPassword: React.FC = () => {
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            email,
-          }),
+          body: JSON.stringify({ email }),
         }
       );
 
@@ -31,23 +27,19 @@ const ForgotPassword: React.FC = () => {
 
       if (response.ok) {
         setAlertType("success");
-        setAlertMessage("Reset link sent to your email");
+        setAlertMessage("Reset link sent to your email.");
         form.reset();
       } else {
-        if (data?.error) {
-          setAlertType("error");
-          setAlertMessage(data?.error);
-        } else {
-          setAlertType("error");
-          setAlertMessage(data?.error || "failed.");
-        }
+        setAlertType("error");
+        setAlertMessage(data?.error || "Reset request failed.");
       }
     } catch (error) {
       console.error("Error during Submission:", error);
-      console.log("Error during Submission:", error);
-      // alert("Something went wrong. Please try again later.");
+      setAlertType("error");
+      setAlertMessage("Something went wrong. Please try again later.");
     }
   }
+
   React.useEffect(() => {
     if (alertMessage) {
       const timer = setTimeout(() => {
@@ -57,90 +49,97 @@ const ForgotPassword: React.FC = () => {
       return () => clearTimeout(timer);
     }
   }, [alertMessage]);
-  return (
-    <main id="content" role="main" className="w-full max-w-md mx-auto p-6">
-      <div className="mt-7 bg-white rounded-xl shadow-lg dark:bg-gray-800 dark:border-gray-700">
-        <div className="p-4 sm:p-7">
-          <div className="text-center">
-            <h1 className="block text-2xl font-bold text-gray-800 dark:text-white">
-              Forgot password?
-            </h1>
-            <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-              Remember your password?{" "}
-              <a
-                className="text-blue-600 decoration-2 hover:underline font-medium"
-                href="/sign-in"
-              >
-                Login here
-              </a>
-            </p>
-          </div>
 
-          <div className="mt-5">
-            <form onSubmit={handleSubmit}>
-              <div className="grid gap-y-4">
-                <div>
-                  <label
-                    htmlFor="email"
-                    className="block text-sm font-bold ml-1 mb-2 dark:text-white"
-                  >
-                    Email address
-                  </label>
-                  <div className="relative">
-                    <input
-                      type="email"
-                      id="email"
-                      name="email"
-                      className="py-3 px-4 block w-full border-2 border-gray-200 rounded-md text-sm focus:border-blue-500 focus:ring-blue-500 shadow-sm"
-                      required
-                      aria-describedby="email-error"
-                    />
-                  </div>
-                  <p
-                    className="hidden text-xs text-red-600 mt-2"
-                    id="email-error"
-                  >
-                    Please include a valid email address so we can get back to
-                    you
-                  </p>
-                </div>
-                <button
-                  type="submit"
-                  className="py-3 px-4 inline-flex justify-center items-center gap-2 rounded-md border border-transparent font-semibold bg-blue-500 text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all text-sm dark:focus:ring-offset-gray-800"
-                >
-                  Reset password
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
+  return (
+    <div className="w-full">
+      {/* Header */}
+      <div className="text-center mb-6">
+        <h2 className="text-xl font-black text-neutral-900 tracking-tight uppercase">
+          Forgot Password?
+        </h2>
+        <p className="mt-1.5 text-xs font-semibold text-neutral-500">
+          Remember your password?{" "}
+          <a
+            className="text-black font-extrabold hover:underline"
+            href="/sign-in"
+          >
+            Login here
+          </a>
+        </p>
       </div>
 
-      <p className="mt-3 flex justify-center items-center text-center divide-x divide-gray-300 dark:divide-gray-700">
+      <form onSubmit={handleSubmit} className="space-y-4">
+        {/* Email Address Input */}
+        <div className="flex flex-col gap-1.5">
+          <label
+            htmlFor="email"
+            className="text-xs font-semibold text-neutral-800 uppercase tracking-wider"
+          >
+            Email Address
+          </label>
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400">
+              <svg className="w-5 h-5 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              placeholder="name@mail.com"
+              className="w-full pl-11 pr-4 py-3.5 text-sm text-black bg-[#f4f4f4] hover:bg-neutral-100/50 focus:bg-white border border-neutral-200/80 rounded-xl outline-none focus:border-black focus:ring-2 focus:ring-black/5 transition-all duration-200"
+              required
+            />
+          </div>
+        </div>
+
+        {/* Action Button */}
+        <button
+          type="submit"
+          className="w-full py-4 bg-black hover:bg-neutral-900 text-white rounded-xl font-black text-xs uppercase tracking-widest transition-all duration-200 shadow-md hover:shadow-lg active:scale-98 flex items-center justify-center cursor-pointer"
+        >
+          Reset Password
+        </button>
+      </form>
+
+      {/* Footer Links */}
+      <div className="mt-6 pt-4 border-t border-neutral-100 flex justify-center items-center gap-4 text-center">
         <a
-          className="pr-3.5 inline-flex items-center gap-x-2 text-sm text-gray-600 decoration-2 hover:underline hover:text-blue-600 dark:text-gray-500 dark:hover:text-gray-200"
+          className="text-xs font-bold text-neutral-400 hover:text-black transition-colors"
           href="/"
-          rel="noopener noreferrer"
         >
           View Bookwindow
         </a>
+        <span className="text-neutral-300 text-xs">|</span>
         <a
-          className="pl-3 inline-flex items-center gap-x-2 text-sm text-gray-600 decoration-2 hover:underline hover:text-blue-600 dark:text-gray-500 dark:hover:text-gray-200"
+          className="text-xs font-bold text-neutral-400 hover:text-black transition-colors"
           href="/contact-us"
         >
-          Contact us!
+          Contact us
         </a>
-      </p>
+      </div>
+
+      {/* Alert Box */}
       {alertMessage && (
-        <Alert
-          color={alertType === "error" ? "red" : "green"}
-          className="mb-4"
-          onClose={() => setAlertMessage("")}
+        <div
+          className={`w-full p-4 mt-4 text-xs font-semibold rounded-xl border flex items-center justify-between transition-all duration-300 ${
+            alertType === "error"
+              ? "bg-red-50 text-red-800 border-red-200"
+              : "bg-green-50 text-green-800 border-green-200"
+          }`}
         >
-          {alertMessage}
-        </Alert>
+          <span>{alertMessage}</span>
+          <button
+            type="button"
+            onClick={() => setAlertMessage("")}
+            className="text-lg font-bold leading-none ml-2 hover:opacity-75 focus:outline-none cursor-pointer"
+          >
+            &times;
+          </button>
+        </div>
       )}
-    </main>
+    </div>
   );
 };
 

@@ -1,17 +1,8 @@
 "use client";
 
 import config from "@/app/config";
-import {
-  Typography,
-  Card,
-  ListItem,
-  List,
-  ListItemSuffix,
-  Chip,
-} from "@material-tailwind/react";
 import axios from "axios";
-import { useEffect, useState } from "react";
-import { usePathname } from "next/navigation";
+import React, { useEffect, useState } from "react";
 
 export default function AllProductSidebar({
   products,
@@ -22,29 +13,31 @@ export default function AllProductSidebar({
 }: any) {
   const [publications, setPublications] = useState([] as any);
   const [categories, setCategories] = useState([] as any);
-  const [filteredPublicationData, setFilteredPublications] = useState(
-    [] as any
-  );
+  const [filteredPublicationData, setFilteredPublications] = useState([] as any);
   const [loading, setLoading] = useState(true);
+  const [catSearch, setCatSearch] = useState("");
+  const [pubSearch, setPubSearch] = useState("");
 
-  const pathname = usePathname(); // e.g. "/all-products"
-  const lastSegment = pathname.split("/").filter(Boolean).pop(); // "all-products"
+  const [isCategoriesOpen, setIsCategoriesOpen] = useState(true);
+  const [isPublicationsOpen, setIsPublicationsOpen] = useState(true);
+  const [categoryLimit, setCategoryLimit] = useState(8);
+  const [publicationLimit, setPublicationLimit] = useState(8);
 
   useEffect(() => {
-    const fetchProductsByCategoryAndPublication = async () => {
+    const fetchPublications = async () => {
       try {
         const response = await axios({
           method: "get",
           url: `${config.apiUrl}api/publications`,
           responseType: "json",
         });
-        setPublications(response.data?.data?.production);
+        setPublications(response.data?.data?.production || []);
       } catch (error) {
         console.log("error", error);
       }
     };
 
-    fetchProductsByCategoryAndPublication();
+    fetchPublications();
   }, []);
 
   useEffect(() => {
@@ -56,7 +49,7 @@ export default function AllProductSidebar({
           url: `${config.apiUrl}api/category`,
           responseType: "json",
         });
-        setCategories(response.data);
+        setCategories(response.data || []);
       } catch (error) {
         console.log("error", error);
       } finally {
@@ -73,183 +66,335 @@ export default function AllProductSidebar({
       publicationIds?.includes(pub.id)
     );
     setFilteredPublications(filteredPublications);
-  }, [publications, categories, products]);
+  }, [publications, products]);
 
-  useEffect(() => {}, [filteredPublicationData]);
-
-  const displayedCategories = categories;
+  const displayedCategories = categories.flatMap((cat: any) => cat.child || []);
   const displayedPublications =
     filteredPublicationData?.length > 0
       ? filteredPublicationData
       : publications;
 
-  return (
-    <div className="md:columns-[20vw] p-4 mt-4">
-      <Card {...({} as React.ComponentProps<typeof Card>)}>
-        <Typography
-          variant="h6"
-          color="white"
-          className="text-center bg-black"
-          {...({} as React.ComponentProps<typeof Typography>)}
-        >
-          Categories
-        </Typography>
-        <List
-          {...({} as React.ComponentProps<typeof List>)}
-          className="h-[30rem] overflow-y-auto overflow-x-hidden"
-        >
-          <ListItem
-            {...({} as React.ComponentProps<typeof ListItem>)}
-            onClick={() => {
-              onCategorySelect("clear"), onPublicationSelect("clear");
-            }}
-          >
-            Show All
-          </ListItem>
-          {loading ? (
-            <div
-              role="status"
-              className="max-w-md p-4 space-y-4 border border-gray-200 divide-y divide-gray-200 rounded-sm shadow-sm animate-pulse dark:divide-gray-700 md:p-6 dark:border-gray-700"
-            >
-              {[...Array(5)].map((_, idx) => (
-                <div
-                  key={idx}
-                  className={`flex items-center justify-between ${
-                    idx !== 0 ? "pt-4" : ""
-                  }`}
-                >
-                  <div>
-                    <div className="h-2.5 bg-gray-300 rounded-full dark:bg-gray-600 w-24 mb-2.5"></div>
-                    <div className="w-32 h-2 bg-gray-200 rounded-full dark:bg-gray-700"></div>
-                  </div>
-                  <div className="h-2.5 bg-gray-300 rounded-full dark:bg-gray-700 w-12"></div>
-                </div>
-              ))}
-              <span className="sr-only">Loading...</span>
-            </div>
-          ) : (
-            displayedCategories?.map((category: any) => (
-              <div key={category?.id}>
-                {category &&
-                  category?.child?.map((childCategory: any) => {
-                    const isChecked = selectedCategoryIds.includes(
-                      childCategory.id
-                    );
-                    const filteredCount = childCategory.id
-                    ? (products || []).filter(
-                        (product: any) =>
-                          String(product?.sub_category_id) === String(childCategory.id)
-                      ).length
-                    : 0;
-                    return (
-                      <ListItem
-                        {...({} as React.ComponentProps<typeof ListItem>)}
-                        key={childCategory?.id}
-                      >
-                        <input
-                          type="checkbox"
-                          className="mr-2"
-                          checked={isChecked}
-                          onChange={() => onCategorySelect(childCategory.id)}
-                        />{" "}
-                        <p className="md:w-[80px]">{childCategory.name}</p>
-                        <ListItemSuffix
-                          {...({} as React.ComponentProps<
-                            typeof ListItemSuffix
-                          >)}
-                        >
-                          <Chip
-                            value={filteredCount}
-                            variant="ghost"
-                            size="sm"
-                            className="rounded-full"
-                          />
-                        </ListItemSuffix>
-                      </ListItem>
-                    );
-                  })}
-              </div>
-            ))
-          )}
-        </List>
-      </Card>
+  const filteredCategories = displayedCategories.filter((cat: any) =>
+    cat.name?.toLowerCase().includes(catSearch.toLowerCase())
+  );
 
-      <Card className="mt-4" {...({} as React.ComponentProps<typeof Card>)}>
-        <Typography
-          variant="h6"
-          color="white"
-          className="text-center bg-black"
-          {...({} as React.ComponentProps<typeof Typography>)}
+  const filteredPubs = displayedPublications.filter((pub: any) =>
+    pub.name?.toLowerCase().includes(pubSearch.toLowerCase())
+  );
+
+  const visibleCategories = filteredCategories.slice(0, categoryLimit);
+  const visiblePubs = filteredPubs.slice(0, publicationLimit);
+
+  const CheckedIcon = () => (
+    <div className="w-[18px] h-[18px] border border-black flex items-center justify-center bg-white flex-shrink-0 transition-all duration-200">
+      <svg
+        className="w-2.5 h-2.5 text-black"
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="4"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <polyline points="20 6 9 17 4 12" />
+      </svg>
+    </div>
+  );
+
+  const UncheckedIcon = () => (
+    <div className="w-[18px] h-[18px] border border-neutral-300 bg-white flex-shrink-0 hover:border-black transition-all duration-200" />
+  );
+
+  return (
+    <div className="w-full md:w-[300px] flex-shrink-0 p-6 flex flex-col gap-8 bg-white border-r border-neutral-100">
+      
+      {/* ================= Categories Section ================= */}
+      <div className="flex flex-col gap-3">
+        {/* Accordion Header */}
+        <div 
+          onClick={() => setIsCategoriesOpen(!isCategoriesOpen)}
+          className="flex items-center justify-between cursor-pointer pb-2 border-b border-neutral-100 hover:border-neutral-200 transition-colors"
         >
-          Publications
-        </Typography>
-        <List
-          {...({} as React.ComponentProps<typeof List>)}
-          className="h-[30rem] overflow-y-auto"
-        >
-          <ListItem
-            {...({} as React.ComponentProps<typeof ListItem>)}
-            onClick={() => {
-              onPublicationSelect("clear"), onCategorySelect("clear");
-            }}
-          >
-            Show All
-          </ListItem>
-          {displayedPublications?.length === 0 ? (
-            <div
-              role="status"
-              className="max-w-md p-4 space-y-4 border border-gray-200 divide-y divide-gray-200 rounded-sm shadow-sm animate-pulse dark:divide-gray-700 md:p-6 dark:border-gray-700"
+          <h3 className="text-sm font-bold text-neutral-900 tracking-wide select-none">
+            Categories
+          </h3>
+          <div className="flex items-center gap-2">
+            {selectedCategoryIds.length > 0 && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onCategorySelect("clear");
+                }}
+                className="text-xs text-neutral-500 font-semibold transition-colors"
+              >
+                Clear
+              </button>
+            )}
+            <svg
+              className={`w-4 h-4 text-black transition-transform duration-200 ${
+                isCategoriesOpen ? "rotate-0" : "-rotate-90"
+              }`}
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth="2.5"
             >
-              {[...Array(5)].map((_, idx) => (
-                <div
-                  key={idx}
-                  className={`flex items-center justify-between ${
-                    idx !== 0 ? "pt-4" : ""
-                  }`}
-                >
-                  <div>
-                    <div className="h-2.5 bg-gray-300 rounded-full dark:bg-gray-600 w-24 mb-2.5"></div>
-                    <div className="w-32 h-2 bg-gray-200 rounded-full dark:bg-gray-700"></div>
-                  </div>
-                  <div className="h-2.5 bg-gray-300 rounded-full dark:bg-gray-700 w-12"></div>
-                </div>
-              ))}
-              <span className="sr-only">Loading...</span>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+            </svg>
+          </div>
+        </div>
+
+        {isCategoriesOpen && (
+          <div className="flex flex-col gap-3 mt-1">
+            {/* Search Input */}
+            <div className="relative">
+              <svg
+                className="absolute left-3 top-2.5 w-3.5 h-3.5 text-neutral-450"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth="2.5"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                />
+              </svg>
+              <input
+                type="text"
+                placeholder="Search categories..."
+                value={catSearch}
+                onChange={(e) => setCatSearch(e.target.value)}
+                className="w-full text-xs bg-neutral-50/70 border border-neutral-200/60 rounded-xl py-2 pl-9 pr-3 outline-none transition-all text-neutral-850"
+              />
             </div>
-          ) : (
-            displayedPublications.map((publication: any) => {
-              const isChecked = selectedPublicationIds.includes(
-                publication?.id
-              );
-              return (
-                <ListItem
-                  {...({} as React.ComponentProps<typeof ListItem>)}
-                  key={publication?.id}
+
+            {/* List Content */}
+            <div className="flex flex-col gap-1 max-h-[350px] overflow-y-auto pr-1 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-neutral-200 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-neutral-350">
+              
+              {/* Show All / All Categories Option */}
+              <div
+                onClick={() => onCategorySelect("clear")}
+                className={`flex items-center gap-3 px-2 py-2 rounded-lg cursor-pointer transition-all duration-200 ${
+                  selectedCategoryIds.length === 0
+                    ? "font-semibold"
+                    : "text-neutral-600 hover:bg-neutral-50/60"
+                }`}
+              >
+                {selectedCategoryIds.length === 0 ? <CheckedIcon /> : <UncheckedIcon />}
+                <span className="text-xs select-none">All Categories</span>
+              </div>
+
+              {loading ? (
+                <div className="flex flex-col gap-3 p-2">
+                  {[...Array(4)].map((_, idx) => (
+                    <div key={idx} className="flex items-center justify-between gap-3 animate-pulse">
+                      <div className="h-4 w-4 bg-neutral-200 rounded-full"></div>
+                      <div className="h-3 bg-neutral-200 rounded flex-1"></div>
+                      <div className="h-4 w-6 bg-neutral-200 rounded-full"></div>
+                    </div>
+                  ))}
+                </div>
+              ) : visibleCategories?.length > 0 ? (
+                visibleCategories.map((category: any) => {
+                  const isChecked = selectedCategoryIds.includes(category.id);
+                  const filteredCount = (products || []).filter(
+                    (product: any) => String(product?.sub_category_id) === String(category.id)
+                  ).length;
+
+                  return (
+                    <div
+                      key={category.id}
+                      className={`flex items-center justify-between px-2 py-2 rounded-lg cursor-pointer transition-all duration-200 ${
+                        isChecked
+                          ? "text-black font-semibold"
+                          : "text-neutral-600 hover:bg-neutral-50/60"
+                      }`}
+                      onClick={() => onCategorySelect(category.id)}
+                    >
+                      <div className="flex items-center gap-3 min-w-0 flex-1">
+                        {isChecked ? <CheckedIcon /> : <UncheckedIcon />}
+                        <span className="text-xs truncate select-none">{category.name}</span>
+                      </div>
+
+                      {filteredCount > 0 && (
+                        <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border scale-90 ${
+                          isChecked 
+                            ? "text-black bg-neutral-50 border-neutral-200" 
+                            : "text-neutral-450 bg-neutral-50 border-neutral-150"
+                        }`}>
+                          {filteredCount}
+                        </span>
+                      )}
+                    </div>
+                  );
+                })
+              ) : (
+                <div className="py-8 text-center text-xs text-neutral-400">
+                  No categories found
+                </div>
+              )}
+
+              {/* Load More Button */}
+              {filteredCategories.length > 8 && (
+                <button
+                  onClick={() => setCategoryLimit(categoryLimit === 8 ? filteredCategories.length : 8)}
+                  className="text-xs text-black font-bold hover:underline transition-colors mt-2 px-2 py-1 flex items-center gap-1 self-start select-none"
                 >
-                  <input
-                    type="checkbox"
-                    className="mr-2"
-                    checked={isChecked}
-                    onChange={() => onPublicationSelect(publication?.id)}
-                  />{" "}
-                  <p className="md:w-[80px]">{publication?.name}</p>
-                  <ListItemSuffix
-                    {...({} as React.ComponentProps<typeof ListItemSuffix>)}
-                  >
-                    <Chip
-                      //value={filteredCount || 0}
-                      value={publication?.products?.length}
-                      variant="ghost"
-                      size="sm"
-                      className="rounded-full"
-                    />
-                  </ListItemSuffix>
-                </ListItem>
-              );
-            })
-          )}
-        </List>
-      </Card>
+                  {categoryLimit === 8 ? "+ Load More" : "- Show Less"}
+                </button>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* ================= Publications Section ================= */}
+      <div className="flex flex-col gap-3">
+        {/* Accordion Header */}
+        <div 
+          onClick={() => setIsPublicationsOpen(!isPublicationsOpen)}
+          className="flex items-center justify-between cursor-pointer pb-2 border-b border-neutral-100 hover:border-neutral-200 transition-colors"
+        >
+          <h3 className="text-sm font-bold text-neutral-900 tracking-wide select-none">
+            Publications
+          </h3>
+          <div className="flex items-center gap-2">
+            {selectedPublicationIds.length > 0 && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onPublicationSelect("clear");
+                }}
+                className="text-xs text-neutral-500 font-semibold transition-colors"
+              >
+                Clear
+              </button>
+            )}
+            <svg
+              className={`w-4 h-4 text-black transition-transform duration-200 ${
+                isPublicationsOpen ? "rotate-0" : "-rotate-90"
+              }`}
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth="2.5"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+            </svg>
+          </div>
+        </div>
+
+        {isPublicationsOpen && (
+          <div className="flex flex-col gap-3 mt-1">
+            {/* Search Input */}
+            <div className="relative">
+              <svg
+                className="absolute left-3 top-2.5 w-3.5 h-3.5 text-neutral-450"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth="2.5"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                />
+              </svg>
+              <input
+                type="text"
+                placeholder="Search publications..."
+                value={pubSearch}
+                onChange={(e) => setPubSearch(e.target.value)}
+                className="w-full text-xs bg-neutral-50/70 border border-neutral-200/60 rounded-xl py-2 pl-9 pr-3 outline-none transition-all text-neutral-855"
+              />
+            </div>
+
+            {/* List Content */}
+            <div className="flex flex-col gap-1 max-h-[350px] overflow-y-auto pr-1 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-neutral-200 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-neutral-350">
+              
+              {/* Show All / All Publications Option */}
+              <div
+                onClick={() => onPublicationSelect("clear")}
+                className={`flex items-center gap-3 px-2 py-2 rounded-lg cursor-pointer transition-all duration-200 ${
+                  selectedPublicationIds.length === 0
+                    ? "font-semibold"
+                    : "text-neutral-600 hover:bg-neutral-50/60"
+                }`}
+              >
+                {selectedPublicationIds.length === 0 ? <CheckedIcon /> : <UncheckedIcon />}
+                <span className="text-xs select-none">All Publications</span>
+              </div>
+
+              {loading ? (
+                <div className="flex flex-col gap-3 p-2">
+                  {[...Array(4)].map((_, idx) => (
+                    <div key={idx} className="flex items-center justify-between gap-3 animate-pulse">
+                      <div className="h-4 w-4 bg-neutral-200 rounded-full"></div>
+                      <div className="h-3 bg-neutral-200 rounded flex-1"></div>
+                      <div className="h-4 w-6 bg-neutral-200 rounded-full"></div>
+                    </div>
+                  ))}
+                </div>
+              ) : visiblePubs?.length > 0 ? (
+                visiblePubs.map((publication: any) => {
+                  const isChecked = selectedPublicationIds.includes(publication.id);
+                  const filteredCount = publication?.products?.length || 0;
+
+                  return (
+                    <div
+                      key={publication.id}
+                      className={`flex items-center justify-between px-2 py-2 rounded-lg cursor-pointer transition-all duration-200 ${
+                        isChecked
+                          ? "text-black font-semibold"
+                          : "text-neutral-600 hover:bg-neutral-50/60"
+                      }`}
+                      onClick={() => onPublicationSelect(publication.id)}
+                    >
+                      <div className="flex items-center gap-3 min-w-0 flex-1">
+                        {isChecked ? <CheckedIcon /> : <UncheckedIcon />}
+                        <span className="text-xs truncate select-none">{publication.name}</span>
+                      </div>
+
+                      {filteredCount > 0 && (
+                        <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border scale-90 ${
+                          isChecked 
+                            ? "text-black bg-neutral-50 border-neutral-200" 
+                            : "text-neutral-455 bg-neutral-50 border-neutral-150"
+                        }`}>
+                          {filteredCount}
+                        </span>
+                      )}
+                    </div>
+                  );
+                })
+              ) : (
+                <div className="py-8 text-center text-xs text-neutral-400">
+                  No publications found
+                </div>
+              )}
+
+              {/* Load More Button */}
+              {filteredPubs.length > 8 && (
+                <button
+                  onClick={() => setPublicationLimit(publicationLimit === 8 ? filteredPubs.length : 8)}
+                  className="text-xs text-black font-bold hover:underline transition-colors mt-2 px-2 py-1 flex items-center gap-1 self-start select-none"
+                >
+                  {publicationLimit === 8 ? "+ Load More" : "- Show Less"}
+                </button>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+
     </div>
   );
 }
