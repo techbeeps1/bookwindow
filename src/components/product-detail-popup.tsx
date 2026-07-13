@@ -63,7 +63,7 @@ export default function ProductDialog({ open, handleOpen, slug }: any) {
           <div className="container px-4 pb-4 md:flex md:col-12 w-full h-[500px] overflow-auto overflow-y">
             <div className="flex gap-[30px] flex-col lg:flex-row">
               {/* Product Images */}              
-                <ImageBook src={`${config.apiUrl}storage/app/public/${productData?.image}`} alt={"Product"} style="w-full"/>         
+                <ImageBook src={`${config.apiUrl}storage/app/public/${productData?.image}`} alt={"Product"} />         
 
               {/* Product Details */}
               <div className="w-full">
