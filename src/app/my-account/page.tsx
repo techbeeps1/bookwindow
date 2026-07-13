@@ -111,45 +111,100 @@ export default function AccountPage() {
           <div className="bg-white border border-neutral-200/80 rounded-3xl flex flex-col md:flex-row overflow-hidden min-h-[60vh]">
             
             {/* Sidebar container */}
-            <aside className="w-full md:w-64 flex-shrink-0 bg-[#fbfbfb] border-b md:border-b-0 md:border-r border-neutral-200/80 p-6 flex flex-col gap-6">
-              
-              {/* User block info */}
+            <aside className="w-full md:w-64 flex-shrink-0 bg-[#fbfbfb] border-b md:border-b-0 md:border-r border-neutral-200/80 p-5 flex flex-col justify-between gap-6 min-h-[50vh] md:min-h-[70vh]">
+              <div>
+                {/* Brand/Logo header matching reference image */}
+                <div className="flex items-center gap-3 pb-6 border-b border-neutral-200/80">
+                  <div className="w-6.5 h-6.5 rounded bg-black flex items-center justify-center text-white font-extrabold text-xs">
+                    B
+                  </div>
+                  <span className="font-extrabold text-sm uppercase tracking-wider text-neutral-900">Bookwindow</span>
+                </div>
+
+                {/* Navigation Tabs */}
+                <nav className="flex flex-col gap-1.5 pt-4">
+                  {tabs.map((tab) => {
+                    const isActive = activeTab === tab.key;
+                    
+                    let icon = null;
+                    if (tab.key === "dashboard") {
+                      icon = (
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.2">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2v-4z" />
+                        </svg>
+                      );
+                    } else if (tab.key === "orders") {
+                      icon = (
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.2">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                        </svg>
+                      );
+                    } else if (tab.key === "addresses") {
+                      icon = (
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.2">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                      );
+                    } else if (tab.key === "account-details") {
+                      icon = (
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.2">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                      );
+                    } else if (tab.key === "password") {
+                      icon = (
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.2">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                        </svg>
+                      );
+                    } else if (tab.key === "logout") {
+                      icon = (
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.2">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                        </svg>
+                      );
+                    }
+
+                    return (
+                      <button
+                        key={tab.key}
+                        onClick={() => {
+                          setActiveTab(tab.key);
+                          if (tab.key === "logout") {
+                            logout();
+                          }
+                        }}
+                        className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-xs font-bold uppercase tracking-wider cursor-pointer ${
+                          isActive
+                            ? "bg-black text-white shadow-sm"
+                            : "text-neutral-500 hover:text-black hover:bg-neutral-100"
+                        }`}
+                      >
+                        {icon}
+                        <span>{tab.label}</span>
+                      </button>
+                    );
+                  })}
+                </nav>
+              </div>
+
+              {/* User block info styled at bottom */}
               {customer && (
-                <div className="pb-4 border-b border-neutral-200">
-                  <span className="text-[10px] font-bold uppercase text-neutral-400 tracking-wider block mb-1">Account Workspace</span>
-                  <span className="text-sm font-bold text-neutral-900 block truncate">
-                    {customer.first_name} {customer.last_name}
-                  </span>
-                  <span className="text-sm text-neutral-450 block truncate mt-0.5">
-                    {customer.email}
-                  </span>
+                <div className="pt-4 border-t border-neutral-200/80 flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-full bg-neutral-900 text-white flex items-center justify-center font-bold text-xs shadow-sm">
+                    {customer.first_name?.[0] || "U"}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <span className="text-xs font-bold text-neutral-900 block truncate leading-tight">
+                      {customer.first_name} {customer.last_name}
+                    </span>
+                    <span className="text-[10px] text-neutral-400 font-bold block truncate mt-0.5 leading-none">
+                      {customer.email}
+                    </span>
+                  </div>
                 </div>
               )}
-
-              {/* Navigation Tabs */}
-              <nav className="flex flex-col gap-2">
-                {tabs.map((tab) => {
-                  const isActive = activeTab === tab.key;
-                  return (
-                    <button
-                      key={tab.key}
-                      onClick={() => {
-                        setActiveTab(tab.key);
-                        if (tab.key === "logout") {
-                          logout();
-                        }
-                      }}
-                      className={`w-full text-left py-2.5 transition-all text-sm uppercase tracking-wider cursor-pointer ${
-                        isActive
-                          ? "border-l-2 border-black pl-3 text-black font-bold"
-                          : "border-l-2 border-transparent pl-3 text-neutral-400 hover:text-black hover:border-neutral-300 font-medium"
-                      }`}
-                    >
-                      {tab.label}
-                    </button>
-                  );
-                })}
-              </nav>
             </aside>
 
             {/* Main Content Area wrapper */}
@@ -221,6 +276,10 @@ function OrdersTab({ userOrders }: any) {
   const [isOrderShow, setIsOrderShow] = useState<boolean>(false);
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filterTab, setFilterTab] = useState<"all" | "active" | "completed" | "cancelled">("all");
+  const [selectedRows, setSelectedRows] = useState<Record<string, boolean>>({});
+  
   const itemsPerPage = 6;
 
   const handleViewOrder = (order: any) => {
@@ -228,8 +287,6 @@ function OrdersTab({ userOrders }: any) {
     setIsOrderShow(true);
   };
 
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const sortedItems = Array.isArray(userOrders?.orders)
     ? [...userOrders?.orders].sort((a, b) => {
         const dateA = new Date(a.order_details.created_at.replace(" ", "T")).getTime();
@@ -238,73 +295,211 @@ function OrdersTab({ userOrders }: any) {
       })
     : [];
 
-  const currentItems = sortedItems?.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(userOrders?.orders?.length / itemsPerPage);
+  const filteredItems = sortedItems.filter((order: any) => {
+    const orderNum = order?.order_details?.order_number?.toLowerCase() || "";
+    const status = order?.order_details?.status?.toLowerCase() || "";
+    const amount = String(order?.order_details?.total_amount) || "";
+    const date = order?.order_details?.created_at?.toLowerCase() || "";
+    
+    const matchesSearch =
+      orderNum.includes(searchQuery.toLowerCase()) ||
+      status.includes(searchQuery.toLowerCase()) ||
+      amount.includes(searchQuery.toLowerCase()) ||
+      date.includes(searchQuery.toLowerCase());
+
+    if (!matchesSearch) return false;
+
+    const isSuccess = ["delivered", "completed", "paid", "success"].some((s) => status?.includes(s));
+    const isCancelled = ["cancelled", "failed", "refunded"].some((s) => status?.includes(s));
+
+    if (filterTab === "active") {
+      return !isSuccess && !isCancelled;
+    }
+    if (filterTab === "completed") {
+      return isSuccess;
+    }
+    if (filterTab === "cancelled") {
+      return isCancelled;
+    }
+    return true;
+  });
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filteredItems.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [userOrders?.orders]);
+  }, [userOrders?.orders, searchQuery, filterTab]);
+
+  const isAllSelectedOnPage = currentItems.length > 0 && currentItems.every((item) => selectedRows[item.id]);
+  
+  const handleSelectAll = () => {
+    const newSelected = { ...selectedRows };
+    if (isAllSelectedOnPage) {
+      currentItems.forEach((item) => {
+        delete newSelected[item.id];
+      });
+    } else {
+      currentItems.forEach((item) => {
+        newSelected[item.id] = true;
+      });
+    }
+    setSelectedRows(newSelected);
+  };
+
+  const handleSelectRow = (id: string) => {
+    setSelectedRows((prev) => {
+      const updated = { ...prev };
+      if (updated[id]) {
+        delete updated[id];
+      } else {
+        updated[id] = true;
+      }
+      return updated;
+    });
+  };
 
   return (
     <div>
       {!isOrderShow && (
         <>
-          <div className="mb-6 pb-4 border-b border-neutral-100">
-            <h1 className="text-xl sm:text-2xl font-bold text-neutral-900 uppercase tracking-tight">Orders</h1>
-            <p className="text-sm text-neutral-450 mt-1">Review your recent transactions and order status.</p>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 pb-4 border-b border-neutral-100">
+            <div>
+              <h1 className="text-2xl font-extrabold text-neutral-900 tracking-tight uppercase">Orders</h1>
+              <p className="text-sm text-neutral-450 mt-1">Review your recent transactions and order status.</p>
+            </div>
+            
+            <div className="relative w-full sm:w-80">
+              <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400">
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </span>
+              <input
+                type="text"
+                placeholder="Search order, status, date..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-10 pr-4 py-2.5 text-sm text-black bg-[#f9f9f9] border border-neutral-200 focus:bg-white rounded-xl outline-none focus:border-black focus:ring-2 focus:ring-black/5 transition-all duration-200"
+              />
+            </div>
           </div>
 
-          {currentItems.length === 0 ? (
-            <div className="text-center py-12 border border-dashed border-neutral-200 rounded-2xl bg-[#fbfbfb]">
-              <p className="text-sm text-neutral-450">No orders found.</p>
+          <div className="flex border-b border-neutral-200 mb-8 overflow-x-auto gap-8 text-xs font-bold uppercase tracking-wider scrollbar-none">
+            <button
+              onClick={() => setFilterTab("all")}
+              className={`pb-3 transition-all relative whitespace-nowrap cursor-pointer ${
+                filterTab === "all" ? "text-neutral-900 font-bold" : "text-neutral-400 hover:text-neutral-900"
+              }`}
+            >
+              All Orders
+              {filterTab === "all" && <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-black rounded-full" />}
+            </button>
+            <button
+              onClick={() => setFilterTab("active")}
+              className={`pb-3 transition-all relative whitespace-nowrap cursor-pointer ${
+                filterTab === "active" ? "text-neutral-900 font-bold" : "text-neutral-400 hover:text-neutral-900"
+              }`}
+            >
+              Active
+              {filterTab === "active" && <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-black rounded-full" />}
+            </button>
+            <button
+              onClick={() => setFilterTab("completed")}
+              className={`pb-3 transition-all relative whitespace-nowrap cursor-pointer ${
+                filterTab === "completed" ? "text-neutral-900 font-bold" : "text-neutral-400 hover:text-neutral-900"
+              }`}
+            >
+              Completed
+              {filterTab === "completed" && <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-black rounded-full" />}
+            </button>
+            <button
+              onClick={() => setFilterTab("cancelled")}
+              className={`pb-3 transition-all relative whitespace-nowrap cursor-pointer ${
+                filterTab === "cancelled" ? "text-neutral-900 font-bold" : "text-neutral-400 hover:text-neutral-900"
+              }`}
+            >
+              Cancelled
+              {filterTab === "cancelled" && <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-black rounded-full" />}
+            </button>
+          </div>
+
+          {filteredItems.length === 0 ? (
+            <div className="text-center py-16 border border-dashed border-neutral-200 rounded-3xl bg-[#fbfbfb]">
+              <p className="text-sm text-neutral-450 font-medium">No orders found matching the filter.</p>
             </div>
           ) : (
-            <div className="overflow-x-auto border border-neutral-200 rounded-xl bg-white shadow-sm">
+            <div className="overflow-x-auto rounded-2xl border border-neutral-200/80 bg-white shadow-sm">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="bg-neutral-50 border-b border-neutral-200">
-                    <th className="p-4 text-sm font-semibold uppercase tracking-wider text-neutral-500">Order ID</th>
-                    <th className="p-4 text-sm font-semibold uppercase tracking-wider text-neutral-500">Date</th>
-                    <th className="p-4 text-sm font-semibold uppercase tracking-wider text-neutral-500">Status</th>
-                    <th className="p-4 text-sm font-semibold uppercase tracking-wider text-neutral-500">Total</th>
-                    <th className="p-4 text-sm font-semibold uppercase tracking-wider text-neutral-500 text-right">Actions</th>
+                  <tr className="border-b border-neutral-200/80 bg-[#fbfbfb]">
+                    <th className="p-4 w-12 text-center">
+                      <div className="flex items-center justify-center">
+                        <input
+                          type="checkbox"
+                          checked={isAllSelectedOnPage}
+                          onChange={handleSelectAll}
+                          className="w-4 h-4 rounded border-neutral-300 text-black focus:ring-black accent-black cursor-pointer"
+                        />
+                      </div>
+                    </th>
+                    <th className="p-4 text-xs font-bold uppercase tracking-wider text-neutral-450">Order no.</th>
+                    <th className="p-4 text-xs font-bold uppercase tracking-wider text-neutral-450">Created date</th>
+                    <th className="p-4 text-xs font-bold uppercase tracking-wider text-neutral-450">Status</th>
+                    <th className="p-4 text-xs font-bold uppercase tracking-wider text-neutral-450">Order Total</th>
+                    <th className="p-4 text-xs font-bold uppercase tracking-wider text-neutral-450 text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-neutral-100">
+                <tbody className="divide-y divide-neutral-150">
                   {currentItems.map((order: any) => {
                     const statusLower = order?.order_details?.status?.toLowerCase();
                     const isSuccess = ["delivered", "completed", "paid", "success"].some((s) => statusLower?.includes(s));
                     const isCancelled = ["cancelled", "failed", "refunded"].some((s) => statusLower?.includes(s));
                     
                     return (
-                      <tr key={order?.id} className="hover:bg-neutral-50/40 transition-colors">
+                      <tr key={order?.id} className={`hover:bg-neutral-50/40 transition-colors ${selectedRows[order.id] ? "bg-neutral-50/20" : ""}`}>
+                        <td className="p-4 text-center">
+                          <div className="flex items-center justify-center">
+                            <input
+                              type="checkbox"
+                              checked={!!selectedRows[order.id]}
+                              onChange={() => handleSelectRow(order.id)}
+                              className="w-4 h-4 rounded border-neutral-300 text-black focus:ring-black accent-black cursor-pointer"
+                            />
+                          </div>
+                        </td>
                         <td
                           className="p-4 text-sm font-bold text-neutral-900 cursor-pointer hover:underline"
                           onClick={() => handleViewOrder(order)}
                         >
                           #{order?.order_details?.order_number}
                         </td>
-                        <td className="p-4 text-sm text-neutral-500">
+                        <td className="p-4 text-sm text-neutral-500 font-semibold">
                           {order?.order_details?.created_at}
                         </td>
                         <td className="p-4 text-sm">
-                          <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold uppercase tracking-wider border ${
+                          <span className={`inline-flex items-center px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider border ${
                             isSuccess
-                              ? "bg-green-50 text-green-700 border-green-100"
+                              ? "bg-neutral-100 text-neutral-900 border-neutral-300/80"
                               : isCancelled
-                              ? "bg-red-50 text-red-700 border-red-100"
-                              : "bg-amber-50 text-amber-700 border-amber-100"
+                              ? "bg-red-50/60 text-red-700 border-red-100/80 line-through"
+                              : "bg-white text-black border-2 border-black"
                           }`}>
                             {order?.order_details?.status}
                           </span>
                         </td>
-                        <td className="p-4 text-sm text-neutral-800 font-medium">
-                          ₹{order?.order_details?.total_amount} <span className="text-neutral-455">({order?.items.length} {order?.items.length === 1 ? "item" : "items"})</span>
+                        <td className="p-4 text-sm text-neutral-900 font-bold">
+                          ₹{order?.order_details?.total_amount}{" "}
+                          <span className="text-neutral-400 font-semibold text-xs ml-1">
+                            ({order?.items.length} {order?.items.length === 1 ? "item" : "items"})
+                          </span>
                         </td>
                         <td className="p-4 text-right">
                           <button
                             onClick={() => handleViewOrder(order)}
-                            className="bg-black hover:bg-neutral-900 text-white text-xs font-semibold uppercase tracking-wider px-3.5 py-2 rounded-lg transition-all active:scale-95 cursor-pointer shadow-sm"
+                            className="bg-white hover:bg-black hover:text-white text-black border border-neutral-300 hover:border-black text-xs font-bold uppercase tracking-wider px-3.5 py-1.5 rounded-xl transition-all cursor-pointer shadow-sm"
                           >
                             View
                           </button>
@@ -318,62 +513,57 @@ function OrdersTab({ userOrders }: any) {
           )}
 
           {totalPages > 1 && (
-            <div className="flex justify-center mt-8 items-center space-x-6">
-              {/* Previous Button */}
-              <button
-                type="button"
-                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                disabled={currentPage === 1}
-                className={`flex items-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-full border transition-all duration-200 active:scale-95 ${
-                  currentPage === 1
-                    ? "bg-[#f5f5f5] text-neutral-400 border-transparent cursor-not-allowed opacity-60"
-                    : "bg-white text-black border-neutral-300 hover:bg-neutral-50 hover:border-neutral-400 hover:shadow-sm"
-                }`}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={2.5}
-                  stroke="currentColor"
-                  className="w-4 h-4 pointer-events-none"
+            <div className="flex justify-between items-center mt-8">
+              <span className="text-xs font-bold text-neutral-450 uppercase tracking-wider">
+                Showing page <span className="text-black font-extrabold">{currentPage}</span> of {totalPages}
+              </span>
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                  disabled={currentPage === 1}
+                  className={`p-2.5 rounded-full border transition-all duration-200 active:scale-95 ${
+                    currentPage === 1
+                      ? "border-neutral-200 text-neutral-300 cursor-not-allowed opacity-50"
+                      : "border-neutral-300 text-black hover:bg-neutral-50 hover:border-black hover:shadow-sm cursor-pointer"
+                  }`}
+                  title="Previous Page"
                 >
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
-                </svg>
-                <span>Previous</span>
-              </button>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={2.5}
+                    stroke="currentColor"
+                    className="w-4 h-4 pointer-events-none"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+                  </svg>
+                </button>
 
-              {/* Page Info */}
-              <div className="flex items-center bg-[#f4f4f4] px-4 py-2 rounded-full border border-neutral-200">
-                <span className="text-sm font-bold text-neutral-800">
-                  Page <span className="text-black">{currentPage}</span> of{" "}
-                  <span className="text-black">{totalPages}</span>
-                </span>
+                <button
+                  type="button"
+                  onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                  disabled={currentPage === totalPages}
+                  className={`p-2.5 rounded-full border transition-all duration-200 active:scale-95 ${
+                    currentPage === totalPages
+                      ? "border-neutral-200 text-neutral-300 cursor-not-allowed opacity-50"
+                      : "border-neutral-300 text-black hover:bg-neutral-50 hover:border-black hover:shadow-sm cursor-pointer"
+                  }`}
+                  title="Next Page"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={2.5}
+                    stroke="currentColor"
+                    className="w-4 h-4 pointer-events-none"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+                  </svg>
+                </button>
               </div>
-
-              {/* Next Button */}
-              <button
-                type="button"
-                onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-                disabled={currentPage === totalPages}
-                className={`flex items-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-full border transition-all duration-200 active:scale-95 ${
-                  currentPage === totalPages
-                    ? "bg-[#f5f5f5] text-neutral-400 border-transparent cursor-not-allowed opacity-60"
-                    : "bg-white text-black border-neutral-300 hover:bg-neutral-50 hover:border-neutral-400 hover:shadow-sm"
-                }`}
-              >
-                <span>Next</span>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={2.5}
-                  stroke="currentColor"
-                  className="w-4 h-4 pointer-events-none"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
-                </svg>
-              </button>
             </div>
           )}
         </>
@@ -381,18 +571,16 @@ function OrdersTab({ userOrders }: any) {
 
       {isOrderShow && selectedOrder && (
         <div className="max-w-4xl mx-auto text-neutral-900">
-          {/* Order Header */}
-          <div className="flex items-center gap-3 mb-6 pb-4 border-b border-neutral-100">
+          <div className="flex items-center gap-4 mb-8 pb-4 border-b border-neutral-100">
             <button
               onClick={() => setIsOrderShow(false)}
-              className="w-9 h-9 rounded-full border border-neutral-200 hover:border-black flex items-center justify-center hover:bg-neutral-50 transition-colors cursor-pointer"
+              className="w-10 h-10 rounded-full border border-neutral-200 hover:border-black flex items-center justify-center hover:bg-neutral-50 transition-all cursor-pointer shadow-sm active:scale-95"
               title="Go back"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
-                strokeWidth="2.5"
                 stroke="currentColor"
                 className="w-4 h-4"
               >
@@ -400,98 +588,136 @@ function OrdersTab({ userOrders }: any) {
               </svg>
             </button>
             <div>
-              <h1 className="text-xl sm:text-2xl font-bold uppercase tracking-tight">Order Details</h1>
-              <p className="text-sm text-neutral-400 mt-0.5">Order #{selectedOrder?.order_details?.order_number}</p>
+              <h1 className="text-xl sm:text-2xl font-extrabold uppercase tracking-tight text-neutral-900">Order Details</h1>
+              <p className="text-xs text-neutral-450 font-bold uppercase tracking-wider mt-0.5">Order #{selectedOrder?.order_details?.order_number}</p>
             </div>
-          </div>
-
-          <div className="bg-[#fbfbfb] border border-neutral-200 rounded-xl p-4 mb-6 text-sm font-semibold text-neutral-700 leading-relaxed shadow-sm">
+          </div>          <div className="bg-[#fbfbfb] border border-neutral-200/80 rounded-2xl p-5 mb-8 text-sm font-semibold text-neutral-700 leading-relaxed shadow-sm">
             Order{" "}
-            <span className="bg-amber-100 text-neutral-900 px-1.5 py-0.5 rounded font-bold">
+            <span className="bg-black text-white px-2.5 py-1 rounded-lg text-xs font-bold font-mono inline-block">
               #{selectedOrder?.order_details?.order_number}
             </span>{" "}
             was placed on{" "}
-            <span className="bg-neutral-100 text-neutral-900 px-1.5 py-0.5 rounded font-bold">
+            <span className="bg-neutral-100 text-neutral-900 border border-neutral-200 px-2.5 py-1 rounded-lg text-xs font-bold inline-block">
               {selectedOrder?.order_details?.created_at}
             </span>{" "}
             and is currently{" "}
-            <span className="bg-green-100 text-green-800 px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">
+            <span className="bg-white text-black border border-black px-2.5 py-1 rounded-lg text-xs font-bold uppercase tracking-wider inline-block">
               {selectedOrder?.order_details?.status}
             </span>.
           </div>
 
           {/* Ordered items */}
-          <div className="border border-neutral-200 rounded-xl overflow-hidden bg-white mb-6">
-            <div className="grid grid-cols-2 bg-neutral-50 font-semibold text-xs uppercase tracking-wider p-4 border-b border-neutral-200 text-neutral-500">
+          <div className="border border-neutral-200/80 rounded-2xl overflow-hidden bg-white mb-8 shadow-sm">
+            <div className="flex justify-between items-center bg-[#fbfbfb] font-bold text-xs uppercase tracking-wider px-6 py-4 border-b border-neutral-200 text-neutral-450">
               <span>Product</span>
               <span className="text-right">Total</span>
             </div>
 
-            <div className="divide-y divide-neutral-100">
+            <div className="divide-y divide-neutral-150">
               {selectedOrder?.items?.map((item: any) => (
-                <div key={item?.id} className="p-4 hover:bg-neutral-50/20 transition-colors">
-                  <div className="flex justify-between items-center gap-4">
-                    <div className="text-sm font-semibold text-neutral-800">
-                      <span className="font-bold text-neutral-950">{item.product_name}</span> × <strong className="font-bold text-neutral-900 bg-neutral-100 px-1.5 py-0.5 rounded text-xs">{item.quantity || 1}</strong>
+                <div key={item?.id} className="p-6 hover:bg-neutral-50/20 transition-colors">
+                  <div className="flex justify-between items-start gap-6">
+                    <div className="text-sm font-semibold text-neutral-800 flex-1">
+                      <span className="font-bold text-neutral-950 block sm:inline">
+                        {item.product_name ? item.product_name.replace(/#COMMA#/g, ",") : ""}
+                      </span>{" "}
+                      <span className="text-neutral-400 font-bold mx-1 hidden sm:inline">×</span>{" "}
+                      <strong className="font-bold text-neutral-900 bg-neutral-100 border border-neutral-200 px-2 py-0.5 rounded-lg text-xs font-mono inline-block mt-1 sm:mt-0">
+                        Qty: {item.quantity || 1}
+                      </strong>
                       {item.size && (
-                        <div className="text-xs text-neutral-450 font-semibold mt-1">Size: {item.size}</div>
+                        <div className="text-xs text-neutral-450 font-bold uppercase tracking-wider mt-1.5">Size: {item.size}</div>
                       )}
                     </div>
-                    <div className="text-right font-bold text-sm text-neutral-900">₹{item.price}</div>
+                    <div className="text-right font-extrabold text-sm text-neutral-950 whitespace-nowrap pt-0.5">₹{item.price}</div>
                   </div>
                 </div>
               ))}
             </div>
 
             {/* Summary */}
-            <div className="bg-neutral-50/30 p-4 border-t border-neutral-200 divide-y divide-neutral-200/60 text-sm font-semibold text-neutral-600 space-y-3">
-              <div className="flex justify-between pb-3">
-                <span>Subtotal</span>
-                <span className="text-neutral-950 font-bold">₹{selectedOrder?.order_details?.subtotal}</span>
+            <div className="bg-[#fbfbfb]/50 p-5 border-t border-neutral-200/80 divide-y divide-neutral-200/60 text-sm font-semibold text-neutral-600 space-y-3.5">
+              <div className="flex justify-between pb-3.5">
+                <span className="text-neutral-455 font-bold uppercase tracking-wider text-xs">Subtotal</span>
+                <span className="text-neutral-955 font-bold">₹{selectedOrder?.order_details?.subtotal}</span>
               </div>
-              <div className="flex justify-between py-3">
-                <span>Discount</span>
+              <div className="flex justify-between py-3.5">
+                <span className="text-neutral-455 font-bold uppercase tracking-wider text-xs">Discount</span>
                 <span className="text-green-700 font-bold">-₹{selectedOrder?.order_details?.discount_amount}</span>
               </div>
-              <div className="flex justify-between py-3">
-                <span>Payment Method</span>
-                <span className="text-neutral-955 uppercase font-bold">{selectedOrder?.order_details?.payment_method}</span>
+              <div className="flex justify-between py-3.5">
+                <span className="text-neutral-455 font-bold uppercase tracking-wider text-xs">Payment Method</span>
+                <span className="text-neutral-955 uppercase font-extrabold">{selectedOrder?.order_details?.payment_method}</span>
               </div>
-              <div className="flex justify-between py-3">
-                <span>Shipping</span>
+              <div className="flex justify-between py-3.5">
+                <span className="text-neutral-455 font-bold uppercase tracking-wider text-xs">Shipping</span>
                 <span className="text-neutral-955 font-bold">
                   {selectedOrder?.order_details?.shipping_method
                     ? selectedOrder?.order_details?.shipping_method
                     : `₹${selectedOrder?.order_details?.shipping_amount}`}
                 </span>
               </div>
-              <div className="flex justify-between pt-3 font-bold text-sm text-neutral-955">
-                <span>Total</span>
-                <span className="text-lg font-bold">₹{selectedOrder?.order_details?.total_amount}</span>
+              <div className="flex justify-between pt-3.5 font-bold text-sm text-neutral-955">
+                <span className="text-neutral-900 font-extrabold uppercase tracking-wider text-xs flex items-center">Total Amount</span>
+                <span className="text-xl font-extrabold text-neutral-955">₹{selectedOrder?.order_details?.total_amount}</span>
               </div>
             </div>
           </div>
 
           {/* Billing Info Address Card */}
-          <div className="bg-[#fbfbfb] border border-neutral-200 rounded-xl p-5 max-w-md shadow-sm">
-            <h2 className="text-sm font-bold uppercase tracking-wider text-neutral-900 mb-3 border-b border-neutral-200 pb-1.5">Billing Address</h2>
-            <div className="text-sm space-y-2 leading-relaxed text-neutral-600 font-medium">
-              <p className="font-bold text-neutral-900">{selectedOrder?.order_details?.billing_name}</p>
-              <p>{selectedOrder?.order_details?.address}</p>
-              <p>{selectedOrder?.order_details?.billing_city}, {selectedOrder?.order_details?.billing_zip}</p>
-              <p>{selectedOrder?.order_details?.billing_state}, {selectedOrder?.order_details?.billing_country}</p>
-              <p className="pt-2 border-t border-neutral-100 flex items-center gap-1.5 text-neutral-500">
-                <svg className="w-4 h-4 text-neutral-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.725.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                </svg>
-                {selectedOrder?.order_details?.customer_phone}
+          <div className="bg-[#fbfbfb] border border-neutral-200/80 rounded-2xl p-6 max-w-md shadow-sm">
+            <h2 className="text-xs font-bold uppercase tracking-wider text-neutral-900 mb-4 border-b border-neutral-200 pb-2">Billing Address</h2>
+            <div className="text-sm space-y-2.5 leading-relaxed text-neutral-600 font-semibold">
+              <p className="font-bold text-neutral-900 text-base">
+                {selectedOrder?.order_details?.billing_name || 
+                 (selectedOrder?.order_details?.first_name 
+                   ? `${selectedOrder.order_details.first_name} ${selectedOrder.order_details.last_name || ""}`.trim() 
+                   : "") || 
+                 selectedOrder?.order_details?.name ||
+                 "Customer"}
               </p>
-              <p className="flex items-center gap-1.5 text-neutral-500">
-                <svg className="w-4 h-4 text-neutral-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              <p className="flex items-start gap-2">
+                <svg className="w-4 h-4 text-neutral-400 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                 </svg>
-                {selectedOrder?.order_details?.email}
+                <span>
+                  {selectedOrder?.order_details?.address}
+                  {(selectedOrder?.order_details?.billing_city || selectedOrder?.order_details?.city || selectedOrder?.order_details?.billing_zip || selectedOrder?.order_details?.zip_code || selectedOrder?.order_details?.zip) && (
+                    <>
+                      <br />
+                      {[
+                        selectedOrder?.order_details?.billing_city || selectedOrder?.order_details?.city,
+                        selectedOrder?.order_details?.billing_zip || selectedOrder?.order_details?.zip_code || selectedOrder?.order_details?.zip
+                      ].filter(Boolean).join(", ")}
+                    </>
+                  )}
+                  {(selectedOrder?.order_details?.billing_state || selectedOrder?.order_details?.state || selectedOrder?.order_details?.billing_country || selectedOrder?.order_details?.country) && (
+                    <>
+                      <br />
+                      {[
+                        selectedOrder?.order_details?.billing_state || selectedOrder?.order_details?.state,
+                        selectedOrder?.order_details?.billing_country || selectedOrder?.order_details?.country
+                      ].filter(Boolean).join(", ")}
+                    </>
+                  )}
+                </span>
               </p>
+              <div className="pt-3.5 mt-3.5 border-t border-neutral-200/60 space-y-2">
+                {(selectedOrder?.order_details?.customer_phone || selectedOrder?.order_details?.phone) && (
+                  <p className="flex items-center gap-2 text-neutral-500">
+                    <svg className="w-4 h-4 text-neutral-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.725.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                    </svg>
+                    <span className="font-mono">{selectedOrder?.order_details?.customer_phone || selectedOrder?.order_details?.phone}</span>
+                  </p>
+                )}
+                <p className="flex items-center gap-2 text-neutral-500">
+                  <svg className="w-4 h-4 text-neutral-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  </svg>
+                  <span>{selectedOrder?.order_details?.email}</span>
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -916,6 +1142,7 @@ function AccountDetailsTab({ customer }: any) {
               <p className="text-sm text-neutral-400 font-semibold mt-0.5">Edit your personal contact parameters.</p>
             </div>
           </div>
+
           <form className="space-y-6" onSubmit={updateUser}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* First Name */}
