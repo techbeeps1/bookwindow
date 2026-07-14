@@ -27,6 +27,13 @@ export default function SignIn() {
 
   useEffect(() => {
     window.scrollTo(0, 0);
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const tab = params.get("tab");
+      if (tab === "register") {
+        setActiveTab("register");
+      }
+    }
   }, []);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {

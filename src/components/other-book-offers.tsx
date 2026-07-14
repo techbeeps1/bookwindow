@@ -33,7 +33,7 @@ const OTHER_BOOKS = [
 
 export function OtherBookOffers({ description, similarProducts, onItemsCountUpdate }: any) {
   return (
-    <section className="px-8 pt-28 pb-28">
+    <section className="px-8 py-[60px]">
       <div className="container mx-auto mb-10">
       {description && (<>
         <Typography
