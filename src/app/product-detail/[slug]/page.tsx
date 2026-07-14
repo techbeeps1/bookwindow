@@ -56,7 +56,7 @@ const parseGallery = (gallery: any): string[] => {
   return [];
 };
 
-export default function ProductDetail({ params, onItemsCountUpdate }:{
+export default function ProductDetail({ params }:{
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = use(params);
@@ -561,7 +561,7 @@ export default function ProductDetail({ params, onItemsCountUpdate }:{
                       slug={product.slug}
                       id={product.id}
                       quantity={product.quantity}
-                      onItemsCountUpdate={onItemsCountUpdate}
+                      onItemsCountUpdate={handleItemsCountUpdate}
                     />
                   ))}
                 {/* // : OTHER_BOOKS.map((props, key) => <BookCard key={key} {...props} />)} */}
