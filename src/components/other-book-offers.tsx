@@ -4,36 +4,15 @@ import { Typography } from "@material-tailwind/react";
 import BookCard from "@/components/book-card";
 import config from "@/app/config";
 
-const OTHER_BOOKS = [
-  {
-    img: `/image/books/RectangleBig1.svg`,
-    category: "33% off",
-    title: "Dr. Bhalla - Contemporary Rajasthan by Kuldeep Publication",
-    desc: "Dr. L.R Bhalla",
-    price: "₹465 ",
-    offPrice: "₹696",
-  },
-  {
-    img: `/image/books/RectangleBig7.svg`,
-    category: "33% off",
-    title: "Utkarsh - Current Affairs Monthly January 2024 By Kumar Gaurav Sir",
-    desc: "GAURAV KUMAR",
-    price: "₹465 ",
-    offPrice: "₹696",
-  },
-  {
-    img: `/image/books/RectangleBig1.svg`,
-    category: "33% off",
-    title: "SSC Mathematics 7300+ Typewise Question All TCS Pettern Questions",
-    desc: "Rakesh Yadav",
-    price: "₹465 ",
-    offPrice: "₹696",
-  },
-];
 
 export function OtherBookOffers({ description, similarProducts, onItemsCountUpdate }: any) {
+
+  console.log("similarProducts:", similarProducts);
+  console.log("Length:", similarProducts?.length);
+
   return (
-    <section className="px-8 py-[60px]">
+    
+    <section className="px-[20px]  py-[60px]">
       <div className="container mx-auto mb-10">
       {description && (<>
         <Typography
@@ -54,47 +33,24 @@ export function OtherBookOffers({ description, similarProducts, onItemsCountUpda
             {...({} as React.ComponentProps<typeof Typography>)}
           >
           </Typography>
-          </>) 
-        // : (
-        //   <>
-        //     <Typography
-        //       variant="lead"
-        //       className="w-full text-gray-600"
-        //       {...({} as React.ComponentProps<typeof Typography>)}
-        //     >
-        //       Escape into{" "}
-        //       <strong className="text-gray-700">captivating stories</strong>,
-        //       vibrant characters, and enchanting worlds with our extensive
-        //       fiction collection. A classic reference book on grammar and
-        //       writing skills, essential for high school and college students. A
-        //       valuable resource for high school seniors and college freshmen,
-        //       offering effective study strategies.A classic reference book on
-        //       grammar and writing skills, essential for high school and college
-        //       students. A{" "}
-        //       <strong className="text-gray-700">valuable resources</strong> for
-        //       high school seniors and college freshmen, offering effective study
-        //       strategies.A classic reference book on grammar and writing skills,
-        //       essential for high school and college students.
-        //     </Typography>
-        //   </>
-        // )
+          </>)
         }
         {similarProducts && similarProducts.length &&( <>
           <Typography
             variant="h2"
             color="blue-gray"
-            className="text-2xl md:text-4xl mt-8"
+            className="text-2xl md:text-4xl"
             {...({} as React.ComponentProps<typeof Typography>)}
           >
             Similar Products of This Category
           </Typography>
           <div className="w-20 h-[2px] bg-black my-4 rounded-full" />
-        </>)}
-       
+        </>)}       
       </div>
-      <div className="container mx-auto grid grid-cols-1 items-start gap-x-6 gap-y-20 md:grid-cols-2 xl:grid-cols-4">
+      <div className="container mx-auto grid grid-cols-1 sm:grid-cols-2 items-start md:gap-6 gap-2 lg:grid-cols-3 xl:grid-cols-5">
+        
         {similarProducts && similarProducts.length > 0
-          && similarProducts.map((product: any) => (
+          && similarProducts.slice(0, 5).map((product: any) => (
               <BookCard
                 key={product.id}
                 img={`${config.apiUrl}storage/${product.image}`}
@@ -111,11 +67,11 @@ export function OtherBookOffers({ description, similarProducts, onItemsCountUpda
                 quantity={product.quantity}
                 onItemsCountUpdate={onItemsCountUpdate}
               />
-            ))}
-          {/* // : OTHER_BOOKS.map((props, key) => <BookCard key={key} {...props} />)} */}
+            ))}          
       </div>
     </section>
   );
+  
 }
 
 export default OtherBookOffers;

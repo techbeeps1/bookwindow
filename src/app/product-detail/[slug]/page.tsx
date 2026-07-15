@@ -14,6 +14,7 @@ import { useCart } from "@/hooks/useCart";
 import { useAddToCartMutation } from "@/lib/api/cartApi";
 import { ImageBook } from "@/components/ImageBook";
 import { BookCard } from "@/components";
+import { FrequentlyBougth } from "@/components/FrequentlyBougth";
 
 
 const parseGallery = (gallery: any): string[] => {
@@ -210,49 +211,14 @@ export default function ProductDetail({ params }:{
             <div className="container mx-auto px-4 py-8 md:flex md:col-12">
         {loading ? (
           <FadeLoaderOverlay />
-        ) : (
-          // <div
-          //   role="status"
-          //   className="space-y-8 animate-pulse md:space-y-0 md:space-x-8 rtl:space-x-reverse md:flex md:items-center w-full"
-          // >
-          //   <div className="flex items-center justify-center w-full h-48 bg-gray-300 rounded-sm sm:w-96 dark:bg-gray-700">
-          //     <svg
-          //       className="w-10 h-10 text-gray-200 dark:text-gray-600"
-          //       aria-hidden="true"
-          //       xmlns="http://www.w3.org/2000/svg"
-          //       fill="currentColor"
-          //       viewBox="0 0 20 18"
-          //     >
-          //       <path d="M18 0H2a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2Zm-5.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Zm4.376 10.481A1 1 0 0 1 16 15H4a1 1 0 0 1-.895-1.447l3.5-7A1 1 0 0 1 7.468 6a.965.965 0 0 1 .9.5l2.775 4.757 1.546-1.887a1 1 0 0 1 1.618.1l2.541 4a1 1 0 0 1 .028 1.011Z" />
-          //     </svg>
-          //   </div>
-
-          //   <div className="w-full">
-          //     <div className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-48 mb-4"></div>
-          //     <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[480px] mb-2.5"></div>
-          //     <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 mb-2.5"></div>
-          //     <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[440px] mb-2.5"></div>
-          //     <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[460px] mb-2.5"></div>
-          //     <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[360px]"></div>
-          //     <div className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-48 mb-4"></div>
-          //     <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[480px] mb-2.5"></div>
-          //     <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 mb-2.5"></div>
-          //     <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[460px] mb-2.5"></div>
-          //     <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[360px]"></div>
-          //     <div className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-48 mb-4"></div>
-          //   </div>
-
-          //   <span className="sr-only">Loading...</span>
-          // </div>
-          <div className="flex flex-wrap">
-            {/* Product Images */}
-            <div className="w-full md:w-[45%] px-4 md:px-10 mb-8 flex flex-col gap-6">
+        ) : (        
+          <div className="flex flex-wrap">           
+            <div className="w-full md:w-[45%] md:px-4 px-0 md:px-10 mb-8 flex flex-col gap-6">
               <div className="relative group/slider w-full">
                 <ImageBook src={mainImage} alt={"Product"} size="large"/>
                 
                 {allImages.length > 1 && (
-                  <>
-                    {/* Left Arrow */}
+                  <>                  
                     <button
                       onClick={handlePrevImage}
                       className="absolute left-6 top-[45%] -translate-y-1/2 z-10 bg-white/80 hover:bg-white text-black p-2.5 rounded-full shadow-lg transition-all duration-200 opacity-0 group-hover/slider:opacity-100 focus:outline-none hover:scale-105 active:scale-95 border border-gray-100"
@@ -273,8 +239,6 @@ export default function ProductDetail({ params }:{
                         />
                       </svg>
                     </button>
-
-                    {/* Right Arrow */}
                     <button
                       onClick={handleNextImage}
                       className="absolute right-6 top-[45%] -translate-y-1/2 z-10 bg-white/80 hover:bg-white text-black p-2.5 rounded-full shadow-lg transition-all duration-200 opacity-0 group-hover/slider:opacity-100 focus:outline-none hover:scale-105 active:scale-95 border border-gray-100"
@@ -295,8 +259,6 @@ export default function ProductDetail({ params }:{
                         />
                       </svg>
                     </button>
-
-                    {/* Indicator Dots */}
                     <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex gap-2 z-10 bg-black/10 backdrop-blur-sm px-3 py-1.5 rounded-full">
                       {allImages.map((_, index) => (
                         <button
@@ -316,16 +278,12 @@ export default function ProductDetail({ params }:{
                 )}
               </div>
             </div>
-
-            {/* Product Details */}
-            <div className="w-full md:w-[55%] px-4">
+            <div className="w-full md:w-[55%] md:px-4 px-0">
               <div className="flex justify-between items-start gap-4">
                 <div className="flex-1">
                   <h2 className="text-2xl font-semibold mb-2">{productData?.name}</h2>
                   <h3 className="text-gray-600 text-lg mb-2">{productData?.sub_title}</h3>
-                </div>
-                
-                {/* Wishlist Button */}
+                </div>               
                 <button
                   onClick={handleWishlistClick}
                   className="flex items-center justify-center w-12 h-12 rounded-full border border-neutral-300 hover:border-black/50 hover:bg-neutral-50 transition-all duration-300 shadow-sm shrink-0 animate-fade-in"
@@ -354,41 +312,11 @@ export default function ProductDetail({ params }:{
               <div className="mb-4">
                 <span className="text-2xl font-bold mr-2">
                   ₹{productData.price}
-                </span>
-                {/* <span className="text-sm font-small mr-2">
-                  {(productData?.mrp && productData?.price
-                    ? ((productData?.mrp - productData?.price) /
-                        productData?.mrp) *
-                      100
-                    : 0
-                  ).toFixed(2)}{" "}
-                
-                </span> */}
+                </span>               
                 <span className="text-gray-500 line-through">
                   ₹{productData.mrp}
                 </span>
-              </div>
-
-              {/* <div className="flex items-center mb-4">
-         
-                {[...Array(5)].map((_, index) => (
-                  <svg
-                    key={index}
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="currentColor"
-                    className="size-6 text-yellow-500"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                ))}
-                <span className="ml-2 text-gray-600">4.5 (120 reviews)</span>
-              </div> */}
-              
+              </div>              
                 <div>
                 <label
                   htmlFor="quantity"
@@ -513,18 +441,7 @@ export default function ProductDetail({ params }:{
 
               <div>
                 <h3 className="text-lg font-semibold mb-2">Key Features:</h3>
-                <ul className="list-disc list-inside text-gray-700">
-                  {/* <li>Stock Quantity: {productData?.quantity}</li> */}
-                  {/* <li>
-                    Discount:{" "}
-                    {(productData?.mrp && productData?.price
-                      ? ((productData?.mrp - productData?.price) /
-                          productData?.mrp) *
-                        100
-                      : 0
-                    ).toFixed(2)}{" "}
-                    %
-                  </li> */}
+                <ul className="list-disc list-inside text-gray-700">                  
                   <li>Publication: {productData?.production?.name}</li>
                   <li>Edition: {productData?.model}</li>
                   <li>Publication Year: {productData?.year}</li>
@@ -540,49 +457,20 @@ export default function ProductDetail({ params }:{
         similarProducts={similarProducts}
         onItemsCountUpdate={handleItemsCountUpdate}
       />
-    <section className="mb-[60px]">
-      <div className="container mx-auto">
-      <h2 className="text-2xl md:text-4xl mt-8"> Frequently Bougth Together</h2>
-        <div className="w-20 h-[2px] bg-black my-4 rounded-full" />
-        <div className=" grid grid-cols-1 items-start gap-x-6 gap-y-20 md:grid-cols-2 xl:grid-cols-4 mb-10">        
-              {similarProducts && similarProducts.length > 0
-                && similarProducts.map((product: any) => (
-                    <BookCard
-                      key={product.id}
-                      img={`${config.apiUrl}storage/${product.image}`}
-                      category={(product?.mrp && product?.price
-                        ? ((product?.mrp - product?.price) / product?.mrp) * 100
-                        : 0
-                      ).toFixed(2)}
-                      title={product.name}
-                      desc={product.description}
-                      price={product.mrp}
-                      offPrice={product.price}
-                      slug={product.slug}
-                      id={product.id}
-                      quantity={product.quantity}
-                      onItemsCountUpdate={handleItemsCountUpdate}
-                    />
-                  ))}
-                {/* // : OTHER_BOOKS.map((props, key) => <BookCard key={key} {...props} />)} */}
-      </div>
-      </div>
-    </section>
-      
-
-      {/* Wishlist Login Prompt Modal */}
+    <FrequentlyBougth
+        similarProducts={similarProducts}
+        onItemsCountUpdate={handleItemsCountUpdate}
+      />  
       {showWishlistModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm transition-all duration-300">
-          <div className="bg-white border border-gray-100 text-gray-900 rounded-3xl shadow-2xl max-w-md w-full p-8 relative mx-4 transition-all transform scale-100">
-            {/* Close Button */}
+          <div className="bg-white border border-gray-100 text-gray-900 rounded-3xl shadow-2xl max-w-md w-full p-8 relative mx-4 transition-all transform scale-100">       
             <button
               onClick={() => setShowWishlistModal(false)}
               className="absolute top-5 right-5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 cursor-pointer font-bold text-sm"
               aria-label="Close modal"
             >
               ✕
-            </button>
-            
+            </button>            
             <div className="text-center">
               <h2 className="text-xl font-bold tracking-tight mb-2">Your Wishlist</h2>
               <div className="w-16 h-[2px] bg-gray-200 mx-auto my-4 rounded-full" />

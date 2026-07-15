@@ -10,7 +10,6 @@ import {
   CardHeader,
 } from "@material-tailwind/react";
 import ProductDialog from "./product-detail-popup";
-import config from "@/app/config";
 import Link from "next/link";
 import { useAddToCartMutation } from "@/lib/api/cartApi";
 import { useSession } from "@/hooks/useSession";
@@ -92,8 +91,6 @@ export function BookCard({
         product_id: productId,
         quantity: quantity,
       }).unwrap();
-
-      // console.log("Cart updated:", result);
     } catch (error) {
       console.error("Error adding to cart:", error);
     }
@@ -147,7 +144,7 @@ export function BookCard({
         )}
       </button>
 
-      <div {...({} as React.ComponentProps<typeof CardBody>)}>
+      <div {...({} as React.ComponentProps<typeof CardBody>)} className="p-2">
         {price !== offPrice && (
           <p className="text-xs uppercase bg-black py-[5px] px-5 w-fit text-white rounded-[4px] font-sans absolute top-[15px] left-[15px] ">
             Sale
@@ -164,21 +161,7 @@ export function BookCard({
             {limitedTitle}
           </Typography>
         </Link>
-        {/* <Typography
-          color="blue"
-          className="text-xs !font-semibold"
-          {...({} as React.ComponentProps<typeof Typography>)}
-        >
-          {subcategoryName
-            ? `${mainCategoryName}/${subcategoryName}`
-            : `${mainCategoryName || ""}`}
-        </Typography> */}
-        {/* <Typography 
-          className="mb-4 font-normal !text-gray-500"
-          dangerouslySetInnerHTML={{ __html: desc?.replace(/#COMMA#/g, ",") }}
-          {...({} as React.ComponentProps<typeof Typography>)}
-        >
-        </Typography> */}
+        
         <div className="flex justify-between items-center">
           <div className="flex gap-2">
             {" "}
