@@ -53,7 +53,7 @@ export function OtherBookOffers({ description, similarProducts, onItemsCountUpda
           && similarProducts.slice(0, 5).map((product: any) => (
               <BookCard
                 key={product.id}
-                img={`${config.apiUrl}storage/${product.image}`}
+                img={`${config.apiUrl}storage/app/public/${product.image}`}
                 category={(product?.mrp && product?.price
                   ? ((product?.mrp - product?.price) / product?.mrp) * 100
                   : 0
