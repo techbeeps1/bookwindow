@@ -95,7 +95,7 @@ const CartItem = ({
           alt={item.product_name}
           width={180}
           height={100}
-          className="object-cover"
+          className="object-cover h-[106px] object-top"
 
         />
       </div>
