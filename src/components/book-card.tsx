@@ -2,7 +2,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { CartPopup } from "@/components/cart-popup";
+
 import {
   Typography,
   Card,
@@ -212,13 +212,14 @@ export function BookCard({
 
             {/* cart Popup */}
             {showPopup && (
-              <CartPopup
-                popupRef={popupRef}
-                setShowPopup={setShowPopup}
-                showPopup={showPopup}
-                productName={title?.replace(/#COMMA#/g, ",")}
-                productImage={img}
-              ></CartPopup>
+              <></>
+              // <CartPopup
+              //   popupRef={popupRef}
+              //   setShowPopup={setShowPopup}
+              //   showPopup={showPopup}
+              //   productName={title?.replace(/#COMMA#/g, ",")}
+              //   productImage={img}
+              // ></CartPopup>
             )}
 
             {/* Quick View Button */}

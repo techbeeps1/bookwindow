@@ -3,7 +3,12 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import config from "@/app/config";
-function Hero({ onButtonClick, bannerData }: any) {
+import { useRouter } from "next/navigation";
+
+
+
+function Hero({ bannerData }: any) {
+    const router = useRouter();
   const [current, setCurrent] = useState(0);
   const [dragOffset, setDragOffset] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
@@ -38,47 +43,24 @@ function Hero({ onButtonClick, bannerData }: any) {
     setDragOffset(0);
   };
 
-  const handleSlideClick = (e: React.MouseEvent) => {
-    if (wasDragged.current) {
-      e.preventDefault();
-      e.stopPropagation();
-      return;
-    }
-    if (onButtonClick) {
-      onButtonClick();
-    }
-  };
 
-  const slides = [
-    {
-      id: 1,
-      image: bannerData?.images
-        ? `${config.apiUrl}storage/app/public/${bannerData?.images}`
-        : "/image/banner-img.jpg",
-      title: bannerData?.banner_title || "UP TO 50% OFF + 15% OFF",
-      description: bannerData?.banner_description || "Ace your exams with our expertly curated selection of competitive exam books.",
-      buttonText: bannerData?.banner_button_title || "DISCOVER",
-      logo: bannerData?.logo_img
-        ? `${config.apiUrl}storage/app/public/${bannerData?.logo_img}`
-        : null
-    },
-    {
-      id: 2,
-      image: "/image/banner-img-2.jpg",
-      title: "READ MORE, LEARN MORE",
-      description: "Explore our diverse range of literature, research journals, and school textbooks.",
-      buttonText: "BROWSE NOW",
-      logo: null
-    },
-    {
-      id: 3,
-      image: "/image/banner-img.jpg",
-      title: "COMPETITIVE EXAM SPECIAL",
-      description: "Get all RAS class notes, reference materials, and exam guides at unbeatable prices.",
-      buttonText: "SHOP BESTSELLERS",
-      logo: null
-    }
-  ];
+
+  const slides = bannerData ;
+  // [
+  //   {
+  //     id: 1,
+  //     image: bannerData?.images
+  //       ? `${config.apiUrl}storage/app/public/${bannerData?.images}`
+  //       : "/image/banner-img.jpg",
+  //     title: bannerData?.banner_title || "",
+  //     description: bannerData?.banner_description || "",
+  //     buttonText: bannerData?.banner_button_title || "",
+  //     logo: bannerData?.logo_img
+  //       ? `${config.apiUrl}storage/app/public/${bannerData?.logo_img}`
+  //       : null
+  //   },
+
+  // ];
 
   const nextSlide = () => {
     setCurrent((prev) => (prev === slides.length - 1 ? 0 : prev + 1));
@@ -116,16 +98,18 @@ function Hero({ onButtonClick, bannerData }: any) {
             onTouchMove={(e) => handlePointerMove(e.touches[0].clientX)}
             onTouchEnd={handlePointerUp}
           >
-            {slides.map((slide, idx) => (
+            {slides.map((slide:any, idx:number) => (
               <div
                 key={slide.id}
-                onClick={handleSlideClick}
+                onClick={()=>{
+                  router.push(slide?.slider_url || '#')
+                }}
                 className="relative h-full cursor-pointer select-none"
                 style={{ width: `${100 / slides.length}%` }}
               >
                 {/* Background Image */}
                 <Image
-                  src={slide.image}
+                  src={`${config.apiUrl}storage/app/public/${slide?.slider_image}`}
                   alt={slide.title}
                   fill
                   
@@ -172,7 +156,7 @@ function Hero({ onButtonClick, bannerData }: any) {
 
           {/* Dots / Indicators */}
           <div className="absolute bottom-4 md:bottom-6 left-1/2 -translate-x-1/2 z-30 flex items-center justify-center gap-3">
-            {slides.map((_, idx) => (
+            {slides.map((_:any, idx:any) => (
               <button
                 key={idx}
                 onClick={() => setCurrent(idx)}

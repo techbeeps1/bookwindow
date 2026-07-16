@@ -2,14 +2,14 @@
 import { useRouter } from "next/navigation";
 import { useSession } from "@/hooks/useSession";
 import { useState, useRef, useEffect } from "react";
-
+import { useAppDispatch } from "@/hooks/useStore";
 import OtherBookOffers from "@/components/other-book-offers";
-import { CartPopup } from "@/components/cart-popup";
+import { openCartDrawer } from "@/lib/slices/uiSlice";
 import axios from "axios";
 import config from "@/app/config";
-import Image from "next/image";
+
 import { use } from "react";
-import FadeLoaderOverlay from "@/components/loader";
+
 import { useCart } from "@/hooks/useCart";
 import { useAddToCartMutation } from "@/lib/api/cartApi";
 import { ImageBook } from "@/components/ImageBook";
@@ -18,6 +18,7 @@ import { FrequentlyBougth } from "@/components/FrequentlyBougth";
 
 
 const parseGallery = (gallery: any): string[] => {
+  
   if (!gallery) return [];
   if (typeof gallery === "string") {
     if (!gallery.trim().startsWith("[") && !gallery.trim().startsWith("{")) {
@@ -69,8 +70,6 @@ export default function ProductDetail({ params }:{
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [showWishlistModal, setShowWishlistModal] = useState(false);
 
-  const [showPopup, setShowPopup] = useState(false);
-  const popupRef = useRef(null as any);
 
   const [loading, setLoading] = useState(true);
 
@@ -87,6 +86,8 @@ export default function ProductDetail({ params }:{
       allImages.push(img);
     }
   });
+  const dispatch = useAppDispatch();
+  
 
   const [addToCart, { isLoading }] = useAddToCartMutation();
 
@@ -189,28 +190,62 @@ export default function ProductDetail({ params }:{
 
 
 
-  const handleAddToCart = async (productId: string, quantity: number) => {
-    try {
-      
+const handleAddToCart = async (productId: string, quantity: number) => {
+  try {
+    await addToCart({
+      session_id: sessionId,
+      product_id: productId,
+      quantity,
+    }).unwrap();
 
+    // wait until cart is refreshed
+    await refetch();
 
-      await addToCart({
-        session_id: sessionId,
-        product_id: productId,
-        quantity: quantity,
-      }).unwrap();
-
-
-    } catch (error) {
-      console.error("Error adding to cart:", error);
-    }
-  };
-
+    // then open drawer
+    dispatch(openCartDrawer());
+  } catch (error) {
+    console.error(error);
+  }
+};
   return (
     <>
-            <div className="container mx-auto px-4 py-8 md:flex md:col-12">
+      <div className="container mx-auto px-4 py-8 md:flex md:col-12">
         {loading ? (
-          <FadeLoaderOverlay />
+           <div
+            role="status"
+            className="container mx-auto space-y-8 mt-10 animate-pulse md:space-y-0 md:space-x-8 rtl:space-x-reverse md:flex justify-center md:items-center w-[80%]"
+          >
+            <div className="w-[50%] p-20 flex items-center justify-center w-full h-full bg-gray-300 rounded-sm sm:w-96 dark:bg-gray-700">
+              <svg
+                className="w-75   h-auto text-gray-200 dark:text-gray-600"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="currentColor"
+                viewBox="0 0 20 18"
+              >
+                <path d="M18 0H2a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2Zm-5.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Zm4.376 10.481A1 1 0 0 1 16 15H4a1 1 0 0 1-.895-1.447l3.5-7A1 1 0 0 1 7.468 6a.965.965 0 0 1 .9.5l2.775 4.757 1.546-1.887a1 1 0 0 1 1.618.1l2.541 4a1 1 0 0 1 .028 1.011Z" />
+              </svg>
+            </div>
+
+            <div className="w-[50%]">
+              <div className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-48 mb-4"></div>
+              <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[480px] mb-2.5"></div>
+              <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 mb-2.5"></div>
+              <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[440px] mb-2.5"></div>
+              <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[460px] mb-2.5"></div>
+              <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[360px]"></div>
+              <div className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-48 mb-4"></div>
+              <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[480px] mb-2.5"></div>
+              <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 mb-2.5"></div>
+              <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[460px] mb-2.5"></div>
+              <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[360px]"></div>
+              <div className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-48 mb-4"></div>
+            </div>
+
+            <span className="sr-only">Loading...</span>
+          </div>
+
+
         ) : (        
           <div className="flex flex-wrap">           
             <div className="w-full md:w-[45%] md:px-4 px-0 md:px-10 mb-8 flex flex-col gap-6">
@@ -390,40 +425,64 @@ export default function ProductDetail({ params }:{
                   </svg>
                   By Now
                 </button>
-                <button
-                  onClick={() => {
-                    setShowPopup(true);
-                    handleAddToCart(productData?.id, quantity);
-                  }}
-                  className="bg-black h-[50px]  flex gap-2 items-center text-white px-6 py-2 rounded-full  "
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth="1.5"
-                    stroke="currentColor"
-                    className="size-6"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"
-                    />
-                  </svg>
-                  Add to Cart
-                </button>
-                {/* Popup */}
-                {showPopup && (
-                  <CartPopup
-                    popupRef={popupRef}
-                    setShowPopup={setShowPopup}
-                    showPopup={showPopup}
-                    productName={productData?.name}
-                    productImage={mainImage}
-                    description={productData?.description}  
-                  ></CartPopup>
-                )}
+
+    <button
+  onClick={() => handleAddToCart(productData?.id, quantity)}
+  disabled={isLoading}
+  className={`bg-black h-[50px] flex gap-2 items-center justify-center
+  text-white px-6 py-2 rounded-full transition-all duration-300
+  ${
+    isLoading
+      ? "opacity-70 cursor-not-allowed"
+      : "hover:scale-[1.02] active:scale-95"
+  }`}
+>
+  {isLoading ? (
+    <>
+      <svg
+        className="w-5 h-5 animate-spin"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+      >
+        <circle
+          className="opacity-20"
+          cx="12"
+          cy="12"
+          r="10"
+          stroke="currentColor"
+          strokeWidth="4"
+        />
+        <path
+          className="opacity-80"
+          fill="currentColor"
+          d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+        />
+      </svg>
+
+      Adding...
+    </>
+  ) : (
+    <>
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        strokeWidth="1.5"
+        stroke="currentColor"
+        className="size-6"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"
+        />
+      </svg>
+
+      Add to Cart
+    </>
+  )}
+</button>
                 
               </div>
               

@@ -3,6 +3,7 @@ import Image from "next/image";
 import React, { useRef, useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
+import Link from "next/link";
 
 export interface Brand {
   name: string;
@@ -17,54 +18,9 @@ interface BrandsCategoryProps {
   brands?: Brand[];
 }
 
-const DEFAULT_BRANDS: Brand[] = [
-  {
-    name: "History",    
-    image: "/image/history.jpg",
-    link: "/category",
-  },
-  {
-    name: "Polity",    
-    image: "/image/polity.jpg",
-    link: "/category",
-  },
-  {
-    name: "Math",    
-    image: "/image/math.jpg",
-    link: "/category",
-  },
-  {
-    name: "English",    
-    image: "/image/english.jpg",
-    link: "/category",
-  },
-  {
-    name: "Reasoning",    
-    image: "/image/reasoning.jpg",
-    link: "/category",
-  },
-  {
-    name: "Geography",    
-    image: "/image/geography.jpg",
-    link: "/category",
-  },
-  {
-    name: "Physics",    
-    image: "/image/physics.jpg",
-    link: "/category",
-  },
-  {
-    name: "Chemistry",   
-    image: "/image/chemistry.jpg",
-    link: "/category",
-  },
-  
-];
 
-export function BestSubjects({
-  title = "Mock Test & Practice Sets",  
-  brands = DEFAULT_BRANDS,
-}: BrandsCategoryProps) {
+
+export function BestSubjects({data}: any) {
   const sliderRef = useRef<HTMLDivElement>(null);
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   const [showRightArrow, setShowRightArrow] = useState(true);
@@ -117,7 +73,7 @@ export function BestSubjects({
         slider.removeEventListener("scroll", checkScrollPosition);
       }
     };
-  }, [brands]);
+  }, [data]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -164,7 +120,7 @@ export function BestSubjects({
           viewport={{ once: true }}
           className="block antialiased tracking-normal font-sans text-2xl md:text-4xl font-semibold leading-[1.3] text-blue-gray-900"
         >
-          {title}
+          {data?.mock_subtitle}
         </motion.h2> 
         <div className="w-20 h-[2px] bg-black my-4 rounded-full" />
       </div>
@@ -203,8 +159,8 @@ export function BestSubjects({
           onMouseMove={handleMouseMove}
           className="flex gap-6 overflow-x-auto no-scrollbar px-8 md:px-16 lg:px-24 cursor-grab active:cursor-grabbing select-none"
         >
-          {brands.map((brand, index) => (
-            <motion.div
+          {data?.mock_test_category.map((brand:any, index:any) => (
+                    <Link href="#">   <motion.div
               key={index}
               initial={{ opacity: 0, scale: 0.95 }}
               whileInView={{ opacity: 1, scale: 1 }}
@@ -213,8 +169,9 @@ export function BestSubjects({
               className="w-[calc((100vw-88px)/1.3)] md:w-[calc((100vw-176px)/2.3)] lg:w-[calc((100vw-264px)/3.35)] aspect-[3/4] flex-shrink-0 relative overflow-hidden rounded-[24px] cursor-pointer group shadow-sm hover:shadow-xl transition-all duration-300"
             >
               {/* Background Image */}
+   
               <img
-                src={brand.image}
+                src={brand.cat_image}
                 alt={brand.name}
                 
                 sizes="(max-width: 768px) 75vw, (max-width: 1024px) 45vw, 30vw"
@@ -232,7 +189,8 @@ export function BestSubjects({
                   {brand.name}
                 </h3>                
               </div>
-            </motion.div>
+              
+            </motion.div></Link>
           ))}
         </div>
       </div>

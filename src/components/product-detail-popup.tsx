@@ -3,7 +3,7 @@
 import React from "react";
 import { Dialog, DialogHeader, DialogBody } from "@material-tailwind/react";
 import { useRouter } from "next/navigation";
-import { CartPopup } from "@/components/cart-popup";
+
 import axios from "axios";
 import config from "@/app/config";
 import Image from "next/image";
@@ -123,13 +123,14 @@ export default function ProductDialog({ open, handleOpen, slug }: any) {
                   </button>
                   {/* Popup */}
                   {showPopup && (
-                    <CartPopup
-                      popupRef={popupRef}
-                      setShowPopup={setShowPopup}
-                      showPopup={showPopup}
-                      productName={productData?.name}
-                      productImage={`${config.apiUrl}storage/${productData?.image}`}
-                    ></CartPopup>
+                    <></>
+                    // <CartPopup
+                    //   popupRef={popupRef}
+                    //   setShowPopup={setShowPopup}
+                    //   showPopup={showPopup}
+                    //   productName={productData?.name}
+                    //   productImage={`${config.apiUrl}storage/${productData?.image}`}
+                    // ></CartPopup>
                   )}
                   <button
                     onClick={() => router.push(`/product-detail/${slug}`)}
