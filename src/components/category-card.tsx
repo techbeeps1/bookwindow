@@ -7,21 +7,19 @@ import config from "@/app/config";
 interface CategoryCardProps {
   cat_image: string;
   cat_title: string;
-  cat_content?: string;
-  cat_icon?: any;
+  cat_slug?: string;
+
 }
 
 function CategoryCard({
   cat_image,
   cat_title,
+  cat_slug
 }: CategoryCardProps) {
   // Dynamic slug based on title
-  const slug = cat_title?.toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)+/g, "") || "school-books";
 
   return (
-    <Link href={`/category/${slug}`} className="group block w-full cursor-pointer">
+    <Link href={`/category/${cat_slug}`} className="group block w-full cursor-pointer">
       <div className="relative w-full aspect-[4/5] rounded-[24px] overflow-hidden bg-gray-50 border border-gray-150 shadow-sm">
         <Image
           width={400}

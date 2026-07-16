@@ -4,45 +4,9 @@ import React from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 
-export interface Publication {
-  name: string;
-  image: string;
-  link?: string;
-}
+import config from "@/app/config";
 
 
-const DEFAULT_PUBLICATIONS: Publication[] = [
-  {
-    name: "Arihant Publications",
-    image: "/image/book.jpg",
-    link: "/category",
-  },
-  {
-    name: "McGraw Hill India",
-    image: "/image/book-2.jpg",
-    link: "/category",
-  },
-  {
-    name: "Disha Publication",
-    image: "/image/book-3.jpg",
-    link: "/category",
-  },
-  {
-    name: "MTG Learning Media",
-    image: "/image/book-4.jpg",
-    link: "/category",
-  },
-  {
-    name: "Ashirwad Publication store",
-    image: "/image/book-5.jpg",
-    link: "/category",
-  },  
-  {
-    name: "Class notes",
-    image: "/image/class-notes.webp",
-    link: "/category",
-  },
-];
 
 export function PublicationsCategory({
   data
@@ -66,7 +30,9 @@ export function PublicationsCategory({
       {/* Grid Container (5 columns on desktop) */}
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
         {data?.publication.map((pub:any, index:number) => (
+          <div  >
           <motion.div
+           
             key={index}
             initial={{ opacity: 0, scale: 0.95 }}
             whileInView={{ opacity: 1, scale: 1 }}
@@ -75,10 +41,10 @@ export function PublicationsCategory({
             className="aspect-[3/4] relative overflow-hidden rounded-[24px] cursor-pointer group shadow-sm hover:shadow-xl transition-all duration-300 w-full"
           >
             {/* Background Image */}
-            <img
-              src={pub.image}
+            <Image
+              fill
               alt={pub.name}
-              
+              src={`${config.apiUrl}storage/app/public/${pub.publication_img}`}
               sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
               className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105 pointer-events-none"
               draggable={false}
@@ -95,6 +61,7 @@ export function PublicationsCategory({
               </h3>
             </div>
           </motion.div>
+          </div>
         ))}
       </div>
     </section>

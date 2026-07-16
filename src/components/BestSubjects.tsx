@@ -3,6 +3,7 @@ import Image from "next/image";
 import React, { useRef, useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
+import Link from "next/link";
 
 export interface Brand {
   name: string;
@@ -17,49 +18,7 @@ interface BrandsCategoryProps {
   brands?: Brand[];
 }
 
-const DEFAULT_BRANDS: Brand[] = [
-  {
-    name: "History",    
-    image: "/image/history.jpg",
-    link: "/category",
-  },
-  {
-    name: "Polity",    
-    image: "/image/polity.jpg",
-    link: "/category",
-  },
-  {
-    name: "Math",    
-    image: "/image/math.jpg",
-    link: "/category",
-  },
-  {
-    name: "English",    
-    image: "/image/english.jpg",
-    link: "/category",
-  },
-  {
-    name: "Reasoning",    
-    image: "/image/reasoning.jpg",
-    link: "/category",
-  },
-  {
-    name: "Geography",    
-    image: "/image/geography.jpg",
-    link: "/category",
-  },
-  {
-    name: "Physics",    
-    image: "/image/physics.jpg",
-    link: "/category",
-  },
-  {
-    name: "Chemistry",   
-    image: "/image/chemistry.jpg",
-    link: "/category",
-  },
-  
-];
+
 
 export function BestSubjects({data}: any) {
   const sliderRef = useRef<HTMLDivElement>(null);
@@ -201,7 +160,7 @@ export function BestSubjects({data}: any) {
           className="flex gap-6 overflow-x-auto no-scrollbar px-8 md:px-16 lg:px-24 cursor-grab active:cursor-grabbing select-none"
         >
           {data?.mock_test_category.map((brand:any, index:any) => (
-            <motion.div
+                    <Link href="#">   <motion.div
               key={index}
               initial={{ opacity: 0, scale: 0.95 }}
               whileInView={{ opacity: 1, scale: 1 }}
@@ -210,6 +169,7 @@ export function BestSubjects({data}: any) {
               className="w-[calc((100vw-88px)/1.3)] md:w-[calc((100vw-176px)/2.3)] lg:w-[calc((100vw-264px)/3.35)] aspect-[3/4] flex-shrink-0 relative overflow-hidden rounded-[24px] cursor-pointer group shadow-sm hover:shadow-xl transition-all duration-300"
             >
               {/* Background Image */}
+   
               <img
                 src={brand.cat_image}
                 alt={brand.name}
@@ -229,7 +189,8 @@ export function BestSubjects({data}: any) {
                   {brand.name}
                 </h3>                
               </div>
-            </motion.div>
+              
+            </motion.div></Link>
           ))}
         </div>
       </div>

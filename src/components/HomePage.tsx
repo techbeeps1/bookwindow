@@ -13,6 +13,8 @@ import { BestSubjects } from "@/components/BestSubjects";
 import PublicationsCategory from "@/components/PublicationsCategory";
 import HobbyCategory from "@/components/HobbyCategory";
 import config from "../app/config";
+import Image from "next/image";
+import Link from "next/link";
 
 export default function HomePage({homePageData}:any) {
 
@@ -27,16 +29,6 @@ console.log(homePageData);
   const [highlightDiv, setHighlightDiv] = useState(false);
   const divRef: any = useRef(null); // Create a reference to the Div
 
-  const handleButtonClick = () => {
-    // Scroll to the Div in the topcategory component
-    divRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
-
-    // Highlight the div
-    setHighlightDiv(true);
-
-    // Reset the highlight after 3 seconds
-    setTimeout(() => setHighlightDiv(false), 2000);
-  };
 
   return (
     <>
@@ -48,8 +40,8 @@ console.log(homePageData);
         viewport={{ once: true }}
        >
         <Hero
-          onButtonClick={handleButtonClick}
-          bannerData={homePageData?.banner}
+          
+          bannerData={homePageData?.sldier_section}
         />
       </motion.div> 
       
@@ -62,7 +54,7 @@ console.log(homePageData);
         <TopBookCategories
           highlightDiv={highlightDiv}
           divRef={divRef}
-          category_section={homePageData?.category_section}
+          category_section={homePageData?.popular_section}
         />
       </motion.div>
       <motion.div
@@ -97,11 +89,16 @@ console.log(homePageData);
         viewport={{ once: true }}
         className="w-full"
       >
-        <img
-          src="/image/banner-2-.png"
+        <Link href={homePageData?.banner?.banner_button_url||"#"}>
+        <Image
+        
+          width={1200}
+          height={580}
+          src={`${config.apiUrl}storage/app/public/${homePageData?.banner?.images}`}
           alt="Rare & Reloved Banner"
           className="w-full xl:h-[700px] lg:h-[580px] object-cover"
         />
+        </Link>
       </motion.div>
      
     </>

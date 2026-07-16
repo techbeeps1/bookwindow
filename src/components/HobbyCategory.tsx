@@ -10,25 +10,9 @@ export interface HobbyItem {
   link?: string;
 }
 
-interface HobbyCategoryProps {
-  title?: string;
-  items?: HobbyItem[];
-}
 
-const DEFAULT_ITEMS: HobbyItem[] = [
-  {
-    name: "Travel",
-    header: "Sara Inspiration",
-    image: "/image/NCERT.jpg",    
-    link: "/category",
-  },
-  {
-    name: "Fashion",
-    header: "Scriptures",
-    image: "/image/Engineering.jpg",   
-    link: "/category",
-  },
-];
+
+
 
 export function HobbyCategory({
   data
@@ -62,7 +46,7 @@ export function HobbyCategory({
             viewport={{ once: true }}
             className="bg-black rounded-[28px] p-4 overflow-hidden flex flex-col shadow-sm hover:shadow-xl hover:scale-[1.01] transition-all duration-300 w-full"
           >
-            <Link href={item.link || "/category"} className="w-full h-full flex flex-col">
+            <Link href={"/category"+item.slug || "#"} className="w-full h-full flex flex-col">
               {/* Header Band */}
               <div className="text-white font-semibold text-base md:text-xl  font-sans text-center mb-4">
                 {item.name}

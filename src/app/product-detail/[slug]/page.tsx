@@ -2,14 +2,14 @@
 import { useRouter } from "next/navigation";
 import { useSession } from "@/hooks/useSession";
 import { useState, useRef, useEffect } from "react";
-
+import { useAppDispatch } from "@/hooks/useStore";
 import OtherBookOffers from "@/components/other-book-offers";
-import { CartPopup } from "@/components/cart-popup";
+import { openCartDrawer } from "@/lib/slices/uiSlice";
 import axios from "axios";
 import config from "@/app/config";
-import Image from "next/image";
+
 import { use } from "react";
-import FadeLoaderOverlay from "@/components/loader";
+
 import { useCart } from "@/hooks/useCart";
 import { useAddToCartMutation } from "@/lib/api/cartApi";
 import { ImageBook } from "@/components/ImageBook";
@@ -18,6 +18,7 @@ import { FrequentlyBougth } from "@/components/FrequentlyBougth";
 
 
 const parseGallery = (gallery: any): string[] => {
+  
   if (!gallery) return [];
   if (typeof gallery === "string") {
     if (!gallery.trim().startsWith("[") && !gallery.trim().startsWith("{")) {
@@ -69,8 +70,6 @@ export default function ProductDetail({ params }:{
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [showWishlistModal, setShowWishlistModal] = useState(false);
 
-  const [showPopup, setShowPopup] = useState(false);
-  const popupRef = useRef(null as any);
 
   const [loading, setLoading] = useState(true);
 
@@ -87,6 +86,8 @@ export default function ProductDetail({ params }:{
       allImages.push(img);
     }
   });
+  const dispatch = useAppDispatch();
+  
 
   const [addToCart, { isLoading }] = useAddToCartMutation();
 
@@ -189,28 +190,28 @@ export default function ProductDetail({ params }:{
 
 
 
-  const handleAddToCart = async (productId: string, quantity: number) => {
-    try {
-      
+const handleAddToCart = async (productId: string, quantity: number) => {
+  try {
+    await addToCart({
+      session_id: sessionId,
+      product_id: productId,
+      quantity,
+    }).unwrap();
 
+    // wait until cart is refreshed
+    await refetch();
 
-      await addToCart({
-        session_id: sessionId,
-        product_id: productId,
-        quantity: quantity,
-      }).unwrap();
-
-
-    } catch (error) {
-      console.error("Error adding to cart:", error);
-    }
-  };
-
+    // then open drawer
+    dispatch(openCartDrawer());
+  } catch (error) {
+    console.error(error);
+  }
+};
   return (
     <>
       <div className="container mx-auto px-4 py-8 md:flex md:col-12">
         {loading ? (
-                     <div
+           <div
             role="status"
             className="container mx-auto space-y-8 mt-10 animate-pulse md:space-y-0 md:space-x-8 rtl:space-x-reverse md:flex justify-center md:items-center w-[80%]"
           >
@@ -424,40 +425,64 @@ export default function ProductDetail({ params }:{
                   </svg>
                   By Now
                 </button>
-                <button
-                  onClick={() => {
-                    setShowPopup(true);
-                    handleAddToCart(productData?.id, quantity);
-                  }}
-                  className="bg-black h-[50px]  flex gap-2 items-center text-white px-6 py-2 rounded-full  "
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth="1.5"
-                    stroke="currentColor"
-                    className="size-6"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"
-                    />
-                  </svg>
-                  Add to Cart
-                </button>
-                {/* Popup */}
-                {showPopup && (
-                  <CartPopup
-                    popupRef={popupRef}
-                    setShowPopup={setShowPopup}
-                    showPopup={showPopup}
-                    productName={productData?.name}
-                    productImage={mainImage}
-                    description={productData?.description}  
-                  ></CartPopup>
-                )}
+
+    <button
+  onClick={() => handleAddToCart(productData?.id, quantity)}
+  disabled={isLoading}
+  className={`bg-black h-[50px] flex gap-2 items-center justify-center
+  text-white px-6 py-2 rounded-full transition-all duration-300
+  ${
+    isLoading
+      ? "opacity-70 cursor-not-allowed"
+      : "hover:scale-[1.02] active:scale-95"
+  }`}
+>
+  {isLoading ? (
+    <>
+      <svg
+        className="w-5 h-5 animate-spin"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+      >
+        <circle
+          className="opacity-20"
+          cx="12"
+          cy="12"
+          r="10"
+          stroke="currentColor"
+          strokeWidth="4"
+        />
+        <path
+          className="opacity-80"
+          fill="currentColor"
+          d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+        />
+      </svg>
+
+      Adding...
+    </>
+  ) : (
+    <>
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        strokeWidth="1.5"
+        stroke="currentColor"
+        className="size-6"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"
+        />
+      </svg>
+
+      Add to Cart
+    </>
+  )}
+</button>
                 
               </div>
               
