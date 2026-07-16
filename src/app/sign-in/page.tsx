@@ -27,6 +27,13 @@ export default function SignIn() {
 
   useEffect(() => {
     window.scrollTo(0, 0);
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const tab = params.get("tab");
+      if (tab === "register") {
+        setActiveTab("register");
+      }
+    }
   }, []);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -235,16 +242,16 @@ export default function SignIn() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-neutral-50 via-neutral-100 to-neutral-200/50 flex items-center justify-center px-4 py-16 md:py-24 relative overflow-hidden">
       
-      {/* Decorative Background Orbs */}
+     
       <div className="absolute top-10 left-10 w-96 h-96 bg-neutral-300/20 rounded-full filter blur-[80px] pointer-events-none animate-pulse"></div>
       <div className="absolute bottom-10 right-10 w-96 h-96 bg-neutral-400/10 rounded-full filter blur-[100px] pointer-events-none"></div>
 
-      {/* Main Container Card (Dual Column Layout on Desktop) */}
+    
       <div className="w-full max-w-5xl bg-white rounded-[2.5rem] shadow-2xl border border-neutral-200/60 overflow-hidden grid grid-cols-1 md:grid-cols-12 relative z-10">
         
-        {/* Left Showcase Column (Hidden on Mobile) */}
+     
         <div className="md:col-span-5 bg-black text-white p-12 flex flex-col justify-between relative overflow-hidden hidden md:flex">
-          {/* Subtle Glowing Background Grid */}
+        
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_left,rgba(50,50,50,0.4),transparent)] pointer-events-none"></div>
           
           <div className="relative z-10">
@@ -260,7 +267,6 @@ export default function SignIn() {
               Access thousands of curated books, academic resources, and literary masterpieces at your fingertips.
             </p>
             
-            {/* Visual Perks */}
             <div className="mt-8 space-y-4">
               <div className="flex items-center gap-3 text-sm text-neutral-300">
                 <svg className="w-5 h-5 text-neutral-400 shrink-0 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
@@ -288,10 +294,8 @@ export default function SignIn() {
           </div>
         </div>
 
-        {/* Right Form Column */}
         <div className="md:col-span-7 p-8 md:p-12 lg:p-16 flex flex-col justify-center bg-white">
           
-          {/* Header */}
           <div className="mb-8">
             <h2 className="text-2xl font-bold text-black tracking-tight">
               {activeTab === "login" ? "Sign in to Bookwindow" : "Create your account"}
@@ -320,7 +324,6 @@ export default function SignIn() {
             </div>
           )}
 
-          {/* Segmented Control Tab Toggle */}
           <div className="flex p-1.5 bg-neutral-100 rounded-full mb-8 border border-neutral-200/50 shadow-inner">
             <button
               type="button"
