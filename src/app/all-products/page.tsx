@@ -107,7 +107,7 @@ export default function Category() {
   return (
     <>
 
-            <section className="container mx-auto mb-10 mt-10 md:flex border border-1">
+            <section className="container mx-auto mb-10 mt-10 md:flex gap-[20px] px-[20px] border border-1">
         <AllProductSidebar
           onCategorySelect={handleCategorySelect}
           onPublicationSelect={handlePublicationSelect}
@@ -154,11 +154,11 @@ export default function Category() {
           </div>
         ) : (
           <div className="col-8">
-            <div className="grid grid-cols-2 gap-[15px] md:grid-cols-3 xl:grid-cols-4 p-8">
+            <div className="grid grid-cols-1 gap-[15px] sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {currentItems.map((product: any) => (
                 <BookCard
                   key={product.id}
-                  img={`${config.apiUrl}storage/${product.image}`}
+                  img={`${config.apiUrl}storage/app/public/${product.image}`}
                   category={(product?.mrp && product?.price
                     ? ((product?.mrp - product?.price) / product?.mrp) * 100
                     : 0
