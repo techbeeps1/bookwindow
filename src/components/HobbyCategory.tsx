@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import config from "@/app/config";
 
 export interface HobbyItem {
   name: string;
@@ -54,8 +55,8 @@ export function HobbyCategory({
               <div className={`flex-grow rounded-[25px] flex flex-col items-center justify-between aspect-square relative overflow-hidden`}>              
               <div className=" w-full h-full">              
                 <div className="relative w-full flex justify-center items-center">
-                  <img
-                    src={item.cat_image}
+                  <img              
+                    src={`${config.apiUrl}storage/app/public/${item.cat_image}`}
                     alt={item.name}
                     className="h-full w-auto z-10 pointer-events-none"
                     draggable={false}

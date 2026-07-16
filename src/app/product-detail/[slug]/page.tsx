@@ -13,7 +13,7 @@ import { use } from "react";
 import { useCart } from "@/hooks/useCart";
 import { useAddToCartMutation } from "@/lib/api/cartApi";
 import { ImageBook } from "@/components/ImageBook";
-import { BookCard } from "@/components";
+
 import { FrequentlyBougth } from "@/components/FrequentlyBougth";
 
 

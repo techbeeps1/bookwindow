@@ -4,6 +4,7 @@ import React, { useRef, useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
+import config from "@/app/config";
 
 export interface Brand {
   name: string;
@@ -171,7 +172,7 @@ export function BestSubjects({data}: any) {
               {/* Background Image */}
    
               <img
-                src={brand.cat_image}
+                src={`${config.apiUrl}storage/app/public/${brand.cat_image}`}
                 alt={brand.name}
                 
                 sizes="(max-width: 768px) 75vw, (max-width: 1024px) 45vw, 30vw"

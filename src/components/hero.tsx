@@ -46,21 +46,6 @@ function Hero({ bannerData }: any) {
 
 
   const slides = bannerData ;
-  // [
-  //   {
-  //     id: 1,
-  //     image: bannerData?.images
-  //       ? `${config.apiUrl}storage/app/public/${bannerData?.images}`
-  //       : "/image/banner-img.jpg",
-  //     title: bannerData?.banner_title || "",
-  //     description: bannerData?.banner_description || "",
-  //     buttonText: bannerData?.banner_button_title || "",
-  //     logo: bannerData?.logo_img
-  //       ? `${config.apiUrl}storage/app/public/${bannerData?.logo_img}`
-  //       : null
-  //   },
-
-  // ];
 
   const nextSlide = () => {
     setCurrent((prev) => (prev === slides.length - 1 ? 0 : prev + 1));
