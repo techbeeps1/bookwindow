@@ -119,7 +119,7 @@ export default function Category({ params }:  {
   return (
     <>
 
-            <section className="container mx-auto mb-10 mt-10 md:flex border border-1">
+      <section className="container  mx-auto mb-10 mt-10 md:flex px-[20px] gap-[20px] border border-1">
         <CategoryPublicationSidebar
           onCategorySelect={handleCategorySelect}
           onPublicationSelect={handlePublicationSelect}
@@ -170,7 +170,7 @@ export default function Category({ params }:  {
           </div>
         ) : (
           <div className="col-8">
-            <div className="grid grid-cols-2 gap-[15px] md:grid-cols-3 xl:grid-cols-4 p-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-[15px] lg:grid-cols-3 xl:grid-cols-4">
               {currentItems.map((product: any) => {
                 const subcategory = childCategory?.find(
                   (sub: any) => sub.id === product.sub_category_id

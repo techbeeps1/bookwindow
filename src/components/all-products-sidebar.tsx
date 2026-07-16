@@ -107,7 +107,7 @@ export default function AllProductSidebar({
   );
 
   return (
-    <div className="w-full md:w-[300px] flex-shrink-0 p-6 flex flex-col gap-8 bg-white border-r border-neutral-100">
+    <div className="w-full md:w-[300px] flex-shrink-0 md:p-6 py-6 flex flex-col gap-8 bg-white md:border-r  md:border-neutral-100 border-0">
       
       {/* ================= Categories Section ================= */}
       <div className="flex flex-col gap-3">
