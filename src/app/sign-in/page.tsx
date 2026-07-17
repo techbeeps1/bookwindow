@@ -24,6 +24,7 @@ export default function SignIn() {
   const [alertType, setAlertType] = useState<"error" | "success" | "">("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("login");
+  const [isloading, setIsloading] = useState(false)
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -59,11 +60,14 @@ export default function SignIn() {
       return;
     }
 
+    setIsloading(true);
+
     const response = await fetch(`${config.apiUrl}api/v1/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password }),
     });
+      setIsloading(false);
     if (response.ok) {
       const data = await response.json();
       setCustomerData(data);
@@ -198,6 +202,7 @@ export default function SignIn() {
       refreshCaptcha();
       return;
     }
+        setIsloading(true);
 
     try {
       const response = await fetch(`${config.apiUrl}api/v1/register`, {
@@ -207,7 +212,7 @@ export default function SignIn() {
       });
 
       const data = await response.json();
-
+  setIsloading(false);
       if (response.ok) {
         setAlertType("success");
         setAlertMessage("Registration successful!");
@@ -404,7 +409,30 @@ export default function SignIn() {
               <button
                 type="submit"
                 className="w-full py-3 mt-4 bg-black text-white text-sm font-semibold rounded-full hover:bg-neutral-800 active:scale-95 transition-all duration-200 shadow-md hover:shadow-lg focus:outline-none flex items-center justify-center gap-2"
-              >
+              >      {isloading && (
+    <>
+      <svg
+        className="w-5 h-5 animate-spin"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+      >
+        <circle
+          className="opacity-20"
+          cx="12"
+          cy="12"
+          r="10"
+          stroke="currentColor"
+          strokeWidth="4"
+        />
+        <path
+          className="opacity-80"
+          fill="currentColor"
+          d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+        />
+      </svg>
+    </>
+  ) }
                 Login
               </button>
             </form>
@@ -571,6 +599,30 @@ export default function SignIn() {
                 type="submit"
                 className="w-full py-3 mt-4 bg-black text-white text-sm font-semibold rounded-full hover:bg-neutral-800 active:scale-95 transition-all duration-200 shadow-md hover:shadow-lg focus:outline-none flex items-center justify-center gap-2"
               >
+      {isloading && (
+    <>
+      <svg
+        className="w-5 h-5 animate-spin"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+      >
+        <circle
+          className="opacity-20"
+          cx="12"
+          cy="12"
+          r="10"
+          stroke="currentColor"
+          strokeWidth="4"
+        />
+        <path
+          className="opacity-80"
+          fill="currentColor"
+          d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+        />
+      </svg>
+    </>
+  ) }
                 Sign Up
               </button>
             </form>
