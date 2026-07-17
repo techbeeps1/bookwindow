@@ -5,21 +5,15 @@ const API_URL = "https://admin.bookwindow.in/api";
 
 export const baseApi = createApi({
   reducerPath: "api",
+  
 
-  baseQuery: fetchBaseQuery({
+ baseQuery: fetchBaseQuery({
     baseUrl: API_URL,
+    credentials: "include", // Important
 
-    prepareHeaders: (headers, { getState }) => {
-      const token = (getState() as RootState).auth.token;
-
-      if (token) {
-        headers.set("Authorization", `Bearer ${token}`);
-      }
-
+    prepareHeaders: (headers) => {
       headers.set("Accept", "application/json");
       headers.set("Content-Type", "application/json");
- 
-
       return headers;
     },
   }),

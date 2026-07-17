@@ -18,8 +18,6 @@ import Link from "next/link";
 
 export default function HomePage({homePageData}:any) {
 
-console.log(homePageData);
-  
   React.useEffect(() => {
     window.scrollTo(0, 0);
   }, []);

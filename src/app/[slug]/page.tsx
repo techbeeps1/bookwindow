@@ -14,11 +14,9 @@ async function getPageData(slug: string) {
       cache: "no-store", // SSR
     }
   );
-
   if (!res.ok) {
     throw new Error("Failed to fetch page");
   }
-
   return res.json();
 }
 

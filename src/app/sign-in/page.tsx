@@ -5,6 +5,8 @@ import { useState, useRef, useEffect, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import Modal from "@/components/modal";
 import ForgotPassword from "@/components/forgot-password";
+import { login } from "@/lib/slices/authSlice";
+import { useDispatch } from "react-redux";
 
 const generateCaptchaText = () => {
   const characters =
@@ -18,6 +20,7 @@ const generateCaptchaText = () => {
 
 export default function SignIn() {
   const router = useRouter();
+    const dispatch = useDispatch();
   
   const [customerData, setCustomerData] = useState({} as any);
   const [alertMessage, setAlertMessage] = useState("");
@@ -68,9 +71,15 @@ export default function SignIn() {
       body: JSON.stringify({ email, password }),
     });
       setIsloading(false);
+        
     if (response.ok) {
       const data = await response.json();
       setCustomerData(data);
+       dispatch(
+              login({
+                user: data,
+              })
+            );
       router.push("/my-account");
     } else {
       const data = await response.json();
@@ -86,6 +95,7 @@ export default function SignIn() {
     }
   }
 
+
   useEffect(() => {
     if (alertMessage) {
       const timer = setTimeout(() => {
@@ -96,6 +106,8 @@ export default function SignIn() {
     }
   }, [alertMessage]);
 
+
+
   useEffect(() => {
     if (
       typeof window !== "undefined" &&
@@ -105,7 +117,7 @@ export default function SignIn() {
     }
   }, [customerData]);
 
-  // Register CAPTCHA setup
+
   const canvasRef = useRef(null);
   const [captcha, setCaptcha] = useState("");
   const [captchaInput, setCaptchaInput] = useState("");

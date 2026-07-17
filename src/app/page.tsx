@@ -10,7 +10,7 @@ import HomePage from "@/components/HomePage";
           responseType: "json",
         });
          return  response.data;
-     
+    
     };
 export default async function Campaign() {
 
