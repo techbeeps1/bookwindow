@@ -33,8 +33,7 @@ export function HobbyCategory({
               {data?.hobby_subtitle}
           </motion.h2>
           <div className="w-20 h-[2px] bg-black my-4 rounded-full" />
-        </div>
-      
+        </div>      
 
       {/* Grid Layout (2 columns centered) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
@@ -54,11 +53,11 @@ export function HobbyCategory({
               </div>              
               <div className={`flex-grow rounded-[25px] flex flex-col items-center justify-between aspect-square relative overflow-hidden`}>              
               <div className=" w-full h-full">              
-                <div className="relative w-full flex justify-center items-center">
+                <div className="relative h-full w-full flex justify-center items-center">
                   <img              
                     src={`${config.apiUrl}storage/app/public/${item.cat_image}`}
                     alt={item.name}
-                    className="h-full w-auto z-10 pointer-events-none"
+                    className="h-full rounded-[25px] w-auto z-10 pointer-events-none"
                     draggable={false}
                     loading="lazy"
                   />
