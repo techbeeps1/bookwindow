@@ -1,9 +1,10 @@
+import config from "@/app/config";
 import { NextResponse } from "next/server";
-import { AUTH_END } from "@/services/api";
+
 
 export async function POST(req: Request) {
   const body = await req.json();
-  const res = await fetch(`${AUTH_END}/forgot-password` ,{
+  const res = await fetch(`${config.apiUrl}/forgot-password` ,{
     method: "POST",
     body: JSON.stringify(body),
     headers:{ "Content-Type": "application/json" }

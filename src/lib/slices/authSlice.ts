@@ -7,7 +7,8 @@ interface AuthState {
   user:{
     id: string;
     name: string;
-  }
+  },
+  loading: boolean;
 }
 
 const initialState: AuthState = {
@@ -18,6 +19,7 @@ const initialState: AuthState = {
     id: "",
     name: "",
   },
+  loading: true
 };
 
 const authSlice = createSlice({
@@ -30,11 +32,14 @@ const authSlice = createSlice({
       state.user.id = action.payload.user.id;
       state.user.name = action.payload.user.name;
       state.isAuthenticated = true;
+      state.loading = false;
     },
 
     logout: (state) => {
-
       state.isAuthenticated = false;
+      state.user.id = "";
+      state.user.name="";
+      state.loading = false;
     },
     setUser: (state, action: PayloadAction<{ id: string; name: string}>) => {
       state.user.id = action.payload.id;

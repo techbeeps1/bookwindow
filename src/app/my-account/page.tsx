@@ -4,7 +4,9 @@ import axios from "axios";
 import { FormEvent, useEffect, useState } from "react";
 import config from "../config";
 import { useRouter } from "next/navigation";
-
+import { useAppSelector } from "@/hooks/useStore";
+import {  logout } from "@/lib/slices/authSlice";
+import { useDispatch } from "react-redux";
 type AccountTab =
   | "dashboard"
   | "orders"
@@ -31,28 +33,32 @@ export default function AccountPage() {
   const [activeTab, setActiveTab] = useState<AccountTab>("dashboard");
   const [customer, setCustomer] = useState<any>(null);
   const [userOrders, setUserOrders] = useState([] as any);
-  const router = useRouter();
+     const router = useRouter();
+     const { user, isAuthenticated ,loading } = useAppSelector((state) => state.auth);
+ const dispatch = useDispatch();
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const customerData = localStorage.getItem("customer");
-      if (customerData) {
-        setCustomer(JSON.parse(customerData));
-      } else {
-        router.push("/");
-      }
-    }
-  }, [router]);
 
-  const logout = () => {
-    if (typeof window !== "undefined") {
-      localStorage.removeItem("customer");
-      localStorage.clear();
-      window.location.reload();
+  useEffect(() => {
+    if (!isAuthenticated && !loading) {
+       router.push("/");
+      }
+    
+  }, [isAuthenticated]);
+
+
+
+    const logoutUser = async () => {
+    try {
+      await fetch(`/api/auth/logout`, {
+        method: "POST",
+      });
+    } finally {
+      dispatch(logout());
+     router.push("/sign-in");
     }
   };
 
@@ -61,7 +67,7 @@ export default function AccountPage() {
       try {
         const response = await axios({
           method: "get",
-          url: `${config.apiUrl}api/user_order/${customer?.id}`,
+          url: `/api/my-account/user_order/${user?.id}`,
           responseType: "json",
         });
         const orders = response?.data;
@@ -71,15 +77,30 @@ export default function AccountPage() {
       }
     };
 
-    if (customer?.id) {
+     const CustomerData = async () => {
+      try {
+        const response = await axios({
+          method: "get",
+          url: `/api/my-account/view-address/${user?.id}`,
+          responseType: "json",
+        });
+        const Customerdata = response?.data;
+        setCustomer(Customerdata?.data);
+      } catch (error) {
+        console.error("Error fetching orders:", error);
+      }
+    };
+
+    if (user?.id) {
       fetchOrdersData();
+      CustomerData();
     }
-  }, [customer?.id]);
+  }, [user?.id]);
 
   const renderTabContent = () => {
     switch (activeTab) {
       case "dashboard":
-        return <DashboardTab customer={customer} logout={logout} setActiveTab={setActiveTab} />;
+        return <DashboardTab customer={customer} logout={logoutUser} setActiveTab={setActiveTab} />;
       case "orders":
         return <OrdersTab userOrders={userOrders} />;
       case "password":
@@ -115,9 +136,7 @@ export default function AccountPage() {
               <div>
                 {/* Brand/Logo header matching reference image */}
                 <div className="flex items-center gap-3 pb-6 border-b border-neutral-200/80">
-                  <div className="w-6.5 h-6.5 rounded bg-black flex items-center justify-center text-white font-extrabold text-xs">
-                    B
-                  </div>
+         
                   <span className="font-extrabold text-sm uppercase tracking-wider text-neutral-900">Bookwindow</span>
                 </div>
 
@@ -683,7 +702,7 @@ function OrdersTab({ userOrders }: any) {
           </div>
 
           {/* Billing Info Address Card */}
-          <div className="bg-[#fbfbfb] border border-neutral-200/80 rounded-2xl p-6 max-w-md shadow-sm">
+       {}   <div className="bg-[#fbfbfb] border border-neutral-200/80 rounded-2xl p-6 max-w-md shadow-sm">
             <h2 className="text-xs font-bold uppercase tracking-wider text-neutral-900 mb-4 border-b border-neutral-200 pb-2">Billing Address</h2>
             <div className="text-sm space-y-2.5 leading-relaxed text-neutral-600 font-semibold">
               <p className="font-bold text-neutral-900 text-base">
@@ -1064,7 +1083,7 @@ function AddressesTab({ customer }: any) {
             </button>
           </div>
 
-          <div className="max-w-md bg-[#fbfbfb] border border-neutral-200/80 rounded-2xl p-6 sm:p-8 shadow-sm">
+         { customer?.address && <div className="max-w-md bg-[#fbfbfb] border border-neutral-200/80 rounded-2xl p-6 sm:p-8 shadow-sm">
             <h2 className="text-sm font-bold uppercase tracking-wider text-neutral-900 mb-4 border-b border-neutral-200 pb-2">Billing Address</h2>
             <div className="text-sm space-y-2.5 font-semibold text-neutral-600 leading-relaxed">
               <p className="font-bold text-neutral-900">{customer?.first_name} {customer?.last_name}</p>
@@ -1085,6 +1104,7 @@ function AddressesTab({ customer }: any) {
               </p>
             </div>
           </div>
+}
         </div>
       )}
     </>

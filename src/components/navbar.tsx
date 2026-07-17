@@ -1,7 +1,7 @@
 import  { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-
+import { useAppSelector } from "@/hooks/useStore";
 import config from "@/app/config";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
 import { XMarkIcon, Bars3Icon } from "@heroicons/react/24/solid";
@@ -10,7 +10,8 @@ import { useAppDispatch } from "@/hooks/useStore";
 import { openCartDrawer } from "@/lib/slices/uiSlice";
 import { useCart } from "@/hooks/useCart";
 import { useViewProductsQuery } from "@/lib/api/productsApi";
-
+import {  logout } from "@/lib/slices/authSlice";
+import { useRouter } from "next/navigation";
 
 const resolveUrl = (url: string) => {
   if (!url) return "#";
@@ -24,7 +25,7 @@ const resolveUrl = (url: string) => {
 };
 
 export function Navbar({  menuData }: any) {
-  const [customer, setCustomer] = useState<any>(null);
+
   const [searchTerm, setSearchTerm] = useState("");
 
   const [filteredProducts, setFilteredProducts] = useState<any[]>([]);
@@ -34,18 +35,14 @@ export function Navbar({  menuData }: any) {
   const headerMenu = menuData;
   const {data:productdatas} = useViewProductsQuery();
    const products = productdatas;
+   const { user, isAuthenticated ,loading } = useAppSelector((state) => state.auth);
+   
 
 
   const { data } = useCart();
 const dispatch = useAppDispatch();
+ const router = useRouter();
 
-
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const customerDataVal = localStorage.getItem("customer");
-      setCustomer(customerDataVal ? JSON.parse(customerDataVal) : null);
-    }
-  }, []);
 
 
   
@@ -80,14 +77,18 @@ const dispatch = useAppDispatch();
     };
   }, []);
 
-  const logout = () => {
-    if (typeof window !== "undefined") {
- 
-      localStorage.removeItem("customer");
-      localStorage.clear();
-      window.location.reload();
-    }
-  };
+  const logoutUser = async () => {
+  try {
+    await fetch(`/api/auth/logout`, {
+      method: "POST",
+    });
+  } finally {
+    dispatch(logout());
+   router.push("/sign-in");
+  }
+};
+
+
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -224,7 +225,7 @@ const dispatch = useAppDispatch();
               {/* Right Icons (Profile/Cart) */}
               <div className="flex-shrink-0 flex items-center gap-6">
                 {/* User Account Dropdown */}
-                { customer ? (
+                { isAuthenticated ? (
                   <div className="relative group">
                     <button className="flex items-center gap-1 text-white hover:text-white/80 transition-colors focus:outline-none py-1">
                       <svg
@@ -242,7 +243,7 @@ const dispatch = useAppDispatch();
                         />
                       </svg>
                       <span className="text-xs font-medium max-w-[80px] truncate hidden md:inline ml-1">
-                        {customer?.first_name}
+                        {user?.name}
                       </span>
                       <ChevronDownIcon className="h-3 w-3 text-white/80 ml-0.5 transition-transform group-hover:rotate-180" />
                     </button>
@@ -255,7 +256,7 @@ const dispatch = useAppDispatch();
                           My Account
                         </Link>
                         <button
-                          onClick={logout}
+                          onClick={logoutUser}
                           className="w-full text-left block hover:bg-gray-50 text-red-500 hover:text-red-400 rounded-xl transition-colors py-2.5 px-4 text-xs font-semibold"
                         >
                           Logout
@@ -623,10 +624,10 @@ const dispatch = useAppDispatch();
      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-[#0c0c0e]/95 backdrop-blur-md border-t border-white/10 px-4 py-3 flex items-center justify-between gap-3 shadow-[0_-8px_30px_rgb(0,0,0,0.5)]">
 
       <div className="flex-shrink-0">
-        {  customer ? (
+        {  isAuthenticated ? (
           <Link href="/my-account" className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-tr from-amber-500 to-rose-500 text-white border border-white/20 shadow-md transform active:scale-95 transition-all">
             <span className="text-sm font-bold uppercase">
-              {customer?.first_name ? customer.first_name[0] : "U"}
+              {user?.name ? user.name[0] : "U"}
             </span>
           </Link>
         ) : (

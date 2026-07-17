@@ -11,7 +11,7 @@ export async function POST(req: Request) {
       controller.abort();
     }, 10000); // 10 sec timeout
 
-    const res = await fetch(`${config.apiUrl}/api/login`, {
+    const res = await fetch(`${config.apiUrl}api/v1/login`, {
       method: "POST",
       body: JSON.stringify(body),
       headers: { "Content-Type": "application/json" },
@@ -21,32 +21,26 @@ export async function POST(req: Request) {
     clearTimeout(timeout);
 
     const data = await res.json();
-
-    if (!data.success) {
+     
+    if (!data.access_token) {
       return NextResponse.json(data, { status: 401 });
     }
+  
+    const response = NextResponse.json(data.customer);
 
-    const response = NextResponse.json(data.user);
-
-    if (data.user.role !== "admin") {
-      response.cookies.set("MMMAT", data.access_token, {
+   
+      response.cookies.set("BWAT", data.access_token, {
         httpOnly: true,
         secure: true,
         path: "/",
       });
 
-      response.cookies.set("MMMRT", data.refresh_token, {
+      response.cookies.set("BWDT", JSON.stringify(data.customer), {
         httpOnly: true,
         secure: true,
         path: "/",
       });
-
-      response.cookies.set("MMMDT", JSON.stringify(data.user), {
-        httpOnly: true,
-        secure: true,
-        path: "/",
-      });
-    }
+    
 
     return response;
 
@@ -62,6 +56,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json(
       { message: "Unable to connect to server" },
+      
       { status: 500 }
     );
   }

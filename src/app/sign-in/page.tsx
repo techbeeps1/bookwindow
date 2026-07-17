@@ -65,7 +65,7 @@ export default function SignIn() {
 
     setIsloading(true);
 
-    const response = await fetch(`${config.apiUrl}api/v1/login`, {
+    const response = await fetch('/api/auth/login', {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password }),

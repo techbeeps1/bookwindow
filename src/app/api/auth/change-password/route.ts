@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { AUTH_END } from "@/services/api";
+
+import config from "@/app/config";
 
 export async function POST(req: NextRequest) {
   const body = await req.json();
@@ -7,7 +8,7 @@ export async function POST(req: NextRequest) {
   if (!token) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
-  const res = await fetch(`${AUTH_END}/change-password` ,{
+  const res = await fetch(`${config.apiUrl}/change-password` ,{
     method: "POST",
     body: JSON.stringify(body),
     headers:{ "Content-Type": "application/json" ,
