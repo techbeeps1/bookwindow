@@ -344,61 +344,64 @@ const dispatch = useAppDispatch();
                         </Link>
                         
                         {/* Mega Menu Dropdown Container - Spans full width of the parent menu row */}
-                        <div className="absolute container  top-[90%] left-[50%] translate-x-[-50%] right-auto w-full opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-300 transform translate-y-1 group-hover:translate-y-0 z-50 pt-[24px] -mt-[24px]">
+                        <div className="absolute container  top-[90%] left-[50%] translate-x-[-50%] right-auto w-full opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-300 transform translate-y-1 group-hover:translate-y-0 z-50">
                           <div className="bg-white border border-neutral-200/80 shadow-[0_25px_55px_rgba(0,0,0,0.15)] p-8 rounded-2xl relative w-full">
                             {/* Decorative top accent line */}
                             <div className="bg-gradient-to-r from-neutral-800 to-black h-[3px] rounded-t-2xl absolute top-0 left-0 right-0" />
                             
-                            {/* Centered container inside full-width dropdown */}
-                            <div className="max-w-[1200px] mx-auto">
-                              {hasNestedChildren ? (
-                                <div className={`grid ${gridColsClass} gap-8`}>
-                                  {item.children.map((child: any, cidx: number) => {
-                                    const hasLevel3 = child.children && child.children.length > 0;
-                                    return (
-                                      <div key={child?.id || cidx} className="flex flex-col text-left">
-                                        <Link
-                                          href={resolveUrl(child.url)}
-                                          className="font-bold text-[12px] uppercase tracking-wider !text-black border-b border-neutral-100 pb-1.5 mb-2.5 hover:!text-neutral-700 transition-colors"
-                                        >
-                                          {child.name}
-                                        </Link>
-                                        {hasLevel3 && (
-                                          <div className="flex flex-col gap-2">
-                                            {child.children.map((subChild: any, sidx: number) => (
-                                              <Link
-                                                key={subChild?.id || sidx}
-                                                href={resolveUrl(subChild.url)}
-                                                className="group/inner text-xs !text-neutral-600 hover:!text-black hover:translate-x-1.5 transition-all duration-200 font-medium py-0.5 flex items-center"
-                                              >
-                                                <span className="relative py-0.5">
-                                                  {subChild.name}
-                                                  <span className="absolute bottom-0 left-0 w-full h-[1px] bg-black transform scale-x-0 origin-left transition-transform duration-300 ease-out group-hover/inner:scale-x-100" />
-                                                </span>
-                                              </Link>
-                                            ))}
-                                          </div>
-                                        )}
-                                      </div>
-                                    );
-                                  })}
-                                </div>
-                              ) : (
-                                <div className={`grid ${gridColsClass} gap-x-8 gap-y-4`}>
-                                  {item.children.map((child: any, cidx: number) => (
-                                    <Link
-                                      key={child?.id || cidx}
-                                      href={resolveUrl(child.url)}
-                                      className="group/inner text-xs !text-neutral-700 hover:!text-black hover:translate-x-1.5 transition-all duration-200 font-semibold py-1 flex items-center text-left"
-                                    >
-                                      <span className="relative py-0.5">
-                                         {child.name}
-                                         <span className="absolute bottom-0 left-0 w-full h-[1px] bg-black transform scale-x-0 origin-left transition-transform duration-300 ease-out group-hover/inner:scale-x-100" />
-                                      </span>
-                                    </Link>
-                                  ))}
-                                </div>
-                              )}
+                            {/* Scrollable Container with max-height and custom scrollbar */}
+                            <div className="max-h-[400px] overflow-y-auto pr-6 custom-scrollbar">
+                              {/* Centered container inside full-width dropdown */}
+                              <div className="max-w-[1200px] mx-auto">
+                                {hasNestedChildren ? (
+                                  <div className={`grid ${gridColsClass} gap-8`}>
+                                    {item.children.map((child: any, cidx: number) => {
+                                      const hasLevel3 = child.children && child.children.length > 0;
+                                      return (
+                                        <div key={child?.id || cidx} className="flex flex-col text-left">
+                                          <Link
+                                            href={resolveUrl(child.url)}
+                                            className="font-bold text-[12px] uppercase tracking-wider !text-black border-b border-neutral-100 pb-1.5 mb-2.5 hover:!text-neutral-700 transition-colors"
+                                          >
+                                            {child.name}
+                                          </Link>
+                                          {hasLevel3 && (
+                                            <div className="flex flex-col gap-2">
+                                              {child.children.map((subChild: any, sidx: number) => (
+                                                <Link
+                                                  key={subChild?.id || sidx}
+                                                  href={resolveUrl(subChild.url)}
+                                                  className="group/inner text-xs !text-neutral-600 hover:!text-black hover:translate-x-1.5 transition-all duration-200 font-medium py-0.5 flex items-center"
+                                                >
+                                                  <span className="relative py-0.5">
+                                                    {subChild.name}
+                                                    <span className="absolute bottom-0 left-0 w-full h-[1px] bg-black transform scale-x-0 origin-left transition-transform duration-300 ease-out group-hover/inner:scale-x-100" />
+                                                  </span>
+                                                </Link>
+                                              ))}
+                                            </div>
+                                          )}
+                                        </div>
+                                      );
+                                    })}
+                                  </div>
+                                ) : (
+                                  <div className={`grid ${gridColsClass} gap-x-8 gap-y-4`}>
+                                    {item.children.map((child: any, cidx: number) => (
+                                      <Link
+                                        key={child?.id || cidx}
+                                        href={resolveUrl(child.url)}
+                                        className="group/inner text-xs !text-neutral-700 hover:!text-black hover:translate-x-1.5 transition-all duration-200 font-semibold py-1 flex items-center text-left"
+                                      >
+                                        <span className="relative py-0.5">
+                                           {child.name}
+                                           <span className="absolute bottom-0 left-0 w-full h-[1px] bg-black transform scale-x-0 origin-left transition-transform duration-300 ease-out group-hover/inner:scale-x-100" />
+                                        </span>
+                                      </Link>
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -445,8 +448,8 @@ const dispatch = useAppDispatch();
 
           </div>   
           <div
-            className={`lg:hidden transition-all duration-300 overflow-hidden ${
-              open ? "max-h-[85vh] opacity-100 mt-4" : "max-h-0 opacity-0 pointer-events-none"
+            className={`lg:hidden transition-all duration-300 ${
+              open ? "max-h-[70vh] overflow-y-auto opacity-100 mt-4 pr-1 custom-scrollbar" : "max-h-0 overflow-hidden opacity-0 pointer-events-none"
             }`}
           >
             <div className="pt-4 border-t border-white/10 flex flex-col gap-4">           

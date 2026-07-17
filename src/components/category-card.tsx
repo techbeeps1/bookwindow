@@ -20,13 +20,13 @@ function CategoryCard({
 
   return (
     <Link href={`/category/${cat_slug}`} className="group block w-full cursor-pointer">
-      <div className="relative w-full aspect-[4/5] rounded-[24px] overflow-hidden bg-gray-50 border border-gray-150 shadow-sm">
+      <div className="relative w-full px-[20px] py-[25px] rounded-[24px] overflow-hidden bg-gray-50 border border-gray-200 shadow-sm">
         <Image
           width={400}
           height={500}
           src={`${config.apiUrl}storage/app/public/${cat_image}`}
           alt={cat_title || "Category"}
-          className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500 ease-out"
+          className=" w-full h-[165px] object-contain group-hover:scale-105 transition-transform duration-500 ease-out"
           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 16vw"
         />
       </div>
