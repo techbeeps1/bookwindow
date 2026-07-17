@@ -57,8 +57,8 @@ const CartItem = ({
         transition: { duration: 0.2 }
       }}
       layout
-      className={`flex gap-4 p-4 border-b border-gray-100 hover:bg-gray-50/50 transition-colors duration-200 group relative ${
-        isUpdatingThisItem ? 'bg-blue-50/30' : ''
+      className={`flex items-start gap-4 p-5 border-b border-gray-100 hover:bg-gray-50/30 transition-colors duration-200 group relative ${
+        isUpdatingThisItem ? 'bg-blue-50/10' : ''
       }`}
     >
       {/* Subtle update indicator overlay */}
@@ -68,9 +68,9 @@ const CartItem = ({
           animate={{ opacity: 1 }}
           className="absolute inset-0 bg-white/40 backdrop-blur-[1px] flex items-center justify-center z-10"
         >
-          <div className="flex items-center gap-3 bg-white/90 px-4 py-2 rounded-full shadow-lg">
-            <div className="w-5 h-5 border-2 border-gray-200 border-t-black rounded-full animate-spin"></div>
-            <span className="text-sm font-medium text-gray-700">Updating...</span>
+          <div className="flex items-center gap-2.5 bg-white/95 px-4 py-2 rounded-full shadow-md border border-gray-100">
+            <div className="w-4 h-4 border-2 border-gray-200 border-t-black rounded-full animate-spin"></div>
+            <span className="text-xs font-semibold text-gray-700">Updating...</span>
           </div>
         </motion.div>
       )}
@@ -80,68 +80,99 @@ const CartItem = ({
         <motion.div 
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="absolute inset-0 bg-white/60 backdrop-blur-[2px] flex items-center justify-center z-10"
+          className="absolute inset-0 bg-white/60 backdrop-blur-[1px] flex items-center justify-center z-10"
         >
-          <div className="flex flex-col items-center gap-2">
-            <div className="w-8 h-8 border-3 border-gray-200 border-t-red-500 rounded-full animate-spin"></div>
-            <span className="text-xs text-gray-500 font-medium">Removing...</span>
+          <div className="flex flex-col items-center gap-1.5 bg-white/95 px-4 py-3 rounded-2xl shadow-md border border-gray-100">
+            <div className="w-5 h-5 border-2 border-gray-200 border-t-red-500 rounded-full animate-spin"></div>
+            <span className="text-xs text-red-500 font-semibold">Removing...</span>
           </div>
         </motion.div>
       )}
 
-      <div className="relative w-20 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
-        <Image
+      {/* Product Image: Rounded light grey square container */}
+      <div className="relative w-[90px] h-[90px] rounded-[18px] overflow-hidden bg-[#F9F9FA] border border-gray-100 flex items-center justify-center p-2 flex-shrink-0">
+        <img
           src={`${config.apiUrl}storage/app/public/${item.image}`}
           alt={item.product_name}
-          width={180}
-          height={100}
-          className="object-cover h-[106px] object-top"
-
+          className="max-w-full max-h-full object-contain pointer-events-none"
+          loading="lazy"
         />
       </div>
 
-      <div className="flex-1 min-w-0">
-        <h4 className="font-medium text-sm text-gray-800 line-clamp-2 group-hover:text-black transition-colors">
+      {/* Middle Column: Details */}
+      <div className="flex-1 min-w-0 pr-2">
+        <h4 className="font-semibold text-[14px] leading-[1.35] text-neutral-800 line-clamp-2 hover:text-black transition-colors">
           {item.product_name}
         </h4>
 
-        <p className="mt-1 font-bold text-black text-sm">
-          ₹{item.product_price}
+        {/* Subtitle / Attributes */}
+        <p className="text-xs text-neutral-400 mt-1 font-medium font-sans">
+          {item.author || item.size || item.category || "Book"}
         </p>
 
-        <div className="mt-2 flex items-center justify-between">
-          <div className="flex items-center bg-gray-100 rounded-full p-0.5 border border-gray-200">
-            <button
-              type="button"
-              disabled={isUpdatingThisItem || isRemovingThisItem}
-              onClick={() => onDecrease(item.product_id)}
-              className="w-7 h-7 flex items-center justify-center rounded-full text-gray-600 hover:bg-white hover:text-black hover:shadow-sm active:scale-95 transition-all duration-200 focus:outline-none disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:shadow-none disabled:cursor-not-allowed shrink-0"
-            >
-              <FaMinus size={10} className="pointer-events-none" />
-            </button>
+        {/* Price */}
+        <p className="mt-3.5 font-bold text-neutral-900 text-[15px]">
+          ₹{item.product_price}
+        </p>
+      </div>
 
-            <span className="w-8 text-center text-sm font-semibold text-gray-900 select-none">
-              {item.quantity}
-            </span>
-
+      {/* Right Column: Quantity Box and Remove Link */}
+      <div className="flex flex-col items-end gap-3 flex-shrink-0 self-stretch justify-between">
+        {/* Quantity Box */}
+        <div className="flex items-center justify-between w-[68px] h-[40px] bg-[#F7F8F9] rounded-[12px]  px-3.5 relative">
+          <span className="text-[14px] font-semibold text-neutral-800 select-none">
+            {item.quantity}
+          </span>
+          <div className="flex flex-col items-center justify-center gap-0">
             <button
               type="button"
               disabled={isUpdatingThisItem || isRemovingThisItem}
               onClick={() => onIncrease(item.product_id)}
-              className="w-7 h-7 flex items-center justify-center rounded-full text-gray-600 hover:bg-white hover:text-black hover:shadow-sm active:scale-95 transition-all duration-200 focus:outline-none disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:shadow-none disabled:cursor-not-allowed shrink-0"
+              className="p-0.5 hover:text-black text-neutral-400 transition-colors active:scale-95 disabled:opacity-40 disabled:pointer-events-none"
+              aria-label="Increase quantity"
             >
-              <FaPlus size={10} className="pointer-events-none" />
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={3}
+                stroke="currentColor"
+                className="w-2.5 h-2.5"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 15.75 7.5-7.5 7.5 7.5" />
+              </svg>
+            </button>
+            <button
+              type="button"
+              disabled={isUpdatingThisItem || isRemovingThisItem}
+              onClick={() => onDecrease(item.product_id)}
+              className="p-0.5 hover:text-black text-neutral-400 transition-colors active:scale-95 disabled:opacity-40 disabled:pointer-events-none"
+              aria-label="Decrease quantity"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={3}
+                stroke="currentColor"
+                className="w-2.5 h-2.5"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+              </svg>
             </button>
           </div>
-
-          <button
-            disabled={isUpdatingThisItem || isRemovingThisItem}
-            onClick={() => onRemove(item.product_id)}
-            className="text-red-500 hover:text-red-900 transition-all duration-200 hover:scale-110 disabled:opacity-40 disabled:cursor-not-allowed"
-          >
-            <CiTrash size={20} />
-          </button>
         </div>
+
+        {/* Remove Button */}
+        <button
+          type="button"
+          disabled={isUpdatingThisItem || isRemovingThisItem}
+          onClick={() => onRemove(item.product_id)}
+          className="text-neutral-400 hover:text-red-500 hover:bg-red-50/60 p-1.5 rounded-lg transition-all duration-200 active:scale-95 disabled:opacity-40 disabled:pointer-events-none"
+          aria-label="Remove item"
+        >
+          <CiTrash className="w-5 h-5" />
+        </button>
       </div>
     </motion.div>
   );
@@ -249,7 +280,7 @@ export default function CartDrawer() {
         initial={{ x: "100%" }}
         animate={{ x: cartDrawer ? 0 : "100%" }}
         transition={{ type: "spring", damping: 25, stiffness: 200 }}
-        className={`fixed top-0 right-0 z-[10000] h-screen w-full sm:w-[420px] bg-white shadow-2xl flex flex-col`}
+        className={`fixed top-0 right-0 rounded-l-[30px] overflow-hidden z-[10000] h-screen w-full sm:w-[420px] bg-white shadow-2xl flex flex-col`}
       >
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 shrink-0">
@@ -276,10 +307,10 @@ export default function CartDrawer() {
 
           <button
             onClick={() => dispatch(closeCartDrawer())}
-            className="p-2 hover:bg-gray-100 rounded-full transition-all duration-200 hover:rotate-90 focus:outline-none"
+            className="flex items-center justify-center p-2 bg-white text-black border border-neutral-200 rounded-full transition-all duration-300 hover:bg-black hover:text-white hover:border-black hover:rotate-90 focus:outline-none"
             aria-label="Close cart"
           >
-            <FiX className="w-5 h-5 text-gray-500 hover:text-black transition-colors" />
+            <FiX className="w-5 h-5" />
           </button>
         </div>
 
@@ -357,7 +388,7 @@ export default function CartDrawer() {
                 <Link
                   href="/checkout"
                   onClick={() => dispatch(closeCartDrawer())}
-                  className="group flex items-center justify-center gap-2 w-full rounded-lg bg-black py-3.5 text-white text-center font-semibold hover:bg-gray-800 transition-all duration-300 hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]"
+                  className="group flex items-center justify-center gap-2 w-full rounded-full bg-black py-3.5 text-white text-center font-semibold hover:bg-gray-800 transition-all duration-300 hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]"
                 >
                   <BsCartCheck className="w-5 h-5 group-hover:scale-110 transition-transform" />
                   Proceed to Checkout
