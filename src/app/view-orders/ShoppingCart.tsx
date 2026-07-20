@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-
+import { useSearchParams } from "next/navigation";
 import config from "@/app/config";
 import axios from "axios";
 
@@ -17,8 +17,9 @@ interface CartItem {
 }
 
 export default function ShoppingCart() {
-  
-  const orderNumber = "5555" ;
+  const searchParams = useSearchParams();
+const orderNumber = searchParams.get("order_number");
+
 
   const [orderItems, setOrderItems] = useState<CartItem[]>([]);
   const [orderData, setOrderData] = useState<any>({});
@@ -54,7 +55,15 @@ export default function ShoppingCart() {
 
 
       <section className="bg-white py-8 md:py-16 mb-4">
-        <div className="mx-auto max-w-screen-xl px-4 2xl:px-0">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
+          <div className="mx-auto max-w-2xl text-center text-2xl font-bold text-gray-900 sm:text-3xl md:text-4xl">
+            Thank you for your order!
+          </div>
+          <div className="mx-auto mt-4  text-center text-sm text-gray-500 sm:text-base">
+       Your order has been placed successfully. You can view the details of your order below.
+       </div>
+          </div>
+        <div className="mx-auto container px-4 2xl:px-0">
           <h2 className="text-xl font-semibold text-gray-900 sm:text-2xl">
             Your Orders
           </h2>
@@ -79,11 +88,11 @@ export default function ShoppingCart() {
                       key={item.id}
                       className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm md:p-6"
                     >
-                      <div className="grid grid-cols-5 gap-6 items-center">
+                      <div className="grid grid-cols-5 gap-2 items-center">
 
                         <Image
                           className="object-contain"
-                          src={`${config.apiUrl}storage/${item.product_image}`}
+                          src={`${config.apiUrl}storage/app/public/${item.product_image}`}
                           alt={item.product_name}
                           width={150}
                           height={200}

@@ -1,10 +1,11 @@
 "use client";
 import BookCard from "@/components/book-card";
 import config from "@/app/config";
-export function FrequentlyBougth({ description, similarProducts, onItemsCountUpdate }: any) {
-   const handleItemsCountUpdate = (count: number) => {
-   //setItemsCount(3);
-  };
+export function FrequentlyBougth({  similarProducts, onItemsCountUpdate }: any) {
+
+  if(similarProducts.length <=0 ){
+    return null;
+  }
   return (
   <section className="px-[20px] mb-[60px]">
         <div className="container mx-auto">

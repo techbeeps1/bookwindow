@@ -11,11 +11,15 @@ import axios from "axios";
 import Checkout from "@/components/Checkout";
 import { ThankYouDialog } from "@/components/thank-you-popup";
 import { NotificationDialog } from "@/components/notification";
-import { CheckIcon } from "@heroicons/react/24/solid";
+
 import Link from "next/link";
 import FadeLoaderOverlay from "@/components/loader";
 import { useCart } from "@/hooks/useCart";
-import { useRemoveCartMutation, useUpdateCartMutation } from "@/lib/api/cartApi";
+import {
+  useRemoveCartMutation,
+  useUpdateCartMutation,
+  useViewCartQuery,
+} from "@/lib/api/cartApi";
 import { useSession } from "@/hooks/useSession";
 
 interface CartItem {
@@ -34,8 +38,8 @@ const steps = ["cart", "shipping", "order"];
 
 export default function ShoppingCart() {
   const router = useRouter();
-   const sessionId = useSession();
-  const initialStep =  "cart";
+  const sessionId = useSession();
+  const initialStep = "cart";
   const [cartFetched, setCartFetched] = useState(false);
 
   const [cartItems, setCartItems] = useState([] as CartItem[] | any[]);
@@ -46,6 +50,7 @@ export default function ShoppingCart() {
   const [couponSuccess, setCouponSuccess] = useState("");
   const [couponError, setCouponError] = useState("");
 
+  const { refetch } = useViewCartQuery(sessionId);
 
   const [deliveryType, setDeliveryType] = useState("standard");
   const [payment_method, setPaymentMethod] = useState("cod");
@@ -55,21 +60,37 @@ export default function ShoppingCart() {
   const [isOpen, setIsOpen] = useState(false);
   const thankYouPopup = () => setIsOpen(!isOpen);
   const [activeTab, setActiveTab] = useState(initialStep);
+  const [isorderProcess, setIsOrderProcess] = useState(false);
   const [completedSteps, setCompletedSteps] = useState<string[]>([]);
   const [shippingData, setShippingData] = useState({});
   const [debounceTimeout, setDebounceTimeout] = useState<NodeJS.Timeout | null>(
-    null
+    null,
   );
-  const [customerData, setCustomerData] = useState({} as any);
+
   const [coupon_code, setCouponCode] = useState("");
   const [couponData, setCouponData] = useState({} as any);
   const [mainCategories, setMainCategories] = useState([] as any);
-  const [isCartEmpty, setIsCartEmpty] = useState(false);
+  const [loginUpdated, setLoginUpdated] = useState(0);
+  
+  
+  const { data } = useCart();
+  const [updateCart, { isLoading: updating }] = useUpdateCartMutation();
+  const [removeCart, { isLoading: removing }] = useRemoveCartMutation();
 
-    const { data } = useCart();
-   const [updateCart, { isLoading: updating }] = useUpdateCartMutation();
-   const [removeCart, { isLoading: removing }] = useRemoveCartMutation();
- 
+  useEffect(() => {
+    fetch("/api/my-account/user")
+      .then((res) => res.json())
+      .then((userData) => {
+        if (userData && userData.id) {
+          setShippingData(userData);
+        }
+      })
+      .catch((error) => {
+        console.error("Error checking user session:", error);
+        router.push("/login");
+      });
+  }, [sessionId,loginUpdated]);
+
   useEffect(() => {
     window.scrollTo(0, 0);
     setActiveTab("cart");
@@ -112,7 +133,7 @@ export default function ShoppingCart() {
     const nextStep = steps[currentIndex + 1];
     if (nextStep) {
       setCompletedSteps((prev) =>
-        prev.includes(activeTab) ? prev : [...prev, activeTab]
+        prev.includes(activeTab) ? prev : [...prev, activeTab],
       );
       setActiveTab(nextStep);
     }
@@ -124,9 +145,6 @@ export default function ShoppingCart() {
     // prevStep === "cart" ? setShowCoupon(true) : setShowCoupon(false);
     if (prevStep) setActiveTab(prevStep);
   };
-  
-
-
 
   useEffect(() => {
     const viewCart = async () => {
@@ -134,12 +152,12 @@ export default function ShoppingCart() {
       try {
         setCartItems(data?.items || []);
         setItemsCount(data?.items_count || 0);
-        setCartFetched(true); 
+        setCartFetched(true);
       } catch (error) {
         console.error("Error loading cart:", error);
         setCartItems([]);
         setItemsCount(0);
-        setCartFetched(true); 
+        setCartFetched(true);
       } finally {
         setLoading(false);
       }
@@ -147,19 +165,15 @@ export default function ShoppingCart() {
     if (sessionId) {
       viewCart();
     }
-  }, [sessionId,data]);
+  }, [sessionId, data]);
 
-
- 
- 
   const updateCartQuantity = async (productId: number, quantity: number) => {
     try {
-         updateCart({
-      product_id: productId,
-      session_id: sessionId,
-      quantity_change: quantity,
-    });
-
+      updateCart({
+        product_id: productId,
+        session_id: sessionId,
+        quantity_change: quantity,
+      });
     } catch (error) {
       console.error("Error adding to cart:", error);
     }
@@ -167,10 +181,10 @@ export default function ShoppingCart() {
 
   const removeCartItem = async (productId: number) => {
     try {
-         removeCart({
-      product_id: productId,
-      session_id: sessionId,
-    });
+      removeCart({
+        product_id: productId,
+        session_id: sessionId,
+      });
     } catch (error) {
       console.error("Error adding to cart:", error);
     }
@@ -178,32 +192,8 @@ export default function ShoppingCart() {
 
   const updateQuantity = (id: number, action: "increment" | "decrement") => {
     updateCartQuantity(id, action === "increment" ? +1 : -1);
-    // if (couponError) {
-    //   setCouponError("");
-    // }
-    // action === "increment"
-    //   ? setItemsCount(items_count + 1)
-    //   : setItemsCount(items_count - 1);
-    // setCartItems((prev) =>
-    //   prev.map((item) =>
-    //     item.product_id === id
-    //       ? {
-    //           ...item,
-    //           quantity:
-    //             action === "increment"
-    //               ? item.quantity + 1
-    //               : Math.max(1, item.quantity - 1),
-    //         }
-    //       : item
-    //   )
-    // );
   };
 
-  // const removeItem = (id: number) => {
-  //   removeCartItem(id);
-  //   setCartItems(cartItems?.filter((item) => item.product_id !== id));
-  //   setItemsCount(items_count - 1);
-  // };
   const removeItem = (id: number) => {
     const itemToRemove = cartItems?.find((item) => item.product_id === id);
     if (!itemToRemove) return;
@@ -215,9 +205,7 @@ export default function ShoppingCart() {
     setCartItems(cartItems?.filter((item) => item.product_id !== id));
     setItemsCount(newItemsCount);
 
-    if (newItemsCount <= 0) {
-      setIsCartEmpty(true);
-    }
+    
   };
 
   const calculateTotal = () => {
@@ -252,11 +240,12 @@ export default function ShoppingCart() {
   // Function to return shipping cost as a number
   const calculateShippingValue = (
     weightInGrams: number,
-    quantity: number
+    quantity: number,
   ): number => {
     // if (deliveryType === "free") return 0;
     const weight = weightInGrams * 1000;
     let shipping = deliveryType === "standard" ? 49 : 125;
+
     if (weight <= 500) return shipping;
     else {
       shipping = shipping * quantity;
@@ -272,7 +261,7 @@ export default function ShoppingCart() {
   // Function to return shipping as a formatted string
   const calculateShipping = (
     weightInGrams: number,
-    quantity: number
+    quantity: number,
   ): string => {
     const value = calculateShippingValue(weightInGrams, quantity);
     // return deliveryType === "free" ? "Free" : `₹${value}`;
@@ -281,12 +270,12 @@ export default function ShoppingCart() {
 
   const totalWeight = cartItems?.reduce(
     (acc, item) => acc + item.product_weight * item.quantity,
-    0
+    0,
   );
 
   const subtotal = cartItems?.reduce(
     (acc, item) => acc + item.product_price * item.quantity,
-    0
+    0,
   );
 
   const handleCouponChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -308,7 +297,7 @@ export default function ShoppingCart() {
   const checkCoupon = async (couponToCheck: string) => {
     try {
       const response = await axios.post(
-        `${config.apiUrl}api/cart/coupon/${couponToCheck}`
+        `${config.apiUrl}api/cart/coupon/${couponToCheck}`,
       );
       if (response.data) {
         setCouponData(response.data);
@@ -323,7 +312,7 @@ export default function ShoppingCart() {
   const couponValidation = (
     max_cart_amount: number,
     min_cart_amount: number,
-    totalAmount: number
+    totalAmount: number,
   ) => {
     if (
       (totalAmount <= max_cart_amount && totalAmount >= min_cart_amount) ||
@@ -361,6 +350,8 @@ export default function ShoppingCart() {
   useEffect(() => {}, [couponData, mainCategories]);
 
   const handlePlaceOrder = async () => {
+    if (isorderProcess) return; // Prevent multiple submissions
+    setIsOrderProcess(true);
     try {
       const response = await fetch(`${config.apiUrl}api/cart/checkout`, {
         method: "POST",
@@ -368,7 +359,7 @@ export default function ShoppingCart() {
         credentials: "include",
         body: JSON.stringify({
           ...shippingData,
-          session_id:   sessionId,
+          session_id: sessionId,
           shipping_method: deliveryType,
           payment_method: payment_method,
           coupon_code:
@@ -379,23 +370,24 @@ export default function ShoppingCart() {
             isCouponApplied && couponData && couponSuccess
               ? cartItems?.reduce(
                   (acc, item) => acc + item.product_price * item.quantity,
-                  0
+                  0,
                 ) - calculateTotal()
               : 0,
         }),
       });
       const result = await response.json();
-      // console.log("Place order", result);
+      // Reset the order process state after the request completes
 
       if (result?.order_number && !result?.razorpay_order_id) {
         setOrderNumber(result?.order_number);
+        refetch();
         router.push(`/view-orders?order_number=${result?.order_number}`);
+
         // thankYouPopup();
         setTimeout(() => {
           // setCartItems([]);
           setItemsCount(0);
-          setIsCartEmpty(true);
-          localStorage.removeItem("checkoutForm");
+         
         }, 2000);
       }
       if (response.ok && result?.razorpay_order_id) {
@@ -405,7 +397,7 @@ export default function ShoppingCart() {
           alert("Failed to load Razorpay SDK");
           return;
         }
-
+        setIsOrderProcess(false);
         // 2. Launch Razorpay checkout
         const options = {
           key: result.razorpay_key,
@@ -427,14 +419,17 @@ export default function ShoppingCart() {
                   razorpay_order_id: response.razorpay_order_id,
                   razorpay_signature: response.razorpay_signature,
                 }),
-              }
+              },
             );
 
             const verifyData = await verifyRes.json();
             console.log("RAzorpay data", verifyData);
             if (verifyRes.ok) {
+              refetch();
               setOrderNumber(result?.order?.order_number);
-              router.push(`/view-orders?order_number=${result?.order?.order_number}`);
+              router.push(
+                `/view-orders?order_number=${result?.order?.order_number}`,
+              );
               // thankYouPopup();
               setTimeout(() => {
                 setCartItems([]);
@@ -457,8 +452,6 @@ export default function ShoppingCart() {
           },
           modal: {
             ondismiss: async function () {
-              alert("Payment Cancelled");
-              // console.log("checkout data",result)
               // Call your server's cancel API explicitly
               try {
                 await fetch(`${config.apiUrl}api/cart/razorpay/cancel`, {
@@ -484,13 +477,16 @@ export default function ShoppingCart() {
 
         const rzp = new window.Razorpay(options);
         rzp.open();
-        localStorage.removeItem("checkoutForm");
       } else {
         if (result.message === "Your cart is empty") {
           setOpen(true);
           errorPopup();
         }
       }
+      if (result.error) {
+        alert("Something went wrong. Please try again later.");
+      }
+      setIsOrderProcess(false);
     } catch (error) {
       setOpen(true);
       console.log("Error in:", error);
@@ -510,7 +506,9 @@ export default function ShoppingCart() {
               <div className="flex w-full max-w-2xl justify-between text-center select-none font-bold uppercase tracking-wider text-xs sm:text-sm">
                 {steps.map((step, idx) => {
                   const isCurrent = step === activeTab;
-                  const isDone = completedSteps.includes(step) || steps.indexOf(step) < steps.indexOf(activeTab);
+                  const isDone =
+                    completedSteps.includes(step) ||
+                    steps.indexOf(step) < steps.indexOf(activeTab);
 
                   return (
                     <div
@@ -520,8 +518,8 @@ export default function ShoppingCart() {
                         isCurrent
                           ? "border-black text-black scale-105"
                           : isDone
-                          ? "border-green-600 text-green-700"
-                          : "border-transparent text-neutral-300 hover:text-neutral-500"
+                            ? "border-green-600 text-green-700"
+                            : "border-transparent text-neutral-300 hover:text-neutral-500"
                       }`}
                     >
                       <span className="mr-1">{idx + 1}.</span> {step}
@@ -540,7 +538,8 @@ export default function ShoppingCart() {
                     Shopping Cart
                   </h1>
                   <p className="text-sm text-neutral-400 font-bold mt-1">
-                    {items_count} {items_count === 1 ? "item" : "items"} in your cart
+                    {items_count} {items_count === 1 ? "item" : "items"} in your
+                    cart
                   </p>
                 </div>
 
@@ -592,7 +591,9 @@ export default function ShoppingCart() {
                               {/* Quantity selector */}
                               <div className="flex items-center gap-1">
                                 <button
-                                  onClick={() => updateQuantity(item.product_id, "decrement")}
+                                  onClick={() =>
+                                    updateQuantity(item.product_id, "decrement")
+                                  }
                                   className="w-8 h-8 rounded border border-neutral-200 bg-white hover:bg-neutral-50 flex items-center justify-center text-neutral-500 font-bold text-sm cursor-pointer"
                                 >
                                   -
@@ -601,7 +602,9 @@ export default function ShoppingCart() {
                                   {item.quantity}
                                 </span>
                                 <button
-                                  onClick={() => updateQuantity(item.product_id, "increment")}
+                                  onClick={() =>
+                                    updateQuantity(item.product_id, "increment")
+                                  }
                                   className="w-8 h-8 rounded border border-neutral-200 bg-white hover:bg-neutral-50 flex items-center justify-center text-neutral-500 font-bold text-sm cursor-pointer"
                                 >
                                   +
@@ -612,21 +615,33 @@ export default function ShoppingCart() {
                               <span className="text-sm sm:text-base font-black text-neutral-900 w-24 text-right">
                                 ₹
                                 {(() => {
-                                  const itemTotal = item.product_price * item.quantity;
-                                  if (isCouponApplied && couponData && couponSuccess) {
-                                    const couponCategories = couponData.category_id
-                                      ? JSON.parse(couponData.category_id)
-                                      : null;
+                                  const itemTotal =
+                                    item.product_price * item.quantity;
+                                  if (
+                                    isCouponApplied &&
+                                    couponData &&
+                                    couponSuccess
+                                  ) {
+                                    const couponCategories =
+                                      couponData.category_id
+                                        ? JSON.parse(couponData.category_id)
+                                        : null;
 
                                     const isCategoryMatch =
                                       !couponCategories ||
-                                      couponCategories.includes(String(item.category_id));
+                                      couponCategories.includes(
+                                        String(item.category_id),
+                                      );
 
                                     if (isCategoryMatch) {
                                       return (
                                         couponData.type === "fixed"
-                                          ? itemTotal - parseFloat(couponData.value)
-                                          : itemTotal - (itemTotal * parseFloat(couponData.value)) / 100
+                                          ? itemTotal -
+                                            parseFloat(couponData.value)
+                                          : itemTotal -
+                                            (itemTotal *
+                                              parseFloat(couponData.value)) /
+                                              100
                                       ).toFixed(2);
                                     }
                                   }
@@ -677,9 +692,10 @@ export default function ShoppingCart() {
                               couponData && couponData.max_cart_amount,
                               couponData && couponData.min_cart_amount,
                               cartItems?.reduce(
-                                (acc, item) => acc + item.product_price * item.quantity,
-                                0
-                              )
+                                (acc, item) =>
+                                  acc + item.product_price * item.quantity,
+                                0,
+                              ),
                             );
                             couponData && setIsCoupnApplied(true);
                           }}
@@ -698,64 +714,69 @@ export default function ShoppingCart() {
                     </div>
 
                     <div className="mt-2">
-                      {couponSuccess && isCouponApplied && couponData ? (
-                        (() => {
-                          const couponCategories = couponData.category_id
-                            ? JSON.parse(couponData.category_id)
-                            : null;
+                      {couponSuccess && isCouponApplied && couponData
+                        ? (() => {
+                            const couponCategories = couponData.category_id
+                              ? JSON.parse(couponData.category_id)
+                              : null;
 
-                          const isCategoryMatch =
-                            !couponCategories ||
-                            cartItems?.some((item) =>
-                              couponCategories.includes(String(item.category_id))
-                            );
-                          return (
-                            isCategoryMatch && (
-                              <div className="inline-flex items-center gap-1 bg-green-50 text-green-800 px-3 py-1 rounded-lg text-xs font-bold border border-green-150 shadow-sm mt-1">
-                                <span>Code: {couponData?.code}</span>
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    setIsCoupnApplied(false);
-                                    setCouponError("");
-                                    setCouponSuccess("");
-                                  }}
-                                  className="p-0.5 hover:bg-green-100 rounded-full transition-colors text-green-600 hover:text-green-900 cursor-pointer"
-                                >
-                                  <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    viewBox="0 0 20 20"
-                                    fill="currentColor"
-                                    className="w-3.5 h-3.5"
+                            const isCategoryMatch =
+                              !couponCategories ||
+                              cartItems?.some((item) =>
+                                couponCategories.includes(
+                                  String(item.category_id),
+                                ),
+                              );
+                            return (
+                              isCategoryMatch && (
+                                <div className="inline-flex items-center gap-1 bg-green-50 text-green-800 px-3 py-1 rounded-lg text-xs font-bold border border-green-150 shadow-sm mt-1">
+                                  <span>Code: {couponData?.code}</span>
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setIsCoupnApplied(false);
+                                      setCouponError("");
+                                      setCouponSuccess("");
+                                    }}
+                                    className="p-0.5 hover:bg-green-100 rounded-full transition-colors text-green-600 hover:text-green-900 cursor-pointer"
                                   >
-                                    <path d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z" />
-                                  </svg>
-                                </button>
-                              </div>
-                            )
-                          );
-                        })()
-                      ) : (
-                        couponError && (
-                          <p className="text-red-700 text-xs font-bold pl-1 mt-1">{couponError}</p>
-                        )
-                      )}
+                                    <svg
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      viewBox="0 0 20 20"
+                                      fill="currentColor"
+                                      className="w-3.5 h-3.5"
+                                    >
+                                      <path d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z" />
+                                    </svg>
+                                  </button>
+                                </div>
+                              )
+                            );
+                          })()
+                        : couponError && (
+                            <p className="text-red-700 text-xs font-bold pl-1 mt-1">
+                              {couponError}
+                            </p>
+                          )}
                     </div>
                   </div>
 
                   {/* Right Column: Order Summary */}
                   <div className="w-full lg:max-w-md flex-1 p-4">
                     <div className="bg-neutral-50/50 border border-neutral-150/60 rounded-2xl p-6 sm:p-8 shadow-sm space-y-6 lg:sticky lg:top-8">
-                      <p className="text-lg font-bold text-neutral-900">Order Summary</p>
-                      
+                      <p className="text-lg font-bold text-neutral-900">
+                        Order Summary
+                      </p>
+
                       <div className="space-y-4">
                         <div className="flex justify-between items-center text-sm font-semibold text-neutral-600">
                           <span>Subtotal</span>
                           <span className="text-neutral-900 font-bold">
                             ₹
                             {cartItems?.reduce(
-                              (acc, item) => acc + item.product_price * item.quantity,
-                              0
+                              (acc, item) =>
+                                acc + item.product_price * item.quantity,
+                              0,
                             )}
                           </span>
                         </div>
@@ -766,8 +787,9 @@ export default function ShoppingCart() {
                             - ₹
                             {isCouponApplied && couponData && couponSuccess
                               ? cartItems?.reduce(
-                                  (acc, item) => acc + item.product_price * item.quantity,
-                                  0
+                                  (acc, item) =>
+                                    acc + item.product_price * item.quantity,
+                                  0,
                                 ) - calculateTotal()
                               : 0}
                           </span>
@@ -778,19 +800,27 @@ export default function ShoppingCart() {
                           <span className="text-neutral-900 font-bold">
                             {calculateShipping(
                               totalWeight,
-                              cartItems?.reduce((acc, item) => acc + item.quantity, 0)
+                              cartItems?.reduce(
+                                (acc, item) => acc + item.quantity,
+                                0,
+                              ),
                             )}
                           </span>
                         </div>
 
                         <div className="flex justify-between items-baseline border-t border-neutral-200/60 pt-4">
-                          <span className="text-sm font-extrabold text-neutral-900 uppercase">Total</span>
+                          <span className="text-sm font-extrabold text-neutral-900 uppercase">
+                            Total
+                          </span>
                           <span className="text-xl font-black text-neutral-950">
                             ₹
                             {calculateTotal() +
                               calculateShippingValue(
                                 totalWeight,
-                                cartItems?.reduce((acc, item) => acc + item.quantity, 0)
+                                cartItems?.reduce(
+                                  (acc, item) => acc + item.quantity,
+                                  0,
+                                ),
                               )}
                           </span>
                         </div>
@@ -829,10 +859,8 @@ export default function ShoppingCart() {
                   setShippingData(data);
                   setActiveTab("order");
                 }}
-                onCustomerData={(customerData: any) => {
-                  setCustomerData(customerData);
-                }}
                 formData={shippingData}
+                setLoginUpdated={setLoginUpdated}
               />
             )}
 
@@ -895,7 +923,9 @@ export default function ShoppingCart() {
                               {/* Quantity selector */}
                               <div className="flex items-center gap-1">
                                 <button
-                                  onClick={() => updateQuantity(item.product_id, "decrement")}
+                                  onClick={() =>
+                                    updateQuantity(item.product_id, "decrement")
+                                  }
                                   className="w-8 h-8 rounded border border-neutral-200 bg-white hover:bg-neutral-50 flex items-center justify-center text-neutral-500 font-bold text-sm cursor-pointer"
                                 >
                                   -
@@ -904,7 +934,9 @@ export default function ShoppingCart() {
                                   {item.quantity}
                                 </span>
                                 <button
-                                  onClick={() => updateQuantity(item.product_id, "increment")}
+                                  onClick={() =>
+                                    updateQuantity(item.product_id, "increment")
+                                  }
                                   className="w-8 h-8 rounded border border-neutral-200 bg-white hover:bg-neutral-50 flex items-center justify-center text-neutral-500 font-bold text-sm cursor-pointer"
                                 >
                                   +
@@ -916,20 +948,31 @@ export default function ShoppingCart() {
                                 ₹
                                 {(() => {
                                   const itemTotal = item.subtotal;
-                                  if (isCouponApplied && couponData && couponSuccess) {
-                                    const couponCategories = couponData.category_id
-                                      ? JSON.parse(couponData.category_id)
-                                      : null;
+                                  if (
+                                    isCouponApplied &&
+                                    couponData &&
+                                    couponSuccess
+                                  ) {
+                                    const couponCategories =
+                                      couponData.category_id
+                                        ? JSON.parse(couponData.category_id)
+                                        : null;
 
                                     const isCategoryMatch =
                                       !couponCategories ||
-                                      couponCategories.includes(String(item.category_id));
+                                      couponCategories.includes(
+                                        String(item.category_id),
+                                      );
 
                                     if (isCategoryMatch) {
                                       return (
                                         couponData.type === "fixed"
-                                          ? itemTotal - parseFloat(couponData.value)
-                                          : itemTotal - (itemTotal * parseFloat(couponData.value)) / 100
+                                          ? itemTotal -
+                                            parseFloat(couponData.value)
+                                          : itemTotal -
+                                            (itemTotal *
+                                              parseFloat(couponData.value)) /
+                                              100
                                       ).toFixed(2);
                                     }
                                   }
@@ -946,11 +989,15 @@ export default function ShoppingCart() {
                   {/* Right Column: Order summary and settings */}
                   <div className="w-full lg:max-w-md flex-1 p-4">
                     <div className="bg-neutral-50/50 border border-neutral-100 rounded-2xl p-6 shadow-sm space-y-6 lg:sticky lg:top-8">
-                      <p className="text-lg font-bold text-neutral-900">Order Summary</p>
+                      <p className="text-lg font-bold text-neutral-900">
+                        Order Summary
+                      </p>
 
                       {/* Delivery Type Option Cards */}
                       <div className="space-y-3">
-                        <p className="text-xs font-black uppercase text-neutral-400 tracking-wider">Delivery Type</p>
+                        <p className="text-xs font-black uppercase text-neutral-400 tracking-wider">
+                          Delivery Type
+                        </p>
                         <div className="grid grid-cols-2 gap-3">
                           {/* Standard Delivery Option */}
                           <div
@@ -961,13 +1008,19 @@ export default function ShoppingCart() {
                                 : "border-neutral-200 bg-white hover:border-neutral-300"
                             }`}
                           >
-                            <span className="text-xs font-bold uppercase tracking-wider text-neutral-850">Standard</span>
-                            <span className="text-[10px] text-neutral-400 font-bold mt-1">3-5 Days</span>
-                            <span className="text-xs font-black text-neutral-900 mt-2.5">₹49</span>
+                            <span className="text-xs font-bold uppercase tracking-wider text-neutral-850">
+                              Standard
+                            </span>
+                            <span className="text-[10px] text-neutral-400 font-bold mt-1">
+                              3-5 Days
+                            </span>
+                            <span className="text-xs font-black text-neutral-900 mt-2.5">
+                              ₹49
+                            </span>
                           </div>
 
                           {/* Express Delivery Option */}
-                          <div
+                          {/* <div
                             onClick={() => setDeliveryType("express")}
                             className={`flex flex-col p-4 rounded-2xl border-2 cursor-pointer transition-all ${
                               deliveryType === "express"
@@ -975,16 +1028,24 @@ export default function ShoppingCart() {
                                 : "border-neutral-200 bg-white hover:border-neutral-300"
                             }`}
                           >
-                            <span className="text-xs font-bold uppercase tracking-wider text-neutral-850">Express</span>
-                            <span className="text-[10px] text-neutral-400 font-bold mt-1">1-2 Days</span>
-                            <span className="text-xs font-black text-neutral-900 mt-2.5">₹125</span>
-                          </div>
+                            <span className="text-xs font-bold uppercase tracking-wider text-neutral-850">
+                              Express
+                            </span>
+                            <span className="text-[10px] text-neutral-400 font-bold mt-1">
+                              1-2 Days
+                            </span>
+                            <span className="text-xs font-black text-neutral-900 mt-2.5">
+                              ₹125
+                            </span>
+                          </div> */}
                         </div>
                       </div>
 
                       {/* Payment Method Option Cards */}
                       <div className="space-y-3">
-                        <p className="text-xs font-black uppercase text-neutral-400 tracking-wider">Payment Method</p>
+                        <p className="text-xs font-black uppercase text-neutral-400 tracking-wider">
+                          Payment Method
+                        </p>
                         <div className="grid grid-cols-2 gap-3">
                           {/* Cash On Delivery Option */}
                           <div
@@ -995,8 +1056,12 @@ export default function ShoppingCart() {
                                 : "border-neutral-200 bg-white hover:border-neutral-300"
                             }`}
                           >
-                            <span className="text-xs font-bold uppercase tracking-wider text-neutral-855">COD</span>
-                            <span className="text-[10px] text-neutral-400 font-bold mt-1">Cash on delivery</span>
+                            <span className="text-xs font-bold uppercase tracking-wider text-neutral-855">
+                              COD
+                            </span>
+                            <span className="text-[10px] text-neutral-400 font-bold mt-1">
+                              Cash on delivery
+                            </span>
                           </div>
 
                           {/* Online Payment Option */}
@@ -1008,8 +1073,12 @@ export default function ShoppingCart() {
                                 : "border-neutral-200 bg-white hover:border-neutral-300"
                             }`}
                           >
-                            <span className="text-xs font-bold uppercase tracking-wider text-neutral-850">Online</span>
-                            <span className="text-[10px] text-neutral-400 font-bold mt-1">Razorpay secure</span>
+                            <span className="text-xs font-bold uppercase tracking-wider text-neutral-850">
+                              Online
+                            </span>
+                            <span className="text-[10px] text-neutral-400 font-bold mt-1">
+                              Razorpay secure
+                            </span>
                           </div>
                         </div>
                       </div>
@@ -1018,7 +1087,9 @@ export default function ShoppingCart() {
                       <div className="space-y-4 pt-4 border-t border-neutral-100">
                         <div className="flex justify-between text-xs text-neutral-500 font-bold uppercase tracking-wider">
                           <span>Subtotal</span>
-                          <span className="text-neutral-800 font-black">₹{subtotal}</span>
+                          <span className="text-neutral-800 font-black">
+                            ₹{subtotal}
+                          </span>
                         </div>
 
                         <div className="flex justify-between text-xs text-neutral-500 font-bold uppercase tracking-wider">
@@ -1027,8 +1098,9 @@ export default function ShoppingCart() {
                             - ₹
                             {isCouponApplied && couponData && couponSuccess
                               ? cartItems?.reduce(
-                                  (acc, item) => acc + item.product_price * item.quantity,
-                                  0
+                                  (acc, item) =>
+                                    acc + item.product_price * item.quantity,
+                                  0,
                                 ) - calculateTotal()
                               : 0}
                           </span>
@@ -1039,28 +1111,46 @@ export default function ShoppingCart() {
                           <span className="text-neutral-800 font-black">
                             {calculateShipping(
                               totalWeight,
-                              cartItems?.reduce((acc, item) => acc + item.quantity, 0)
+                              cartItems?.reduce(
+                                (acc, item) => acc + item.quantity,
+                                0,
+                              ),
                             )}
                           </span>
                         </div>
 
                         <div className="flex justify-between items-baseline pt-4 border-t border-neutral-100">
-                          <span className="text-sm font-extrabold text-neutral-900 uppercase">Total</span>
+                          <span className="text-sm font-extrabold text-neutral-900 uppercase">
+                            Total
+                          </span>
                           <span className="text-2xl font-black text-neutral-950">
                             ₹
                             {calculateTotal() +
                               calculateShippingValue(
                                 totalWeight,
-                                cartItems?.reduce((acc, item) => acc + item.quantity, 0)
+                                cartItems?.reduce(
+                                  (acc, item) => acc + item.quantity,
+                                  0,
+                                ),
                               )}
                           </span>
                         </div>
                       </div>
 
                       {/* Dialogs */}
-                      {open && <NotificationDialog open={open} handleOpen={errorPopup} />}
+                      {open && (
+                        <NotificationDialog
+                          open={open}
+                          handleOpen={errorPopup}
+                        />
+                      )}
+
                       {isOpen && (
-                        <ThankYouDialog open={isOpen} handleOpen={thankYouPopup} orderNumber={orderNumber} />
+                        <ThankYouDialog
+                          open={isOpen}
+                          handleOpen={thankYouPopup}
+                          orderNumber={orderNumber}
+                        />
                       )}
 
                       {/* Action buttons */}
@@ -1075,7 +1165,7 @@ export default function ShoppingCart() {
                           onClick={handlePlaceOrder}
                           className="flex-1 py-3.5 bg-black hover:bg-neutral-900 text-white font-bold text-xs rounded-xl uppercase transition-all duration-200 shadow-md cursor-pointer text-center"
                         >
-                          Place Order
+                          {isorderProcess ? "Processing..." : "Place Order"}
                         </button>
                       </div>
                     </div>

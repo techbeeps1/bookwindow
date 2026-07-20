@@ -75,7 +75,8 @@ export default function ProductDetail({ params }:{
 
   const [productData, setProductData] = useState([] as any);
   const [similarProducts, setSimilarProducts] = useState([] as any);
-
+  const [FBTProducts, setFBTProducts] = useState([] as any);
+  
   const galleryImages = parseGallery(productData?.gallery);
   const allImages: string[] = [];
   if (productData?.image) {
@@ -159,7 +160,8 @@ export default function ProductDetail({ params }:{
           responseType: "json",
         });
         setProductData(response.data?.product);
-        setSimilarProducts(response.data?.related_products);
+        setSimilarProducts(response.data?.related_products || []);
+        setFBTProducts(response.data?.bought_together || [])
       } catch (error) {
         console.log("error", error);
       } finally {
@@ -345,12 +347,14 @@ const handleAddToCart = async (productId: string, quantity: number) => {
                <span className="text-black font-semibold">Author:</span> {productData?.author}
               </p>
               <div className="mb-4">
-                <span className="text-2xl font-bold mr-2">
+               {productData.price  && <span className="text-2xl font-bold mr-2">
                   ₹{productData.price}
-                </span>               
-                <span className="text-gray-500 line-through">
+                </span>     
+                  }           
+               {(productData.mrp && productData.mrp != 0 && productData.mrp != productData.price ) &&  <span className={`${productData.price ? "text-gray-500 line-through" :"text-2xl font-bold mr-2" }`}>
                   ₹{productData.mrp}
                 </span>
+              }
               </div>              
                 <div>
                 <label
@@ -517,7 +521,7 @@ const handleAddToCart = async (productId: string, quantity: number) => {
         onItemsCountUpdate={handleItemsCountUpdate}
       />
     <FrequentlyBougth
-        similarProducts={similarProducts}
+        similarProducts={FBTProducts}
         onItemsCountUpdate={handleItemsCountUpdate}
       />  
       {showWishlistModal && (

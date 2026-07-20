@@ -4,12 +4,15 @@ import { FormEvent, useEffect, useState } from "react";
 import config from "@/app/config";
 import axios from "axios";
 import React from "react";
+import { useAppSelector } from "@/hooks/useStore";
+import { useDispatch } from "react-redux";
+import { login } from "@/lib/slices/authSlice";
 
 type CheckoutProps = {
   onBack: () => void;
   onNext: (data: any) => void; // <-- accept data here
   formData: any;
-  onCustomerData: (data: any) => void;
+setLoginUpdated: React.Dispatch<React.SetStateAction<number>>;
   shippingData?: any;
 };
 
@@ -17,7 +20,7 @@ export default function Checkout({
   onNext,
   onBack,
   formData,
-  onCustomerData,
+ setLoginUpdated,
   shippingData,
 }: CheckoutProps) {
 
@@ -34,8 +37,8 @@ export default function Checkout({
     country: "India",
   };
 
-  const [customerData, setCustomerData] = useState({} as any);
-  const [customer, setCustomer] = useState<any>(null);
+ 
+
   const [isEdit, setIsEdit] = useState<boolean>(false);
 
   const [email, setEmail] = useState("");
@@ -47,84 +50,17 @@ export default function Checkout({
     null
   );
 
-  const [open, setOpen] = React.useState(false);
-  const errorPopup = () => setOpen(!open);
-  const [isOpen, setIsOpen] = React.useState(false);
-  const thankYouPopup = () => setIsOpen(!isOpen);
   const [selectedState, setSelectedState] = useState<string>("");
   const [states, setStates] = useState([] as any);
   const [statesFeteched, setStatesFatched] = useState(false);
   const [filteredCities, setFilteredCities] = useState([]);
 
   const [formValues, setFormValues] = useState(formData?.first_name ? formData : initialFormValues);
-  const [isLoaded, setIsLoaded] = useState(false);
 
-  useEffect(() => {
-    if (typeof window === "undefined") return;
+  const { user, isAuthenticated ,loading } = useAppSelector((state) => state.auth);
+     const dispatch = useDispatch();
 
-    if (customerData?.customer) {
-      localStorage.setItem("customer", JSON.stringify(customerData.customer));
-      setCustomer(customerData.customer);
-
-      // Pre-fill form with customer data
-      const customer = customerData.customer;
-      setFormValues((prev: any) => ({
-        ...prev,
-        first_name: customer.first_name || "",
-        last_name: customer.last_name || "",
-        email: customer.email || "",
-        phone: customer.phone || "",
-        address: customer.address || "",
-        address_2: customer.address_2 || "",
-        city: customer.city || "",
-        state: customer.state || "",
-        zip_code: customer.zip_code || "",
-        country: customer.country || "India",
-      }));
-    } else {
-      // Try loading customer from localStorage
-      const storedCustomer = localStorage.getItem("customer");
-
-      if (storedCustomer) {
-        const parsedCustomer = JSON.parse(storedCustomer);
-        setCustomer(parsedCustomer);
-
-        setFormValues((prev: any) => ({
-          ...prev,
-          first_name: parsedCustomer.first_name || "",
-          last_name: parsedCustomer.last_name || "",
-          email: parsedCustomer.email || "",
-          phone: parsedCustomer.phone || "",
-          address: parsedCustomer.address || "",
-          address_2: parsedCustomer.address_2 || "",
-          city: parsedCustomer.city || "",
-          state: parsedCustomer.state || "",
-          zip_code: parsedCustomer.zip_code || "",
-          country: parsedCustomer.country || "India",
-        }));
-      } else {
-        // Fallback to previously saved form data
-        const savedForm = localStorage.getItem("checkoutForm");
-        if (savedForm) {
-          try {
-            setFormValues(JSON.parse(savedForm));
-          } catch (e) {
-            console.error("Failed to parse stored form data", e);
-          }
-        }
-      }
-    }
-
-    setIsLoaded(true);
-  }, [customerData]);
-
-  // Update localStorage whenever formValues changes
-  useEffect(() => {
-    if (isLoaded && !customer) {
-      localStorage.setItem("checkoutForm", JSON.stringify(formValues));
-    }
-  }, [customer, formValues, isLoaded]);
-
+ 
   useEffect(() => {
     if (formData?.first_name) {
       setFormValues(formData);
@@ -190,7 +126,6 @@ export default function Checkout({
     if (debounceTimeout) {
       clearTimeout(debounceTimeout);
     }
-
     const timeout = setTimeout(() => {
       checkUser(value);
     }, 500);
@@ -222,7 +157,7 @@ export default function Checkout({
 
   async function handleLogin(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const response = await fetch(`${config.apiUrl}api/v1/login`, {
+    const response = await fetch(`/api/auth/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email: email, password: password }),
@@ -230,8 +165,13 @@ export default function Checkout({
     if (response.ok) {
       const data = await response.json();
       setUserFound(false);
-      setCustomerData(data);
-      onCustomerData(data);
+  
+         dispatch(
+                    login({
+                      user: data,
+                    })
+                  );
+      setLoginUpdated((prev) => prev + 1);
     } else {
       const data = await response.json();
       console.error("Login failed", response.status);
@@ -240,10 +180,7 @@ export default function Checkout({
   }
 
   useEffect(() => {
-    const source =
-      shippingData && Object.keys(shippingData).length > 0
-        ? shippingData
-        : customer;
+    const source = shippingData && shippingData;
     if (!source) return;
 
     setFormValues((prev: any) => {
@@ -259,9 +196,10 @@ export default function Checkout({
         zip_code: source.zip_code || "",
         state: source.state || "",
         city: source.city || "",
+        country: source.country ?? "India",
       };
     });
-  }, [shippingData, customer]);
+  }, [shippingData]);
 
   const handleNext = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -276,8 +214,7 @@ export default function Checkout({
 
     for (const field of requiredFields) {
       const value =
-        formValues[field as keyof typeof formValues] ||
-        customer?.[field as keyof typeof customer];
+        formValues[field as keyof typeof formValues] 
       if (!value?.toString().trim()) {
         alert(`${field.replace(/_/g, " ")} is required`);
         return;
@@ -285,11 +222,11 @@ export default function Checkout({
     }
 
     const source =
-      formValues && Object.keys(formValues).length > 0 ? formValues : customer;
+      formValues &&  formValues  ;
 
     const data = {
       ...source,
-      email: email || formValues?.email || customer?.email || "",
+      email: email || formValues?.email || "",
       password: password || "",
       is_guest: !password,
     };
@@ -297,13 +234,6 @@ export default function Checkout({
     onNext(data);
   };
 
-  if (!isLoaded) {
-    return (
-      <div className="flex justify-center items-center min-h-[40vh] text-neutral-450 font-semibold text-sm">
-        Loading checkout form...
-      </div>
-    );
-  }
 
   return (
     <>
@@ -337,20 +267,20 @@ export default function Checkout({
             <h1 className="text-xl font-bold text-neutral-900 tracking-tight uppercase">Shipping Details</h1>
           </div>
 
-          {!isEdit && customer ? (
+          {(!isEdit && isAuthenticated) && shippingData ? (
             <div className="text-sm space-y-2.5 leading-relaxed p-6 border border-neutral-200 bg-neutral-50/40 rounded-xl">
               <div className="font-bold text-neutral-900">
-                {shippingData?.first_name || customer?.first_name}{" "}
-                {shippingData?.last_name || customer?.last_name}
+                {shippingData?.first_name ||" "}{" "}
+                {shippingData?.last_name || " "}
               </div>
               <div className="text-neutral-600 space-y-0.5 font-medium">
-                <p>{shippingData?.address || customer?.address}</p>
-                {customer?.address_2 && <p>{shippingData?.address_2 || customer?.address_2}</p>}
+                <p>{shippingData?.address || " "}</p>
+                { shippingData?.address_2 && <p>{shippingData?.address_2 || ""}</p> }
                 <p>
-                  {shippingData?.city || customer?.city},{" "}
-                  {shippingData?.state || customer?.state} {shippingData?.zip_code || customer?.zip_code}
+                  {shippingData?.city || ""},{" "}
+                  {shippingData?.state || ""} {shippingData?.zip_code || ""}
                 </p>
-                <p>Phone: {shippingData?.phone || customer?.phone}</p>
+                <p>Phone: {shippingData?.phone || ""}</p>
               </div>
               <div className="text-end pt-3 border-t border-neutral-200/60 mt-4">
                 <button
@@ -364,7 +294,7 @@ export default function Checkout({
             </div>
           ) : (
             <div className="space-y-5">
-              {!customer && (
+              {!isAuthenticated && (
                 <div className="flex flex-col gap-1.5">
                   <label className="text-xs font-semibold text-neutral-800 uppercase tracking-wider">
                     Email Address
@@ -398,30 +328,7 @@ export default function Checkout({
                   <p className="text-neutral-500 text-xs font-bold uppercase tracking-wider">{errorMessage}</p>
                   {errorMessage && (
                     <>
-                      <div className="flex flex-col gap-1.5">
-                        <label className="text-xs font-semibold text-neutral-800 uppercase tracking-wider">
-                          Password
-                        </label>
-                        <div className="relative">
-                          <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400">
-                            <svg className="w-5 h-5 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                            </svg>
-                          </div>
-                          <input
-                            type="password"
-                            placeholder="********"
-                            name="password"
-                            value={password}
-                            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                              setPassword(e.target.value)
-                            }
-                            className="w-full pl-11 pr-4 py-3 text-sm text-black bg-[#f4f4f4] hover:bg-neutral-100/50 focus:bg-white border border-neutral-200/80 rounded-xl outline-none focus:border-black focus:ring-2 focus:ring-black/5 transition-all duration-200"
-                            required
-                          />
-                        </div>
-                      </div>
-                      {!password && (
+              
                         <div className="flex gap-2">
                           <button
                             type="button"
@@ -431,7 +338,7 @@ export default function Checkout({
                             Continue as guest
                           </button>
                         </div>
-                      )}
+                   
                     </>
                   )}
                 </div>
@@ -480,13 +387,7 @@ export default function Checkout({
                     >
                       Login
                     </button>
-                    <button
-                      type="button"
-                      onClick={() => setUserFound(false)}
-                      className="bg-neutral-250 hover:bg-neutral-300 text-neutral-800 text-xs font-bold px-5 py-2.5 rounded-lg transition-colors cursor-pointer"
-                    >
-                      Continue as guest
-                    </button>
+                 
                   </div>
                 </div>
               )}
@@ -621,8 +522,8 @@ export default function Checkout({
                       value={formValues.state}
                       onChange={handleStateChange}
                     >
-                      <option defaultValue={customer?.state || ""}>
-                        {customer?.state || "Select state"}
+                      <option defaultValue={shippingData?.state || ""}>
+                        {shippingData?.state || "Select state"}
                       </option>
                       {!statesFeteched ? (
                         <option className="text-sm text-red-400" disabled>
@@ -717,6 +618,7 @@ export default function Checkout({
                   >
                     <option defaultValue="India">India</option>
                   </select>
+                  {formValues.country}
                 </div>
               </div>
             </div>

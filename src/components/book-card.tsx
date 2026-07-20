@@ -14,14 +14,15 @@ import { useSession } from "@/hooks/useSession";
 import { ImageBook } from "./ImageBook";
 import { useCart } from "@/hooks/useCart";
 import { openCartDrawer } from "@/lib/slices/uiSlice";
+import { number } from "framer-motion";
 
 interface BookCardProps {
   img: string;
   title: string;
   desc: string;
   category: string;
-  price: string;
-  offPrice?: string;
+  price: string | number;
+  offPrice?: string | number;
   slug?: string;
   id?: string | any;
   quantity: number;
@@ -188,25 +189,18 @@ export function BookCard({
         </Link>
 
         <div className="flex justify-between items-center">
-          <div className="flex gap-2">
-            {price !== offPrice && (
-              <Typography
-                variant="h5"
-                color="red"
-                className={offPrice ? "line-through text-xs" : ""}
-                {...({} as React.ComponentProps<typeof Typography>)}
-              >
-                ₹{price}
-              </Typography>
-            )}
-            <Typography
-              variant="h5"
-              color="blue-gray"
-              className="text-xs"
-              {...({} as React.ComponentProps<typeof Typography>)}
-            >
-              ₹{offPrice}
-            </Typography>
+          <div className="flex gap-2 justify-between items-center">
+
+               {offPrice  && <span className="text-sm font-bold ">
+                  ₹{offPrice}
+                </span>     
+                  }           
+               {(price && price != 0 && price != offPrice ) &&  <span className={`${offPrice ? "text-red-500 line-through text-xs font-bold" :"text-xs font-bold mr-2" }`}>
+                  ₹{price}
+                </span>
+              }
+       
+      
           </div>
           <div className="flex gap-2 items-center">
             {/* Add to Cart Button with Animation */}

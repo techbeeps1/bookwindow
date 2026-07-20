@@ -93,8 +93,7 @@ async function handle(
 
 
     if (apiRes.status === 401) {
-      console.error("Unauthorized - invalid or expired token token - created");
-
+ 
       return NextResponse.json(
         { error: "Unauthorized Access" },
         { status: 401 }

@@ -208,12 +208,19 @@ const dispatch = useAppDispatch();
                             />
                           </div>
                           <div className="flex-1 min-w-0 text-left">
-                            <h4 className="font-semibold text-xs text-neutral-855 hover:text-black transition-colors truncate">
+                            <h4 className="font-semibold text-sm text-neutral-855 hover:text-black transition-colors truncate">
                               {product?.name}
                             </h4>
-                            <div className="text-xs font-extrabold text-black mt-1">
-                              ₹{product?.price}
-                            </div>
+
+
+                            {product.price  && <span className="font-extrabold text-black mt-1 mr-2">
+                  ₹{product.price} 
+                </span>     
+                  }           
+               {(product.mrp && product.mrp != 0 && product.mrp != product.price ) &&  <span className={`${product.price ? "text-gray-500 line-through text-xs " :"text-sm font-bold mr-2" }`}>
+                   ₹{product.mrp}
+                </span>
+              }
                           </div>
                         </Link>
                       ))}
