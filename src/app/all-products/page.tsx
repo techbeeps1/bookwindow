@@ -5,13 +5,13 @@ import BookCard from "@/components/book-card";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import config from "../config";
-import CategoryPublicationSidebar from "@/components/category-publication-sidebar";
+
 import AllProductSidebar from "@/components/all-products-sidebar";
 
 export default function Category() {
 
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 6;
+  const itemsPerPage = 12;
 
 
   const [products, setProducts] = useState([] as any);

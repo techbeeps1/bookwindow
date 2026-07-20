@@ -149,7 +149,7 @@ export default function Tutor() {
                   type="text"
                   name="name"
                   required
-                  placeholder="your name"
+                  placeholder="Your Name"
                   className="w-full pl-11 pr-4 py-3 text-sm text-black bg-[#f4f4f4] hover:bg-neutral-100/50 focus:bg-white border border-neutral-200/80 rounded-xl outline-none focus:border-black focus:ring-2 focus:ring-black/5 transition-all duration-200"
                 />
               </div>
@@ -189,7 +189,7 @@ export default function Tutor() {
                   </svg>
                 </div>
                 <input
-                  type="number"
+                  type="text"
                   name="phone"
                   required
                   placeholder="9000000033"
@@ -244,7 +244,7 @@ export default function Tutor() {
                   type="text"
                   name="locality"
                   required
-                  placeholder="your locality"
+                  placeholder="Your Locality"
                   className="w-full pl-11 pr-4 py-3 text-sm text-black bg-[#f4f4f4] hover:bg-neutral-100/50 focus:bg-white border border-neutral-200/80 rounded-xl outline-none focus:border-black focus:ring-2 focus:ring-black/5 transition-all duration-200"
                 />
               </div>
@@ -264,7 +264,7 @@ export default function Tutor() {
                   type="text"
                   name="city"
                   required
-                  placeholder="your city"
+                  placeholder="Your City"
                   className="w-full pl-11 pr-4 py-3 text-sm text-black bg-[#f4f4f4] hover:bg-neutral-100/50 focus:bg-white border border-neutral-200/80 rounded-xl outline-none focus:border-black focus:ring-2 focus:ring-black/5 transition-all duration-200"
                 />
               </div>

@@ -69,8 +69,8 @@ export function BookCard({
     if (typeof window !== "undefined") {
       const customer = localStorage.getItem("customer");
       if (!customer) {
-        setShowWishlistModal(true);
-        return;
+      //  setShowWishlistModal(true);
+     //   return;
       }
       
       const storedWishlist = localStorage.getItem("wishlist");
@@ -304,7 +304,7 @@ export function BookCard({
             )}
 
             {/* Wishlist Login Prompt Modal */}
-            {showWishlistModal && (
+            {/* {showWishlistModal && (
               <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm transition-all duration-300">
                 <div className="bg-white border border-gray-100 text-gray-900 rounded-3xl shadow-2xl max-w-md w-full p-8 relative mx-4 transition-all transform scale-100">
                   <button
@@ -344,7 +344,7 @@ export function BookCard({
                   </div>
                 </div>
               </div>
-            )}
+            )} */}
           </div>
         </div>
       </div>

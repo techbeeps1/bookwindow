@@ -33,6 +33,7 @@ export default function AccountPage() {
   const [activeTab, setActiveTab] = useState<AccountTab>("dashboard");
   const [customer, setCustomer] = useState<any>(null);
   const [userOrders, setUserOrders] = useState([] as any);
+
      const router = useRouter();
      const { user, isAuthenticated ,loading } = useAppSelector((state) => state.auth);
  const dispatch = useDispatch();
@@ -40,8 +41,10 @@ export default function AccountPage() {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+ 
 
-
+  
+  
   useEffect(() => {
     if (!isAuthenticated && !loading) {
        router.push("/");
@@ -766,12 +769,26 @@ function OrdersTab({ userOrders }: any) {
 function PasswordTab({ customer }: any) {
   async function changePassword(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    
     const form = event.currentTarget;
     const formData = new FormData(event.currentTarget);
     const email = customer?.email;
     const password_confirmation = formData.get("password_confirmation")?.toString().trim() || "";
     const password = formData.get("password")?.toString() || "";
-    const response = await fetch(`${config.apiUrl}api/v1/passwordchange`, {
+
+    if (!customer?.email) {
+      alert("Customer email is not available.");
+      return;
+    }
+    if(password !== password_confirmation) {
+      alert("Passwords do not match.");
+      return;
+    }
+    if(password.length < 8) {
+      alert("Password must be at least 8 characters long.");
+      return;
+    }
+    const response = await fetch(`/api/my-account/passwordchange`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password, password_confirmation }),
@@ -779,8 +796,10 @@ function PasswordTab({ customer }: any) {
     if (response.ok) {
       alert("Password updated!");
     } else {
-      console.log("something went wrong!!");
+      alert("Failed to update password.");
     }
+   const data = await response.json();
+    console.log("Password change response:", data);
   }
 
   return (
@@ -879,7 +898,43 @@ function AddressesTab({ customer }: any) {
       console.log("something went wrong!!");
     }
   }
+    const [selectedState, setSelectedState] = useState<string>("");
+ const [states, setStates] = useState([] as any);
+  const [statesFatched, setStatesFatched] = useState(false);
+  const [filteredCities, setFilteredCities] = useState([] as any);
+  useEffect(() => {
+    const fetchStatesAndCities = async () => {
+      try {
+        const response = await axios({
+          method: "get",
+          url: `${config.apiUrl}api/state-of-india`,
+          responseType: "json",
+        });
+        setStates(response?.data);
+        setStatesFatched(true);
+        if (customer?.state) {
+          console.log("customer state:", customer.state);
+          setSelectedState(customer.state);
+        }
+      } catch (error) {
+        // error handling
+      }
+    };
+    fetchStatesAndCities();
+  }, []);
 
+    useEffect(() => {
+      let allCities = [];
+      if (selectedState) {
+        const selectedStateValue = states.find(
+          (pub: any) => pub.name === selectedState
+        );
+        allCities = selectedStateValue?.cities || [];
+      }
+      setFilteredCities(allCities);
+      console.log("filteredCities:", allCities);
+    }, [selectedState, states]);
+  
   useEffect(() => {
     if (typeof window !== "undefined" && customerData?.customer) {
       localStorage.setItem("customer", JSON.stringify(customerData.customer));
@@ -986,12 +1041,27 @@ function AddressesTab({ customer }: any) {
                   <select
                     className="w-full pl-11 pr-4 py-3.5 text-base text-black bg-[#f4f4f4] hover:bg-neutral-100/50 focus:bg-white border border-neutral-200/80 rounded-xl outline-none focus:border-black focus:ring-2 focus:ring-black/5 transition-all duration-200 appearance-none cursor-pointer"
                     name="state"
-                    onChange={(e: any) => setState(e.target.value)}
+                    onChange={(e: any) => { setState(e.target.value);  setSelectedState(e.target.value);}}
                     defaultValue={customer?.state}
                   >
-                    <option value="">Select State</option>
-                    <option value="Rajasthan">Rajasthan</option>
-                    <option value="Punjab">Punjab</option>
+                    <option defaultValue={customer?.state || ""}>
+                        {customer?.state || "Select state"}
+                      </option>
+                      {!statesFatched ? (
+                        <option className="text-sm text-red-400" disabled>
+                          loading ↻
+                        </option>
+                      ) : (
+                        states?.map((state: any) => (
+                          <option
+                            value={state?.name}
+                            className="px-4 py-2 text-gray-600 hover:bg-gray-50 text-sm cursor-pointer"
+                            key={state?.id}
+                          >
+                            {state?.name}
+                          </option>
+                        ))
+                      )}
                   </select>
                 </div>
               </div>
@@ -1014,9 +1084,19 @@ function AddressesTab({ customer }: any) {
                     onChange={(e: any) => setCity(e.target.value)}
                     defaultValue={customer?.city}
                   >
-                    <option value="">Select City</option>
-                    <option value="Jaipur">Jaipur</option>
-                    <option value="Delhi">Delhi</option>
+                       <option defaultValue={customer.city || ""}>
+                        {selectedState ? customer.city : "Select city"  }
+
+                      </option>
+                      {filteredCities?.map((city: any) => (
+                        <option
+                          value={city?.name}
+                          className="px-4 py-2 text-gray-600 hover:bg-gray-50 text-sm cursor-pointer"
+                          key={city?.id}
+                        >
+                          {city?.name}
+                        </option>
+                      ))}
                   </select>
                 </div>
               </div>
@@ -1257,6 +1337,9 @@ function AccountDetailsTab({ customer }: any) {
                     name="date_of_birth"
                     defaultValue={customer?.date_of_birth}
                     onChange={(e: any) => setDob(e.target.value)}
+                    
+                    max={new Date(new Date().setFullYear(new Date().getFullYear() - 10)).toISOString().split("T")[0]}
+                    
                     className="w-full pl-11 pr-4 py-3.5 text-base text-black bg-[#f4f4f4] hover:bg-neutral-100/50 focus:bg-white border border-neutral-200/80 rounded-xl outline-none focus:border-black focus:ring-2 focus:ring-black/5 transition-all duration-200"
                   />
                 </div>

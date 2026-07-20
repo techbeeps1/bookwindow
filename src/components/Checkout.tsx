@@ -76,7 +76,7 @@ export default function Checkout({
 
   const handleStateChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const { value } = e.target;
-    handleOptionClick(value);
+    setSelectedState(value);
     setFormValues((prev: any) => ({ ...prev, state: value })); // Update form values
   };
 
@@ -95,7 +95,7 @@ export default function Checkout({
       }
     };
     fetchStatesAndCities();
-  }, []);
+  }, []); 
 
   useEffect(() => {
     let allCities = [];
@@ -108,9 +108,7 @@ export default function Checkout({
     setFilteredCities(allCities);
   }, [selectedState, states]);
 
-  const handleOptionClick = (value: string) => {
-    setSelectedState(value);
-  };
+
 
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;

@@ -524,7 +524,7 @@ export default function SignIn() {
                     </svg>
                   </div>
                   <input
-                    type="number"
+                    type="text"
                     name="phone"
                     required
                     placeholder="9836348346"
