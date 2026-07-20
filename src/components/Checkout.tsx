@@ -605,7 +605,7 @@ export default function Checkout({
                   Country
                 </label>
                 <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400">
+                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center justify-center pointer-events-none text-neutral-400">
                     <svg className="w-5 h-5 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 002 2h2a2.5 2.5 0 002.5-2.5V9a2 2 0 00-2-2h-1.03a3.374 3.374 0 00-3-3V3.545M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
@@ -618,7 +618,7 @@ export default function Checkout({
                   >
                     <option defaultValue="India">India</option>
                   </select>
-                  {formValues.country}
+                  
                 </div>
               </div>
             </div>

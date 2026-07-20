@@ -52,10 +52,13 @@ const dispatch = useAppDispatch();
       return;
     }
     const query = searchTerm.toLowerCase();
+    if (products && products.length > 0) {
     const filtered = products.filter((p: any) =>
       p.name?.toLowerCase().includes(query)
     );
+  
     setFilteredProducts(filtered.slice(0, 8));
+  }
   }, [searchTerm, products]);
 
   const handleOpen = () => setOpen((cur) => !cur);

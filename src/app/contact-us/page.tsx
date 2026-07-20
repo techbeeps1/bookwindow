@@ -88,7 +88,7 @@ export default function ContactSection() {
 
       if (response.ok) {
         setAlertType("success");
-        setAlertMessage("Send mail successful!");
+        setAlertMessage("Thank you! Your message has been sent successfully");
         form.reset();
       } else {
         setAlertType("error");

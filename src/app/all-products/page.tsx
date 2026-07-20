@@ -7,6 +7,7 @@ import axios from "axios";
 import config from "../config";
 
 import AllProductSidebar from "@/components/all-products-sidebar";
+import { useViewProductsQuery } from "@/lib/api/productsApi";
 
 export default function Category() {
 
@@ -14,7 +15,7 @@ export default function Category() {
   const itemsPerPage = 12;
 
 
-  const [products, setProducts] = useState([] as any);
+
   const [filteredProducts, setFilteredProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedCategoryIds, setSelectedCategoryIds] = useState<number[]>([]);
@@ -22,30 +23,25 @@ export default function Category() {
     number[]
   >([]);
 
+    const {data:productdatas} = useViewProductsQuery();
+
+      const [products, setProducts] = useState(() => {
+    if (productdatas) {
+      return productdatas;
+    }
+    return [];
+  });
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
   useEffect(() => {
-    const fetchProducts = async () => {
-      setLoading(true);
-      try {
-        const response = await axios({
-          method: "get",
-          url: `${config.apiUrl}api/products`,
-          responseType: "json",
-        });
-        setProducts(response.data);
-      } catch (error) {
-        console.error("Error loading products:", error);
-        setProducts([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProducts();
-  }, []);
+    if (productdatas) {
+      setProducts(productdatas);
+      setLoading(false);
+    }
+  }, [productdatas]);
 
   useEffect(() => {}, [products]);
 
@@ -148,7 +144,7 @@ export default function Category() {
               </div>
             </div>
           ))
-        ) : displayedProducts?.length === 0 ? (
+        ) : !loading && displayedProducts?.length === 0 ? (
           <div className="grid grid-cols-1 shadow-lg w-full p-4 text-center text-6xl font-extrabold">
             No record Found 😔 !
           </div>
