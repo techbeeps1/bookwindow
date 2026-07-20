@@ -49,6 +49,9 @@ const ResetPassword: React.FC = () => {
       if (response.ok) {
         setAlertType("success");
         setAlertMessage("Your password is changed successfully");
+        setTimeout(() => {
+          router.push("/sign-in");
+        }, 2000);
         form.reset();
       } else {
         if (data?.error) {
@@ -66,10 +69,9 @@ const ResetPassword: React.FC = () => {
     }
   }
 
+ 
   React.useEffect(() => {
-    if(!email && !token){
-      router.push('/');
-    }
+
     if (alertMessage) {
       const timer = setTimeout(() => {
         setAlertMessage("");
@@ -77,19 +79,28 @@ const ResetPassword: React.FC = () => {
       }, 3000);
       return () => {
         clearTimeout(timer);
-        router.push("/sign-in");
+        
       };
     }
   }, [alertMessage, email, router, token]);
 
   return (
     <>
-
+      
             <main
         id="content"
         role="main"
         className="w-full max-w-md mx-auto p-6 mb-7"
       >
+         {alertMessage && (
+          <Alert
+            color={alertType === "error" ? "red" : "green"}
+            className="mb-4"
+            onClose={() => setAlertMessage("")}
+          >
+            {alertMessage}
+          </Alert>
+        )}
         <div className="mt-7 bg-white dark:bg-gray-800 dark:border-gray-700 shadow-xl p-6 ring-2 ring-gray-500/50 rounded-xl">
           <div className="p-4 sm:p-7">
             <div className="text-center">
@@ -137,7 +148,7 @@ const ResetPassword: React.FC = () => {
                   </div>
                   <button
                     type="submit"
-                    className="py-3 px-4 inline-flex justify-center items-center gap-2 rounded-md border border-transparent font-semibold bg-blue-500 text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all text-sm dark:focus:ring-offset-gray-800"
+                    className="py-3 px-4 inline-flex justify-center items-center gap-2 rounded-md border border-transparent font-semibold bg-black text-white hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all text-sm dark:focus:ring-offset-gray-800"
                   >
                     Change password
                   </button>
@@ -147,7 +158,7 @@ const ResetPassword: React.FC = () => {
           </div>
           <p className="mt-3 flex justify-center items-center text-center divide-x divide-gray-300 dark:divide-gray-700">
             <a
-              className="text-blue-600 decoration-2 hover:underline font-medium"
+              className="text-black decoration-2 hover:underline font-medium"
               href="/sign-in"
             >
               Login
@@ -155,15 +166,7 @@ const ResetPassword: React.FC = () => {
           </p>
         </div>
 
-        {alertMessage && (
-          <Alert
-            color={alertType === "error" ? "red" : "green"}
-            className="mb-4"
-            onClose={() => setAlertMessage("")}
-          >
-            {alertMessage}
-          </Alert>
-        )}
+ 
       </main>
 
     </>

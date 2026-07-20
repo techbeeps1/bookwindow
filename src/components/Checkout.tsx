@@ -7,6 +7,7 @@ import React from "react";
 import { useAppSelector } from "@/hooks/useStore";
 import { useDispatch } from "react-redux";
 import { login } from "@/lib/slices/authSlice";
+import { count } from "node:console";
 
 type CheckoutProps = {
   onBack: () => void;
@@ -227,6 +228,7 @@ export default function Checkout({
       email: email || formValues?.email || "",
       password: password || "",
       is_guest: !password,
+      country: formValues?.country || "India",
     };
 
     onNext(data);
