@@ -66,7 +66,7 @@ function Hero({ bannerData }: any) {
   return (
     <>
       <section className="relative w-full overflow-hidden bg-gray-900 group">
-        <div className="relative w-full xl:h-[90vh] lg:h-[80vh] md:h-[60vh] sm:h-[40vh] h-[25vh] overflow-hidden">
+        <div className="relative w-full xl:h-[90vh] lg:h-[80vh] sm:h-[60vh] h-[40vh] overflow-hidden">
           {/* Slider Content Row */}
           <div 
             className={`flex h-full ${isDragging ? "" : "transition-transform duration-700 ease-in-out"}`}
@@ -147,8 +147,8 @@ function Hero({ bannerData }: any) {
                 onClick={() => setCurrent(idx)}
                 className={`transition-all duration-300 rounded-full ${
                   current === idx 
-                    ? "w-4 h-4 bg-white shadow-lg" 
-                    : "w-2 h-2 bg-white/50 hover:bg-white/85"
+                    ? "md:w-4 md:h-4 w-3 h-3 bg-white shadow-lg" 
+                    : " w-2 h-2 bg-white/50 hover:bg-white/85"
                 }`}
               />
             ))}

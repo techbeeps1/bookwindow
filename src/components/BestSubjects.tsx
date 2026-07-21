@@ -158,7 +158,7 @@ export function BestSubjects({data}: any) {
           onMouseLeave={handleMouseLeave}
           onMouseUp={handleMouseUp}
           onMouseMove={handleMouseMove}
-          className="flex gap-6 overflow-x-auto no-scrollbar px-8 md:px-16 lg:px-24 cursor-grab active:cursor-grabbing select-none"
+          className="flex gap-6 overflow-x-auto no-scrollbar px-8 md:px-16 lg:px-24 active:cursor-grabbing select-none"
         >
           {data?.mock_test_category.map((brand:any, index:any) => (
                     <Link href="#">   <motion.div

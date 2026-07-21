@@ -434,9 +434,10 @@ const dispatch = useAppDispatch();
         </div>
 
         {/* ================= MOBILE VIEW ================= */}
-        <div className="lg:hidden w-full flex flex-col">          {/* Header Row */}
+        <div className="lg:hidden w-full flex flex-col">
+          {/* Header Row */}
           <div className="flex items-center justify-between w-full text-white">
-            <Link href="/">
+            <Link href="/" className="flex-shrink-0">
               <Image
                 src={logo}
                 alt="Bookwindow Logo"
@@ -445,9 +446,13 @@ const dispatch = useAppDispatch();
               />
             </Link>
 
+            <span className="text-white text-center text-xs sm:text-sm font-medium px-2 flex-1">
+              “ सर्वं सम्भाव्यते त्वयि। ”
+            </span>
+
             <button
               onClick={handleOpen}
-              className="text-white hover:bg-[#1a1a1a] p-2 rounded-lg focus:outline-none"
+              className="flex-shrink-0 text-white hover:bg-[#1a1a1a] p-2 rounded-lg focus:outline-none"
             >
               {open ? (
                 <XMarkIcon strokeWidth={2.5} className="h-5 w-5 text-white" />
@@ -455,7 +460,6 @@ const dispatch = useAppDispatch();
                 <Bars3Icon strokeWidth={2.5} className="h-5 w-5 text-white" />
               )}
             </button>
-
           </div>   
           <div
             className={`lg:hidden transition-all duration-300 ${
@@ -555,9 +559,6 @@ const dispatch = useAppDispatch();
         </div>
       </div>
     </nav>
-    <div className="p-4 bg-black border-t border-white/20">
-      <p className="text-white text-center">“Test your limits. Discover your strengths.”</p>
-    </div>
 
     {/* ================= MOBILE SEARCH PANEL ================= */}
     {searchTerm.trim() !== "" && (

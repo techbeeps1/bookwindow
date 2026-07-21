@@ -534,7 +534,7 @@ export default function WishlistPage() {
                               <button
                                 onClick={() => handleAddToCart(item)}
                                 disabled={loadingItemId === String(item.id) || item.inStock === false}
-                                className="relative p-2 border border-gray-200 text-gray-500 hover:text-black hover:border-black hover:bg-gray-50 rounded-full transition-all duration-200 active:scale-95 flex items-center justify-center overflow-hidden"
+                                className="relative p-2 border border-gray-200 text-gray-500 hover:text-white hover:border-black hover:bg-black rounded-full transition-all duration-200 active:scale-95 flex items-center justify-center overflow-hidden"
                                 aria-label="Add to cart"
                               >
                                 <div className="relative w-[18px] h-[18px] flex items-center justify-center">
@@ -581,7 +581,7 @@ export default function WishlistPage() {
                               {/* Quick View Eye Button matching BookCard */}
                               <button
                                 onClick={() => setQuickViewSlug(item.slug || item.id)}
-                                className="p-2 border border-gray-200 text-gray-500 hover:text-black hover:border-black hover:bg-gray-50 rounded-full transition-all duration-200 active:scale-95 flex items-center justify-center"
+                                className="p-2 border border-gray-200 text-gray-500 hover:text-white hover:border-black hover:bg-black rounded-full transition-all duration-200 active:scale-95 flex items-center justify-center"
                                 aria-label="Quick view product"
                               >
                                 <svg
@@ -731,7 +731,7 @@ export default function WishlistPage() {
                             {/* View Eye Button */}
                             <button
                               onClick={() => setQuickViewSlug(item.slug || item.id)}
-                              className="p-2 border border-gray-200 text-gray-500 hover:text-black hover:border-black hover:bg-gray-50 rounded-full transition-all duration-200 active:scale-95 flex items-center justify-center"
+                              className="p-2 border border-gray-200 text-gray-500 hover:text-white hover:border-black hover:bg-black rounded-full transition-all duration-200 active:scale-95 flex items-center justify-center"
                               aria-label="Quick view product"
                             >
                               <svg
@@ -758,7 +758,7 @@ export default function WishlistPage() {
                             {/* Remove button */}
                             <button
                               onClick={() => handleRemoveItem(item.id)}
-                              className="p-2 text-gray-400 hover:text-black hover:bg-gray-100 rounded-full transition-colors border border-gray-200"
+                              className="p-2 text-gray-400 hover:text-white hover:bg-black rounded-full transition-colors border border-gray-200"
                               title="Remove from wishlist"
                             >
                               <FiTrash2 className="w-4 h-4" />
