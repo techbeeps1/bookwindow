@@ -15,7 +15,7 @@ export default function Category({ params }: {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 12;
   const { slug } = use(params);
-  const [filteredProducts, setFilteredProducts] = useState<any[]>([]);
+
   const [selectedCategoryIds, setSelectedCategoryIds] = useState<number[]>([]);
   const [selectedPublicationIds, setSelectedPublicationIds] = useState<number[]>([]);
 
@@ -24,7 +24,8 @@ export default function Category({ params }: {
   const [sortBy, setSortBy] = useState<string>("default");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
-  const { data: categoryData, isLoading: isProductFetched } = useViewCategoryQuery(slug);
+  const { data: categoryData, isLoading: isProductFetched , isFetching } = useViewCategoryQuery(slug);
+  const isDataLoading = isProductFetched || isFetching;
 const products = useMemo(
   () => categoryData?.products ?? [],
   [categoryData]
@@ -44,8 +45,7 @@ const publicationData = useMemo(
   }, []);
 
 
-  // Filter & Sort products based on sidebar selections, search query, and sort selection
-  useEffect(() => {
+  const filteredProducts = useMemo(() => {
     let filtered = products.filter((product: any) => {
       const categoryMatch =
         selectedCategoryIds.length === 0 ||
@@ -71,7 +71,8 @@ const publicationData = useMemo(
       filtered.sort((a: any, b: any) => (a.name || "").localeCompare(b.name || ""));
     }
 
-    setFilteredProducts(filtered);
+    
+    return filtered;
   }, [products, selectedCategoryIds, selectedPublicationIds, searchQuery, sortBy]);
 
   const handleCategorySelect = (categoryId: number | "clear") => {
@@ -109,7 +110,6 @@ const publicationData = useMemo(
   const totalPages = Math.ceil(displayedProducts.length / itemsPerPage);
 
   useEffect(() => {
-
     setCurrentPage(1);
   }, [filteredProducts, products]);
 
@@ -126,6 +126,7 @@ const publicationData = useMemo(
           publications={publicationData}
           category_id={childCategory[0]?.parent_id}
           isFetched={isProductFetched}
+        
         />
 
         <div className="flex-1 w-full">
@@ -199,7 +200,7 @@ const publicationData = useMemo(
             </div>
           </div>
 
-          {isProductFetched ? (
+          {isDataLoading  ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {[1, 2, 3, 4].map((_i) => (
                 <div key={_i} className="animate-pulse bg-white p-4 rounded-2xl border border-gray-200">
@@ -210,7 +211,7 @@ const publicationData = useMemo(
               ))}
             </div>
           ) : displayedProducts?.length === 0 ? (
-           <div className="bg-white rounded-2xl border border-gray-200 p-12 text-center text-xl font-bold text-gray-600">
+            <div className="bg-white rounded-2xl border border-gray-200 p-12 text-center text-xl font-bold text-gray-600">
              <div className="text-4xl mb-4">
               Products not found
              </div>

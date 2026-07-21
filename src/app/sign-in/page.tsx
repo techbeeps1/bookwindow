@@ -320,7 +320,7 @@ export default function SignIn() {
 
           {activeTab === "login" ? (
             /* Login Form */
-            <form className="flex flex-col gap-5 w-full" onSubmit={handleSubmit}>
+            <form  className="flex flex-col gap-5 w-full" onSubmit={handleSubmit} name="loginForm" autoComplete="on">
               <div className="flex flex-col gap-2">
                 <label className="text-xs font-semibold text-neutral-800 uppercase tracking-wider">
                   Your Email
@@ -336,6 +336,9 @@ export default function SignIn() {
                     name="email"
                     required
                     placeholder="name@mail.com"
+                    autoComplete="username"
+                    inputMode="email"
+                    
                     className="w-full pl-11 pr-4 py-3 text-sm text-black bg-[#f4f4f4] hover:bg-neutral-100/50 focus:bg-white border border-neutral-200/80 rounded-xl outline-none focus:border-black focus:ring-2 focus:ring-black/5 transition-all duration-200"
                   />
                 </div>
@@ -365,6 +368,8 @@ export default function SignIn() {
                     name="password"
                     required
                     placeholder="********"
+                    autoComplete="current-password"
+                    inputMode="text"
                     className="w-full pl-11 pr-4 py-3 text-sm text-black bg-[#f4f4f4] hover:bg-neutral-100/50 focus:bg-white border border-neutral-200/80 rounded-xl outline-none focus:border-black focus:ring-2 focus:ring-black/5 transition-all duration-200"
                   />
                 </div>
@@ -402,7 +407,7 @@ export default function SignIn() {
             </form>
           ) : (
             /* Register Form */
-            <form className="flex flex-col gap-5 w-full animate-fadeIn" onSubmit={handleSubmit1}>
+            <form autoComplete="off" className="flex flex-col gap-5 w-full animate-fadeIn" onSubmit={handleSubmit1} name="registerForm" >
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="flex flex-col gap-2">
                   <label className="text-xs font-semibold text-neutral-800 uppercase tracking-wider">
@@ -419,6 +424,7 @@ export default function SignIn() {
                       name="first_name"
                       required
                       placeholder="First Name"
+                      autoComplete="off"
                       className="w-full pl-11 pr-4 py-3 text-sm text-black bg-[#f4f4f4] hover:bg-neutral-100/50 focus:bg-white border border-neutral-200/80 rounded-xl outline-none focus:border-black focus:ring-2 focus:ring-black/5 transition-all duration-200"
                     />
                   </div>
@@ -439,6 +445,7 @@ export default function SignIn() {
                       name="last_name"
                       required
                       placeholder="Last Name"
+                      autoComplete="family-name"
                       className="w-full pl-11 pr-4 py-3 text-sm text-black bg-[#f4f4f4] hover:bg-neutral-100/50 focus:bg-white border border-neutral-200/80 rounded-xl outline-none focus:border-black focus:ring-2 focus:ring-black/5 transition-all duration-200"
                     />
                   </div>
@@ -460,6 +467,8 @@ export default function SignIn() {
                     name="email"
                     required
                     placeholder="name@mail.com"
+                     autoComplete="off"
+                    inputMode="email"
                     className="w-full pl-11 pr-4 py-3 text-sm text-black bg-[#f4f4f4] hover:bg-neutral-100/50 focus:bg-white border border-neutral-200/80 rounded-xl outline-none focus:border-black focus:ring-2 focus:ring-black/5 transition-all duration-200"
                   />
                 </div>
@@ -480,6 +489,7 @@ export default function SignIn() {
                     name="phone"
                     required
                     placeholder="9836348346"
+                    autoComplete="tel"
                     className="w-full pl-11 pr-4 py-3 text-sm text-black bg-[#f4f4f4] hover:bg-neutral-100/50 focus:bg-white border border-neutral-200/80 rounded-xl outline-none focus:border-black focus:ring-2 focus:ring-black/5 transition-all duration-200"
                   />
                 </div>
@@ -500,6 +510,7 @@ export default function SignIn() {
                     name="password"
                     required
                     placeholder="********"
+                    autoComplete="new-password"
                     className="w-full pl-11 pr-4 py-3 text-sm text-black bg-[#f4f4f4] hover:bg-neutral-100/50 focus:bg-white border border-neutral-200/80 rounded-xl outline-none focus:border-black focus:ring-2 focus:ring-black/5 transition-all duration-200"
                   />
                 </div>
