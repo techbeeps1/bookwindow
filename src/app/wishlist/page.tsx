@@ -787,11 +787,11 @@ export default function WishlistPage() {
             </p>
 
             <Link
-              href="/publications"
+              href="/all-products"
               className="inline-flex items-center gap-2.5 bg-black hover:bg-gray-800 text-white font-bold text-sm px-8 py-3.5 rounded-xl transition-all shadow-lg hover:shadow-gray-500/25 active:scale-95"
             >
               <FiShoppingBag className="w-4 h-4" />
-              <span>Explore Books & Publications</span>
+              <span>Explore Books</span>
               <FiArrowRight className="w-4 h-4" />
             </Link>
           </div>
