@@ -8,6 +8,7 @@ import AppInitializer from "@/components/AppInitializer";
 import { Footer, Navbar } from "@/components";
 import config from "@/app/config";
 import CartDrawer from "@/components/cart/CartDrawer";
+import { Toaster } from "react-hot-toast";
 
 async function getMenu() {
   const response = await fetch(`${config.apiUrl}api/menus/header_menu`, {
@@ -49,6 +50,7 @@ export default async function RootLayout({
            <CartDrawer/>
            <FixedPlugin />
           <Footer menuData={menuData.footer} />
+          <Toaster position="top-right"   reverseOrder={false}/>
         </ReduxProvider>
       </body>
     </html>

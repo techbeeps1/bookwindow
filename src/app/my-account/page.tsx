@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { useAppSelector } from "@/hooks/useStore";
 import {  logout } from "@/lib/slices/authSlice";
 import { useDispatch } from "react-redux";
+import { IconBase } from "react-icons";
 type AccountTab =
   | "dashboard"
   | "orders"
@@ -113,6 +114,7 @@ export default function AccountPage() {
       case "account-details":
         return <AccountDetailsTab customer={customer} />;
       case "logout":
+        logoutUser();
         return (
           <div className="flex flex-col items-center justify-center p-12 text-center">
             <svg className="w-12 h-12 text-neutral-300 mb-3 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
@@ -1392,7 +1394,7 @@ function AccountDetailsTab({ customer }: any) {
             <div className="text-sm space-y-3 font-semibold text-neutral-600 leading-relaxed">
               <p className="flex items-center gap-2 text-neutral-900 font-bold text-sm pb-2 border-b border-neutral-100">
                 <span className="w-8 h-8 rounded-full bg-neutral-100 flex items-center justify-center font-bold text-xs text-neutral-700">
-                  {customer?.first_name?.[0] || "U"}
+                  <IconBase name="user" className="w-4 h-4" />
                 </span>
                 <span>{customer?.first_name} {customer?.last_name}</span>
               </p>

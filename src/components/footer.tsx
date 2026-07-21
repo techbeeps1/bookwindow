@@ -6,15 +6,54 @@ import React from "react";
 import axios from "axios";
 import config from "@/app/config";
 import Link from "next/link";
+import toast from "react-hot-toast";
+
 
 export function Footer({menuData}:any) {
-
+  const [email, setEmail] = React.useState("");
+  const [loading, setLoading] = React.useState(false);
   function chunkArray(array: any[], size: number) {
     const result = [];
     for (let i = 0; i < array.length; i += size) {
       result.push(array.slice(i, i + size));
     }
     return result;
+  }
+
+  async function SubmitNewsLetter() {
+ 
+
+
+  if (!email) {
+    toast.error("Please enter a valid email address.");
+    return;
+  }
+  if (!/\S+@\S+\.\S+/.test(email)) {
+    toast.error("Please enter a valid email address.");
+    return;
+  }
+  if (loading) return; 
+
+    setLoading(true);
+   const res = await fetch(`${config.apiUrl}api/newsletter`, {
+     method: "POST",
+     headers: {
+       "Content-Type": "application/json"
+     },
+     body: JSON.stringify({ email })
+   });
+   const data = await res.json();
+   console.log(data);
+   setLoading(false);
+   if (data.success) {
+    toast.success("Thank you for subscribe!");
+    setEmail("");
+   } if (data.mailchimp.title ==="Member Exists") {
+    toast.success("You are already subscribed to our newsletter.");
+   }
+   else {
+    toast.error("Failed to subscribe. Please try again.");
+   }
   }
 
   const chunkedMenu = chunkArray(
@@ -37,8 +76,10 @@ export function Footer({menuData}:any) {
               type="email"
               placeholder="Enter your email address"
               className="bg-[#242120] text-white border-none rounded-md px-4 py-3 w-full sm:w-[280px] md:w-[320px] text-sm focus:outline-none focus:ring-1 focus:ring-gray-700 placeholder-gray-500"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
             />
-            <button className="bg-white text-black font-semibold text-xs md:text-sm px-6 py-3 rounded-md uppercase tracking-wider hover:bg-gray-200 transition-all duration-200 shrink-0">
+            <button onClick={SubmitNewsLetter} className="bg-white text-black font-semibold text-xs md:text-sm px-6 py-3 rounded-md uppercase tracking-wider hover:bg-gray-200 transition-all duration-200 shrink-0">
               Subscribe
             </button>
           </div>

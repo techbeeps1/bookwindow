@@ -7,6 +7,7 @@ import Modal from "@/components/modal";
 import ForgotPassword from "@/components/forgot-password";
 import { login } from "@/lib/slices/authSlice";
 import { useDispatch } from "react-redux";
+import toast from "react-hot-toast";
 
 const generateCaptchaText = () => {
   const characters =
@@ -46,21 +47,18 @@ export default function SignIn() {
     const email = formData.get("email");
     const password = formData.get("password")?.toString() || "";
     if (!email) {
-      setAlertType("error");
-      setAlertMessage("Email is required.");
+      toast.error("Email is required.");
       return;
     }
 
     if (!password) {
-      setAlertType("error");
-      setAlertMessage("Password is required.");
+      toast.error("Password is required.");
       return;
     }
 
     if (password.length < 8) {
-      setAlertType("error");
-      setAlertMessage("Password must be at least 8 characters long.");
-      return;
+      toast.error("Password must be at least 8 characters long.");
+      return; 
     }
 
     setIsloading(true);
@@ -81,15 +79,14 @@ export default function SignIn() {
               })
             );
       router.push("/my-account");
+      toast.success("Login successful!");
     } else {
       const data = await response.json();
       if (data?.error === "The provided credentials are incorrect.") {
-        setAlertType("error");
-        setAlertMessage("The provided credentials are incorrect.");
+        toast.error("The provided credentials are incorrect.");
         return;
       } else {
-        setAlertType("error");
-        setAlertMessage(data?.error);
+        toast.error(data?.error);
       }
       console.error("Login failed", response.status);
     }
