@@ -86,12 +86,12 @@ const orderNumber = searchParams.get("order_number");
                   orderItems.map((item) => (
                     <div
                       key={item.id}
-                      className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm md:p-6"
+                      className="rounded-lg border border-gray-200 bg-white shadow-sm md:py-4 py-4 px-6"
                     >
-                      <div className="grid grid-cols-5 gap-2 items-center">
+                      <div className="grid grid-cols-1 sm:grid-cols-5 gap-2 items-center">
 
                         <Image
-                          className="object-contain"
+                          className="object-contain w-[90px]"
                           src={`${config.apiUrl}storage/app/public/${item.product_image}`}
                           alt={item.product_name}
                           width={150}
@@ -102,15 +102,15 @@ const orderNumber = searchParams.get("order_number");
                           {item.product_name}
                         </div>
 
-                        <div className="text-center font-bold text-gray-900">
+                        <div className="sm:text-center font-bold text-gray-900">
                           ₹{item.price}
                         </div>
 
-                        <div className="text-center font-bold text-gray-900">
+                        <div className="sm:text-center font-bold text-gray-900">
                           {item.quantity}
                         </div>
 
-                        <div className="text-end font-bold text-gray-900">
+                        <div className="sm:text-end font-bold text-gray-900">
                           ₹{item.total}
                         </div>
 
