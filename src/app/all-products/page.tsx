@@ -1,6 +1,5 @@
 "use client";
 
-
 import BookCard from "@/components/book-card";
 import { useEffect, useState } from "react";
 import axios from "axios";
@@ -8,24 +7,25 @@ import config from "../config";
 
 import AllProductSidebar from "@/components/all-products-sidebar";
 import { useViewProductsQuery } from "@/lib/api/productsApi";
+import { FiSearch, FiFilter, FiGrid, FiList } from "react-icons/fi";
 
 export default function Category() {
-
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 12;
-
-
 
   const [filteredProducts, setFilteredProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedCategoryIds, setSelectedCategoryIds] = useState<number[]>([]);
-  const [selectedPublicationIds, setSelectedPublicationIds] = useState<
-    number[]
-  >([]);
+  const [selectedPublicationIds, setSelectedPublicationIds] = useState<number[]>([]);
 
-    const {data:productdatas} = useViewProductsQuery();
+  // Toolbar states
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sortBy, setSortBy] = useState<string>("default");
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
-      const [products, setProducts] = useState(() => {
+  const { data: productdatas } = useViewProductsQuery();
+
+  const [products, setProducts] = useState<any[]>(() => {
     if (productdatas) {
       return productdatas;
     }
@@ -43,10 +43,8 @@ export default function Category() {
     }
   }, [productdatas]);
 
-  useEffect(() => {}, [products]);
-
   useEffect(() => {
-    const filtered = products.filter((product: any) => {
+    let filtered = products.filter((product: any) => {
       const categoryMatch =
         selectedCategoryIds.length === 0 ||
         selectedCategoryIds.includes(product.sub_category_id);
@@ -55,21 +53,33 @@ export default function Category() {
         selectedPublicationIds.length === 0 ||
         selectedPublicationIds.includes(product.production_id);
 
-      return categoryMatch && publicationMatch;
+      const searchMatch =
+        !searchQuery.trim() ||
+        product.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        product.description?.toLowerCase().includes(searchQuery.toLowerCase());
+
+      return categoryMatch && publicationMatch && searchMatch;
     });
 
+    if (sortBy === "price-low") {
+      filtered.sort((a: any, b: any) => Number(a.price || a.mrp) - Number(b.price || b.mrp));
+    } else if (sortBy === "price-high") {
+      filtered.sort((a: any, b: any) => Number(b.price || b.mrp) - Number(a.price || a.mrp));
+    } else if (sortBy === "name") {
+      filtered.sort((a: any, b: any) => (a.name || "").localeCompare(b.name || ""));
+    }
+
     setFilteredProducts(filtered);
-  }, [products, selectedCategoryIds, selectedPublicationIds]);
+  }, [products, selectedCategoryIds, selectedPublicationIds, searchQuery, sortBy]);
 
   const handleCategorySelect = (categoryId: number | "clear") => {
     if (categoryId === "clear") {
-      setSelectedCategoryIds([]); // Clear all filters
+      setSelectedCategoryIds([]);
     } else {
-      setSelectedCategoryIds(
-        (prev) =>
-          prev.includes(categoryId)
-            ? prev.filter((id) => id !== categoryId) // uncheck
-            : [...prev, categoryId] // check
+      setSelectedCategoryIds((prev) =>
+        prev.includes(categoryId)
+          ? prev.filter((id) => id !== categoryId)
+          : [...prev, categoryId]
       );
     }
   };
@@ -85,8 +95,8 @@ export default function Category() {
       );
     }
   };
+
   const displayedProducts = filteredProducts;
-  // filteredProducts.length > 0 ? filteredProducts : products;
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = displayedProducts.slice(
@@ -102,8 +112,7 @@ export default function Category() {
 
   return (
     <>
-
-            <section className="container mx-auto mb-10 mt-10 md:flex gap-[20px] px-[20px] border border-1">
+      <section className="container mx-auto mb-10 mt-10 md:flex gap-[20px] px-[20px]">
         <AllProductSidebar
           onCategorySelect={handleCategorySelect}
           onPublicationSelect={handlePublicationSelect}
@@ -111,46 +120,96 @@ export default function Category() {
           selectedPublicationIds={selectedPublicationIds}
           products={products}
         />
-        {loading ? (
-          [1, 2].map((_i) => (
-            <div
-              key={_i}
-              className="grid grid-cols-1 w-full p-4 text-center text-6xl font-extrabold"
-            >
-              <div
-                role="status"
-                className="space-y-8 animate-pulse md:space-y-0 md:space-x-8 rtl:space-x-reverse md:flex flex-col md:items-center p-4"
-              >
-                <div className="flex items-center justify-center w-full h-48 bg-gray-300 rounded-sm sm:w-96 dark:bg-gray-700">
-                  <svg
-                    className="w-10 h-20 text-gray-200 dark:text-gray-600"
-                    aria-hidden="true"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="currentColor"
-                    viewBox="0 0 20 18"
-                  >
-                    <path d="M18 0H2a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2Zm-5.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Zm4.376 10.481A1 1 0 0 1 16 15H4a1 1 0 0 1-.895-1.447l3.5-7A1 1 0 0 1 7.468 6a.965.965 0 0 1 .9.5l2.775 4.757 1.546-1.887a1 1 0 0 1 1.618.1l2.541 4a1 1 0 0 1 .028 1.011Z" />
-                  </svg>
-                </div>
-                <div className="w-full">
-                  <div className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-48 mb-4"></div>
-                  <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[480px] mb-2.5"></div>
-                  <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 mb-2.5"></div>
-                  <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[440px] mb-2.5"></div>
-                  <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[460px] mb-2.5"></div>
-                  <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[360px]"></div>
-                </div>
-                <span className="sr-only">Loading...</span>
+
+        <div className="flex-1 w-full">
+          {/* Filter Toolbar matching Wishlist header */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-6 flex flex-col md:flex-row items-center justify-between gap-4 w-full">
+            {/* Search Bar */}
+            <div className="relative w-full md:w-80">
+              <FiSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search products..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:bg-white transition-all"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery("")}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400 hover:text-gray-600"
+                >
+                  Clear
+                </button>
+              )}
+            </div>
+
+            {/* Sort Dropdown & View Mode Switches */}
+            <div className="flex flex-wrap items-center justify-between w-full md:w-auto gap-3">
+              {/* Sort Selection */}
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-semibold text-gray-500 flex items-center gap-1">
+                  <FiFilter className="w-3.5 h-3.5" /> Sort:
+                </span>
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                  className="text-xs bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 font-medium focus:outline-none focus:ring-2 focus:ring-black"
+                >
+                  <option value="default">Default</option>
+                  <option value="price-low">Price: Low to High</option>
+                  <option value="price-high">Price: High to Low</option>
+                  <option value="name">Book Title (A-Z)</option>
+                </select>
+              </div>
+
+              {/* View Mode Switchers */}
+              <div className="flex items-center bg-gray-100 p-1 rounded-lg border border-gray-200">
+                <button
+                  onClick={() => setViewMode("grid")}
+                  className={`p-1.5 rounded-md transition-all ${
+                    viewMode === "grid"
+                      ? "bg-white text-black shadow-sm font-semibold"
+                      : "text-gray-500 hover:text-gray-800"
+                  }`}
+                  title="Grid View"
+                >
+                  <FiGrid className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => setViewMode("list")}
+                  className={`p-1.5 rounded-md transition-all ${
+                    viewMode === "list"
+                      ? "bg-white text-black shadow-sm font-semibold"
+                      : "text-gray-500 hover:text-gray-800"
+                  }`}
+                  title="List View"
+                >
+                  <FiList className="w-4 h-4" />
+                </button>
               </div>
             </div>
-          ))
-        ) : !loading && displayedProducts?.length === 0 ? (
-          <div className="grid grid-cols-1 shadow-lg w-full p-4 text-center text-6xl font-extrabold">
-            No record Found 😔 !
           </div>
-        ) : (
-          <div className="col-8">
-            <div className="grid grid-cols-1 gap-[15px] sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+
+          {loading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              {[1, 2, 3, 4].map((_i) => (
+                <div key={_i} className="animate-pulse bg-white p-4 rounded-2xl border border-gray-200">
+                  <div className="w-full h-48 bg-gray-200 rounded-xl mb-4" />
+                  <div className="h-4 bg-gray-200 rounded w-3/4 mb-2" />
+                  <div className="h-3 bg-gray-200 rounded w-1/2" />
+                </div>
+              ))}
+            </div>
+          ) : !loading && displayedProducts?.length === 0 ? (
+            <div className="bg-white rounded-2xl border border-gray-200 p-12 text-center text-xl font-bold text-gray-600">
+              No products found! 😔
+            </div>
+          ) : (
+            <div className={viewMode === "grid"
+              ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
+              : "flex flex-col gap-4"
+            }>
               {currentItems.map((product: any) => (
                 <BookCard
                   key={product.id}
@@ -166,87 +225,87 @@ export default function Category() {
                   slug={product.slug}
                   id={product.id}
                   quantity={product.quantity}
-                  onItemsCountUpdate={()=>{}}
+                  onItemsCountUpdate={() => {}}
+                  viewMode={viewMode}
                 />
               ))}
             </div>
-          </div>
-        )}
-      </section>
-      {totalPages > 1 && (
-        <div className="flex justify-center mt-12 mb-12 items-center space-x-6">
-          {/* Previous Button */}
-          <button
-            type="button"
-            onClick={() => {
-              setCurrentPage((prev) => Math.max(prev - 1, 1));
-              window.scrollTo({ top: 0, behavior: "smooth" });
-            }}
-            disabled={currentPage === 1}
-            className={`flex items-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-full border transition-all duration-200 active:scale-95 ${
-              currentPage === 1
-                ? "bg-[#f5f5f5] text-neutral-400 border-transparent cursor-not-allowed opacity-60"
-                : "bg-white text-black border-neutral-300 hover:bg-neutral-50 hover:border-neutral-400 hover:shadow-sm"
-            }`}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={2.5}
-              stroke="currentColor"
-              className="w-4 h-4 pointer-events-none"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M15.75 19.5 8.25 12l7.5-7.5"
-              />
-            </svg>
-            <span>Previous</span>
-          </button>
+          )}
 
-          {/* Page Info */}
-          <div className="flex items-center bg-[#f4f4f4] px-4 py-2 rounded-full border border-neutral-200">
-            <span className="text-sm font-bold text-neutral-800">
-              Page <span className="text-black">{currentPage}</span> of{" "}
-              <span className="text-black">{totalPages}</span>
-            </span>
-          </div>
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="flex justify-center mt-12 mb-12 items-center space-x-6">
+              <button
+                type="button"
+                onClick={() => {
+                  setCurrentPage((prev) => Math.max(prev - 1, 1));
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                }}
+                disabled={currentPage === 1}
+                className={`flex items-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-full border transition-all duration-200 active:scale-95 ${
+                  currentPage === 1
+                    ? "bg-[#f5f5f5] text-neutral-400 border-transparent cursor-not-allowed opacity-60"
+                    : "bg-white text-black border-neutral-300 hover:bg-neutral-50 hover:border-neutral-400 hover:shadow-sm"
+                }`}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={2.5}
+                  stroke="currentColor"
+                  className="w-4 h-4 pointer-events-none"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M15.75 19.5 8.25 12l7.5-7.5"
+                  />
+                </svg>
+                <span>Previous</span>
+              </button>
 
-          {/* Next Button */}
-          <button
-            type="button"
-            onClick={() => {
-              setCurrentPage((prev) => Math.min(prev + 1, totalPages));
-              window.scrollTo({ top: 0, behavior: "smooth" });
-            }}
-            disabled={currentPage === totalPages}
-            className={`flex items-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-full border transition-all duration-200 active:scale-95 ${
-              currentPage === totalPages
-                ? "bg-[#f5f5f5] text-neutral-400 border-transparent cursor-not-allowed opacity-60"
-                : "bg-white text-black border-neutral-300 hover:bg-neutral-50 hover:border-neutral-400 hover:shadow-sm"
-            }`}
-          >
-            <span>Next</span>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={2.5}
-              stroke="currentColor"
-              className="w-4 h-4 pointer-events-none"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="m8.25 4.5 7.5 7.5-7.5 7.5"
-              />
-            </svg>
-          </button>
+              <div className="flex items-center bg-[#f4f4f4] px-4 py-2 rounded-full border border-neutral-200">
+                <span className="text-sm font-bold text-neutral-800">
+                  Page <span className="text-black">{currentPage}</span> of{" "}
+                  <span className="text-black">{totalPages}</span>
+                </span>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setCurrentPage((prev) => Math.min(prev + 1, totalPages));
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                }}
+                disabled={currentPage === totalPages}
+                className={`flex items-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-full border transition-all duration-200 active:scale-95 ${
+                  currentPage === totalPages
+                    ? "bg-[#f5f5f5] text-neutral-400 border-transparent cursor-not-allowed opacity-60"
+                    : "bg-white text-black border-neutral-300 hover:bg-neutral-50 hover:border-neutral-400 hover:shadow-sm"
+                }`}
+              >
+                <span>Next</span>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={2.5}
+                  stroke="currentColor"
+                  className="w-4 h-4 pointer-events-none"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="m8.25 4.5 7.5 7.5-7.5 7.5"
+                  />
+                </svg>
+              </button>
+            </div>
+          )}
         </div>
-      )}
-
+      </section>
     </>
   );
 }
+

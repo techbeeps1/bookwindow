@@ -5,7 +5,7 @@ export function ImageBook({src,alt,size="small"}:{src:string,alt:string,size?:st
   return (
 
     <div className="group relative block w-full h-full p-2 transition-all duration-300">
-          <div className={ `relative mb-4 bg-[#ededed]  ${size=="small"? "p-[40px]":"p-[70px]" }`}>
+          <div className={ `relative mb-4 bg-[#ededed]  ${size=="small"? "p-[30px]":"p-[70px]" }`}>
             <div className="relative">
               <div className="relative aspect-[3/4]">
                 <div
