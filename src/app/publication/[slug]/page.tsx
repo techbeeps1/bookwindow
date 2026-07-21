@@ -7,7 +7,7 @@ import { use } from "react";
 import config from "../../config";
 import CategoryPublicationSidebar from "@/components/category-publication-sidebar";
 import { FiSearch, FiFilter, FiGrid, FiList } from "react-icons/fi";
-import { useViewCategoryQuery } from "@/lib/api/categoryApi";
+import { useViewPublicationQuery } from "@/lib/api/publicationApi";
 
 export default function Category({ params }: {
   params: Promise<{ slug: string }>;
@@ -24,7 +24,7 @@ export default function Category({ params }: {
   const [sortBy, setSortBy] = useState<string>("default");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
-  const { data: categoryData, isLoading: isProductFetched } = useViewCategoryQuery(slug);
+  const { data: categoryData, isLoading: isProductFetched } = useViewPublicationQuery(slug);
 const products = useMemo(
   () => categoryData?.products ?? [],
   [categoryData]
@@ -126,6 +126,7 @@ const publicationData = useMemo(
           publications={publicationData}
           category_id={childCategory[0]?.parent_id}
           isFetched={isProductFetched}
+          publicationVisible={false}
         />
 
         <div className="flex-1 w-full">
@@ -210,7 +211,7 @@ const publicationData = useMemo(
               ))}
             </div>
           ) : displayedProducts?.length === 0 ? (
-           <div className="bg-white rounded-2xl border border-gray-200 p-12 text-center text-xl font-bold text-gray-600">
+            <div className="bg-white rounded-2xl border border-gray-200 p-12 text-center text-xl font-bold text-gray-600">
              <div className="text-4xl mb-4">
               Products not found
              </div>

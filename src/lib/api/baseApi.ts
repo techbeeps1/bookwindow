@@ -30,7 +30,8 @@ export const baseApi = createApi({
     "Wishlist",
     "Settings",
     'Menu',
-    "products"
+    "products",
+    "Publication"
   ],
 
   endpoints: () => ({}),

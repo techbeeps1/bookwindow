@@ -56,6 +56,7 @@ export function BookCard({
   const [cartBounce, setCartBounce] = useState(false);
 
   useEffect(() => {
+
     if (typeof window !== "undefined" && id) {
       const storedWishlist = localStorage.getItem("wishlist");
       const wishlist = storedWishlist ? JSON.parse(storedWishlist) : [];

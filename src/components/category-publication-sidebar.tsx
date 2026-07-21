@@ -2,7 +2,7 @@
 
 import config from "@/app/config";
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 
 export default function CategoryPublicationSidebar({
   category_id,
@@ -11,11 +11,16 @@ export default function CategoryPublicationSidebar({
   onCategorySelect,
   selectedCategoryIds,
   selectedPublicationIds,
+  publications,
   onPublicationSelect,
+  isFetched,
+  publicationVisible = true,
 }: any) {
-  const [publications, setPublications] = useState([] as any);
-  const [filteredPublicationData, setFilteredPublications] = useState([] as any);
-  const [loading, setLoading] = useState(true);
+ 
+
+  useEffect(() => {
+  }, [category_id,selectedCategoryIds]);
+ 
   const [catSearch, setCatSearch] = useState("");
   const [pubSearch, setPubSearch] = useState("");
 
@@ -24,32 +29,16 @@ export default function CategoryPublicationSidebar({
   const [categoryLimit, setCategoryLimit] = useState(8);
   const [publicationLimit, setPublicationLimit] = useState(8);
 
-  useEffect(() => {
-    const fetchProductsByCategoryAndPublication = async () => {
-      try {
-        const response = await axios({
-          method: "get",
-          url: `${config.apiUrl}api/publications`,
-          responseType: "json",
-        });
-        setLoading(false);
-        setPublications(response.data?.data?.production || []);
-      } catch (error) {
-        console.log("error", error);
-        setLoading(false);
-      }
-    };
+ 
 
-    fetchProductsByCategoryAndPublication();
-  }, []);
+  const filteredPublicationData = useMemo(() => {
+  const ids = products.map((p: any) => p.publicationId);
 
-  useEffect(() => {
-    const publicationIds = products?.map((p: any) => p.production_id);
-    const filteredPublications = publications.filter((pub: any) =>
-      publicationIds?.includes(pub.id)
-    );
-    setFilteredPublications(filteredPublications);
-  }, [publications, products]);
+  return publications.filter((pub:any) =>
+    ids.includes(pub.id)
+  );
+}, [products, publications]);
+
 
   const displayedCategories = childCategory || [];
   const displayedPublications =
@@ -160,7 +149,19 @@ export default function CategoryPublicationSidebar({
             <div className="flex flex-col gap-1 max-h-[350px] overflow-y-auto pr-1 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-neutral-200 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-neutral-350">
               
               {/* Show All / All Categories Option */}
-              <div
+   
+
+              {isFetched ? (
+                <div className="flex flex-col gap-3 p-2">
+                  {[...Array(5)].map((_, idx) => (
+                  <div key={idx} className="flex items-center justify-between gap-3 animate-pulse">
+                      <div className="bg-gray-300 h-4 w-4 "></div>
+                      <div className="bg-gray-300 h-3 rounded flex-1"></div>                   
+                    </div>
+                  ))}
+                </div>
+              ) : visibleCategories?.length > 0 ? (<>
+                           <div
                 onClick={() => onCategorySelect("clear")}
                 className={`flex items-center gap-3 px-2 py-2 rounded-lg cursor-pointer transition-all duration-200 ${
                   selectedCategoryIds.length === 0
@@ -171,18 +172,7 @@ export default function CategoryPublicationSidebar({
                 {selectedCategoryIds.length === 0 ? <CheckedIcon /> : <UncheckedIcon />}
                 <span className="text-xs select-none">All Categories</span>
               </div>
-
-              {loading ? (
-                <div className="flex flex-col gap-3 p-2">
-                  {[...Array(4)].map((_, idx) => (
-                    <div key={idx} className="flex items-center justify-between gap-3 animate-pulse">
-                      <div className="h-4 w-4 bg-neutral-200 rounded-full"></div>
-                      <div className="h-3 bg-neutral-200 rounded flex-1"></div>
-                      <div className="h-4 w-6 bg-neutral-200 rounded-full"></div>
-                    </div>
-                  ))}
-                </div>
-              ) : visibleCategories?.length > 0 ? (
+                 {
                 visibleCategories.map((category: any) => {
                   const isChecked = selectedCategoryIds.includes(category.id);
 
@@ -211,8 +201,12 @@ export default function CategoryPublicationSidebar({
                         </span>
                       )}
                     </div>
-                  );
-                })
+                  ); 
+                 
+                }) 
+              }
+                
+                </>
               ) : (
                 <div className="py-8 text-center text-xs text-neutral-400">
                   No categories found
@@ -234,7 +228,7 @@ export default function CategoryPublicationSidebar({
       </div>
 
       {/* ================= Publications Section ================= */}
-      <div className="flex flex-col gap-3">
+    {publicationVisible &&  <div className="flex flex-col gap-3">
         {/* Accordion Header */}
         <div 
           onClick={() => setIsPublicationsOpen(!isPublicationsOpen)}
@@ -301,7 +295,20 @@ export default function CategoryPublicationSidebar({
             <div className="flex flex-col gap-1 max-h-[350px] overflow-y-auto pr-1 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-neutral-200 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-neutral-350">
               
               {/* Show All / All Publications Option */}
-              <div
+ 
+
+              {isFetched ? (
+                <div className="flex flex-col gap-3 p-2">
+                  {[...Array(5)].map((_, idx) => (
+                    <div key={idx} className="flex items-center justify-between gap-3 animate-pulse">
+                      <div className="bg-gray-300 h-4 w-4 "></div>
+                      <div className="bg-gray-300 h-3 rounded flex-1"></div>                   
+                    </div>
+                  ))}
+                </div>
+              ) : visiblePubs?.length > 0 ? (
+                <>
+                                             <div
                 onClick={() => onPublicationSelect("clear")}
                 className={`flex items-center gap-3 px-2 py-2 rounded-lg cursor-pointer transition-all duration-200 ${
                   selectedPublicationIds.length === 0
@@ -312,19 +319,8 @@ export default function CategoryPublicationSidebar({
                 {selectedPublicationIds.length === 0 ? <CheckedIcon /> : <UncheckedIcon />}
                 <span className="text-xs select-none">All Publications</span>
               </div>
-
-              {loading ? (
-                <div className="flex flex-col gap-3 p-2">
-                  {[...Array(4)].map((_, idx) => (
-                    <div key={idx} className="flex items-center justify-between gap-3 animate-pulse">
-                      <div className="h-4 w-4 bg-neutral-200 rounded-full"></div>
-                      <div className="h-3 bg-neutral-200 rounded flex-1"></div>
-                      <div className="h-4 w-6 bg-neutral-200 rounded-full"></div>
-                    </div>
-                  ))}
-                </div>
-              ) : visiblePubs?.length > 0 ? (
-                visiblePubs.map((publication: any) => {
+                 {
+              visiblePubs.map((publication: any) => {
                   const filteredCount = category_id
                     ? (publication?.products || []).filter(
                         (product: any) =>
@@ -335,6 +331,7 @@ export default function CategoryPublicationSidebar({
                   const isChecked = selectedPublicationIds.includes(publication.id);
 
                   return (
+
                     <div
                       key={publication.id}
                       className={`flex items-center justify-between px-2 py-2 rounded-lg cursor-pointer transition-all duration-200 ${
@@ -359,8 +356,14 @@ export default function CategoryPublicationSidebar({
                         </span>
                       )}
                     </div>
+                     
                   );
-                })
+                }
+              
+              )
+            }
+              </>
+
               ) : (
                 <div className="py-8 text-center text-xs text-neutral-400">
                   No publications found
@@ -380,7 +383,7 @@ export default function CategoryPublicationSidebar({
           </div>
         )}
       </div>
-
+}
     </div>
   );
 }
