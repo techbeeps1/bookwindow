@@ -24,8 +24,6 @@ export default function SignIn() {
     const dispatch = useDispatch();
   
   const [customerData, setCustomerData] = useState({} as any);
-  const [alertMessage, setAlertMessage] = useState("");
-  const [alertType, setAlertType] = useState<"error" | "success" | "">("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("login");
   const [isloading, setIsloading] = useState(false)
@@ -93,15 +91,6 @@ export default function SignIn() {
   }
 
 
-  useEffect(() => {
-    if (alertMessage) {
-      const timer = setTimeout(() => {
-        setAlertMessage("");
-        setAlertType("");
-      }, 5000);
-      return () => clearTimeout(timer);
-    }
-  }, [alertMessage]);
 
 
 
@@ -182,32 +171,27 @@ export default function SignIn() {
     const password = formData.get("password")?.toString() || "";
 
     if (first_name.length > 255) {
-      setAlertType("error");
-      setAlertMessage("First name cannot be more than 255 characters.");
+      
       return;
     }
 
     if (last_name.length > 255) {
-      setAlertType("error");
-      setAlertMessage("Last name cannot be more than 255 characters.");
+      toast.error("Last name cannot be more than 255 characters.");
       return;
     }
 
     if (password.length < 8) {
-      setAlertType("error");
-      setAlertMessage("Password must be at least 8 characters long.");
+      toast.error("Password must be at least 8 characters long.");
       return;
     }
 
     if (!email) {
-      setAlertType("error");
-      setAlertMessage("Email is required.");
+      toast.error("Email is required.");
       return;
     }
 
     if (captchaInput !== captcha) {
-      setAlertType("error");
-      setAlertMessage("Invalid CAPTCHA. Please try again.");
+      toast.error("Invalid CAPTCHA. Please try again.");
       refreshCaptcha();
       return;
     }
@@ -221,21 +205,18 @@ export default function SignIn() {
       });
 
       const data = await response.json();
-  setIsloading(false);
+       setIsloading(false);
       if (response.ok) {
-        setAlertType("success");
-        setAlertMessage("Registration successful!");
+       toast.success("Registration successful!");
         form.reset();
         setCaptchaInput("");
       } else {
         if (data?.error?.includes("email has already been taken")) {
-          setAlertType("error");
-          setAlertMessage(
-            "Email is already registered. Please use another one."
-          );
+          toast.error("Email is already registered. Please use another one.");
         } else {
-          setAlertType("error");
-          setAlertMessage(data?.error || "Registration failed.");
+          toast.error("Registration failed.");
+          toast.error(data?.error || "Registration failed.");
+         
         }
       }
     } catch (error) {
@@ -243,15 +224,6 @@ export default function SignIn() {
     }
   }
 
-  useEffect(() => {
-    if (alertMessage) {
-      const timer = setTimeout(() => {
-        setAlertMessage("");
-        setAlertType("");
-      }, 5000);
-      return () => clearTimeout(timer);
-    }
-  }, [alertMessage]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-neutral-50 via-neutral-100 to-neutral-200/50 flex items-center justify-center px-4 py-16 md:py-24 relative overflow-hidden">
@@ -319,24 +291,7 @@ export default function SignIn() {
             </p>
           </div>
 
-          {/* Alerts */}
-          {alertMessage && (
-            <div
-              className={`w-full p-4 mb-6 text-sm rounded-2xl border flex items-center justify-between transition-all duration-300 ${
-                alertType === "error"
-                  ? "bg-red-50 text-red-800 border-red-200"
-                  : "bg-green-50 text-green-800 border-green-200"
-              }`}
-            >
-              <span>{alertMessage}</span>
-              <button
-                onClick={() => setAlertMessage("")}
-                className="text-lg font-bold leading-none ml-2 hover:opacity-75 focus:outline-none"
-              >
-                &times;
-              </button>
-            </div>
-          )}
+      
 
           <div className="flex p-1.5 bg-neutral-100 rounded-full mb-8 border border-neutral-200/50 shadow-inner">
             <button
