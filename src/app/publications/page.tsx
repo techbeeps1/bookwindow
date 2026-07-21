@@ -41,7 +41,7 @@ function PublisherCard({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35, delay: Math.min((index % 12) * 0.04, 0.4) }}
-      className="group bg-white rounded-2xl border border-gray-200/90 hover:border-black/30 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between overflow-hidden relative"
+      className="group bg-white rounded-2xl border border-gray-200/90 hover:border-black/30 shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between overflow-hidden relative"
     >
       {/* Publisher Image Banner */}
       <div className="relative h-44 w-full bg-gradient-to-br from-gray-50 via-white to-gray-100 flex items-center justify-center p-5 overflow-hidden border-b border-gray-100 group-hover:bg-gray-50/80 transition-colors">
@@ -62,10 +62,7 @@ function PublisherCard({
             </span>
           </div>
         )}
-        <span className="absolute top-3 right-3 bg-white/90 backdrop-blur-md px-2.5 py-1 rounded-full text-[11px] font-semibold text-gray-700 border border-gray-200/80 shadow-xs flex items-center gap-1.5">
-          <span className="w-1.5 h-1.5 rounded-full bg-black"></span>
-          Publisher
-        </span>
+
       </div>
 
       {/* Content */}
@@ -88,7 +85,7 @@ function PublisherCard({
 
         {/* Link Button */}
         <Link
-          href={`/category/${pub.slug || pub.name.toLowerCase().replace(/\s+/g, "-")}`}
+          href={`/publication/${pub.slug || pub.name.toLowerCase().replace(/\s+/g, "-")}`}
           className="w-full mt-2 py-2.5 px-4 bg-gray-900 text-white hover:bg-black rounded-xl font-semibold text-xs transition-all duration-200 flex items-center justify-center gap-2 group/btn shadow-xs hover:shadow-md"
         >
           <span>View Books</span>

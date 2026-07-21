@@ -5,12 +5,15 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 
 import config from "@/app/config";
+import { useRouter } from "next/navigation";
 
 
 
 export function PublicationsCategory({
   data
 }: any) {
+
+  const router = useRouter();
   return (
     <section className="container mx-auto px-8">
       {/* Header */}
@@ -32,7 +35,7 @@ export function PublicationsCategory({
         {data?.publication.map((pub:any, index:number) => (
           <div  >
           <motion.div
-           
+            onClick={() => router.push(`/publication/${pub.slug}`)}
             key={index}
             initial={{ opacity: 0, scale: 0.95 }}
             whileInView={{ opacity: 1, scale: 1 }}

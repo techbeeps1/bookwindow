@@ -7,7 +7,7 @@ import { use } from "react";
 import config from "../../config";
 import CategoryPublicationSidebar from "@/components/category-publication-sidebar";
 import { FiSearch, FiFilter, FiGrid, FiList } from "react-icons/fi";
-import { useViewCategoryQuery } from "@/lib/api/categoryApi";
+import { useViewPublicationQuery } from "@/lib/api/publicationApi";
 
 export default function Category({ params }: {
   params: Promise<{ slug: string }>;
@@ -24,7 +24,7 @@ export default function Category({ params }: {
   const [sortBy, setSortBy] = useState<string>("default");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
-  const { data: categoryData, isLoading: isProductFetched , isFetching } = useViewCategoryQuery(slug);
+  const { data: categoryData, isLoading: isProductFetched , isFetching } = useViewPublicationQuery(slug);
   const isDataLoading = isProductFetched || isFetching;
 const products = useMemo(
   () => categoryData?.products ?? [],
@@ -115,7 +115,7 @@ const publicationData = useMemo(
 
   return (
     <>
-      <section className="container mx-auto mb-10 mt-10 flex flex-col md:flex-row px-3 sm:px-5 lg:px-8 gap-4 lg:gap-6 overflow-x-hidden">
+      <section className="container mx-auto mb-10 mt-10 md:flex px-[20px] gap-[20px]">
         <CategoryPublicationSidebar
           onCategorySelect={handleCategorySelect}
           onPublicationSelect={handlePublicationSelect}
@@ -126,15 +126,15 @@ const publicationData = useMemo(
           publications={publicationData}
           category_id={childCategory[0]?.parent_id}
           isFetched={isProductFetched}
-        
+          publicationVisible={false}
         />
 
-        <div className="flex-1 w-full min-w-0">
+        <div className="flex-1 w-full">
           {/* Top Filter & Toolbar matching Wishlist header */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-3 sm:p-4 mb-6 flex flex-col sm:flex-row items-center justify-between gap-3 w-full">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-6 flex flex-col md:flex-row items-center justify-between gap-4 w-full">
             
             {/* Search Bar */}
-            <div className="relative w-full sm:w-48 md:w-52 lg:w-64 xl:w-80">
+            <div className="relative w-full md:w-80">
               <FiSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
               <input
                 type="text"
