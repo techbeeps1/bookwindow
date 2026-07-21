@@ -498,7 +498,7 @@ export default function WishlistPage() {
                         <div className="relative pt-4 px-4 bg-gray-50/60 group-hover:bg-gray-50 transition-colors">
                           <Link href={`/product-detail/${item.slug || item.id}`}>
                             <div className="w-full flex justify-center transform group-hover:scale-[1.03] transition-transform duration-300">
-                              <ImageBook src={getImageSrc(item)} alt={item.title || "Book"} size="small" />
+                              <ImageBook src={getImageSrc(item)} alt={item.title || "Book"} size="30px" />
                             </div>
                           </Link>
                         </div>
@@ -627,12 +627,12 @@ export default function WishlistPage() {
                         initial={{ opacity: 0, y: 15 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, x: -50 }}
-                        className="bg-white rounded-2xl border border-gray-200 p-4 sm:p-5 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-sm hover:shadow-md transition-all"
+                        className="bg-white rounded-2xl border border-gray-200  sm:p-5 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-sm hover:shadow-md transition-all"
                       >
                         {/* Book Image */}
-                        <div className="w-28 sm:w-36 flex-shrink-0 bg-gray-50 rounded-xl p-2">
+                        <div className="w-28 sm:w-36 flex-shrink-0 bg-gray-50 rounded-xl ">
                           <Link href={`/product-detail/${item.slug || item.id}`}>
-                            <ImageBook src={getImageSrc(item)} alt={item.title || "Book"} size="small" />
+                            <ImageBook src={getImageSrc(item)} alt={item.title || "Book"} size={viewMode === "list" ? "16px" : "30px"} />
                           </Link>
                         </div>
 

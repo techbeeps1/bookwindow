@@ -16,13 +16,14 @@ import { ImageBook } from "@/components/ImageBook";
 
 import { FrequentlyBougth } from "@/components/FrequentlyBougth";
 
-
 const parseGallery = (gallery: any): string[] => {
-  
   if (!gallery) return [];
   if (typeof gallery === "string") {
     if (!gallery.trim().startsWith("[") && !gallery.trim().startsWith("{")) {
-      return gallery.split(",").map(img => img.trim()).filter(Boolean);
+      return gallery
+        .split(",")
+        .map((img) => img.trim())
+        .filter(Boolean);
     }
     try {
       const parsed = JSON.parse(gallery);
@@ -58,7 +59,9 @@ const parseGallery = (gallery: any): string[] => {
   return [];
 };
 
-export default function ProductDetail({ params }:{
+export default function ProductDetail({
+  params,
+}: {
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = use(params);
@@ -66,17 +69,16 @@ export default function ProductDetail({ params }:{
   const router = useRouter();
   const [mainImage, setMainImage] = useState("");
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  
+
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [showWishlistModal, setShowWishlistModal] = useState(false);
-
 
   const [loading, setLoading] = useState(true);
 
   const [productData, setProductData] = useState([] as any);
   const [similarProducts, setSimilarProducts] = useState([] as any);
   const [FBTProducts, setFBTProducts] = useState([] as any);
-  
+
   const galleryImages = parseGallery(productData?.gallery);
   const allImages: string[] = [];
   if (productData?.image) {
@@ -88,15 +90,16 @@ export default function ProductDetail({ params }:{
     }
   });
   const dispatch = useAppDispatch();
-  
 
   const [addToCart, { isLoading }] = useAddToCartMutation();
+  const [clicktype, setClicktype] = useState("");
 
   const { refetch } = useCart();
 
   const handlePrevImage = () => {
     if (allImages.length > 0) {
-      const newIndex = (currentImageIndex - 1 + allImages.length) % allImages.length;
+      const newIndex =
+        (currentImageIndex - 1 + allImages.length) % allImages.length;
       setCurrentImageIndex(newIndex);
       setMainImage(`${config.apiUrl}storage/app/public/${allImages[newIndex]}`);
     }
@@ -122,10 +125,10 @@ export default function ProductDetail({ params }:{
     if (typeof window !== "undefined") {
       const customer = localStorage.getItem("customer");
       if (!customer) {
-       // setShowWishlistModal(true);
-      //  return;
+        // setShowWishlistModal(true);
+        //  return;
       }
-      
+
       const storedWishlist = localStorage.getItem("wishlist");
       let wishlist = storedWishlist ? JSON.parse(storedWishlist) : [];
       if (wishlist.includes(productData?.id)) {
@@ -139,13 +142,12 @@ export default function ProductDetail({ params }:{
     }
   };
 
-   const handleItemsCountUpdate = (count: number) => {
-   // setItemsCount(count);
+  const handleItemsCountUpdate = (count: number) => {
+    // setItemsCount(count);
   };
 
-
   // Callback function to receive data from child
-  
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -161,7 +163,7 @@ export default function ProductDetail({ params }:{
         });
         setProductData(response.data?.product);
         setSimilarProducts(response.data?.related_products || []);
-        setFBTProducts(response.data?.bought_together || [])
+        setFBTProducts(response.data?.bought_together || []);
       } catch (error) {
         console.log("error", error);
       } finally {
@@ -189,31 +191,47 @@ export default function ProductDetail({ params }:{
     }
   };
 
+  const handleAddToCart = async (productId: string, quantity: number) => {
+    setClicktype("addtocart");
+    try {
+      await addToCart({
+        session_id: sessionId,
+        product_id: productId,
+        quantity,
+      }).unwrap();
 
+      // wait until cart is refreshed
+      await refetch();
 
+      // then open drawer
+      dispatch(openCartDrawer());
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
-const handleAddToCart = async (productId: string, quantity: number) => {
-  try {
-    await addToCart({
-      session_id: sessionId,
-      product_id: productId,
-      quantity,
-    }).unwrap();
+  async function BuyNow(productId: string, quantity: number) {
+    setClicktype("buynow");
+    try {
+      await addToCart({
+        session_id: sessionId,
+        product_id: productId,
+        quantity,
+      }).unwrap();
 
-    // wait until cart is refreshed
-    await refetch();
+      // wait until cart is refreshed
+      await refetch();
 
-    // then open drawer
-    dispatch(openCartDrawer());
-  } catch (error) {
-    console.error(error);
+      router.push("/checkout");
+    } catch (error) {
+      console.error(error);
+    }
   }
-};
   return (
     <>
       <div className="container mx-auto px-4 py-8 md:flex md:col-12">
         {loading ? (
-           <div
+          <div
             role="status"
             className="container mx-auto space-y-8 mt-10 animate-pulse md:space-y-0 md:space-x-8 rtl:space-x-reverse md:flex justify-center md:items-center w-[80%]"
           >
@@ -246,16 +264,14 @@ const handleAddToCart = async (productId: string, quantity: number) => {
 
             <span className="sr-only">Loading...</span>
           </div>
-
-
-        ) : (        
-          <div className="flex flex-wrap">           
+        ) : (
+          <div className="flex flex-wrap">
             <div className="w-full md:w-[45%] md:px-4 px-0 md:px-10 mb-8 flex flex-col gap-6">
               <div className="relative group/slider w-full">
-                <ImageBook src={mainImage} alt={"Product"} size="large"/>
-                
+                <ImageBook src={mainImage} alt={"Product"} size="70px" />
+
                 {allImages.length > 1 && (
-                  <>                  
+                  <>
                     <button
                       onClick={handlePrevImage}
                       className="absolute left-6 top-[45%] -translate-y-1/2 z-10 bg-white/80 hover:bg-white text-black p-2.5 rounded-full shadow-lg transition-all duration-200 opacity-0 group-hover/slider:opacity-100 focus:outline-none hover:scale-105 active:scale-95 border border-gray-100"
@@ -302,10 +318,14 @@ const handleAddToCart = async (productId: string, quantity: number) => {
                           key={index}
                           onClick={() => {
                             setCurrentImageIndex(index);
-                            setMainImage(`${config.apiUrl}storage/app/public/${allImages[index]}`);
+                            setMainImage(
+                              `${config.apiUrl}storage/app/public/${allImages[index]}`,
+                            );
                           }}
                           className={`h-2 rounded-full transition-all duration-300 ${
-                            index === currentImageIndex ? "w-6 bg-black" : "w-2 bg-black/40 hover:bg-black/60"
+                            index === currentImageIndex
+                              ? "w-6 bg-black"
+                              : "w-2 bg-black/40 hover:bg-black/60"
                           }`}
                           aria-label={`Go to slide ${index + 1}`}
                         />
@@ -318,9 +338,13 @@ const handleAddToCart = async (productId: string, quantity: number) => {
             <div className="w-full md:w-[55%] md:px-4 px-0">
               <div className="flex justify-between items-start gap-4">
                 <div className="flex-1">
-                  <h2 className="text-2xl font-semibold mb-2">{productData?.name}</h2>
-                  <h3 className="text-gray-600 text-lg mb-2">{productData?.sub_title}</h3>
-                </div>               
+                  <h2 className="text-2xl font-semibold mb-2">
+                    {productData?.name}
+                  </h2>
+                  <h3 className="text-gray-600 text-lg mb-2">
+                    {productData?.sub_title}
+                  </h3>
+                </div>
                 <button
                   onClick={handleWishlistClick}
                   className="flex items-center justify-center w-12 h-12 rounded-full border border-neutral-300 hover:border-black/50 hover:bg-neutral-50 transition-all duration-300 shadow-sm shrink-0 animate-fade-in"
@@ -344,19 +368,26 @@ const handleAddToCart = async (productId: string, quantity: number) => {
               </div>
 
               <p className="text-gray-600 mb-4">
-               <span className="text-black font-semibold">Author:</span> {productData?.author}
+                <span className="text-black font-semibold">Author:</span>{" "}
+                {productData?.author}
               </p>
               <div className="mb-4">
-               {productData.price  && <span className="text-2xl font-bold mr-2">
-                  ₹{productData.price}
-                </span>     
-                  }           
-               {(productData.mrp && productData.mrp != 0 && productData.mrp != productData.price ) &&  <span className={`${productData.price ? "text-gray-500 line-through" :"text-2xl font-bold mr-2" }`}>
-                  ₹{productData.mrp}
-                </span>
-              }
-              </div>              
-                <div>
+                {productData.price && (
+                  <span className="text-2xl font-bold mr-2">
+                    ₹{productData.price}
+                  </span>
+                )}
+                {productData.mrp &&
+                  productData.mrp != 0 &&
+                  productData.mrp != productData.price && (
+                    <span
+                      className={`${productData.price ? "text-gray-500 line-through" : "text-2xl font-bold mr-2"}`}
+                    >
+                      ₹{productData.mrp}
+                    </span>
+                  )}
+              </div>
+              <div>
                 <label
                   htmlFor="quantity"
                   className="block text-sm font-semibold text-gray-800 mb-2 uppercase tracking-wider"
@@ -412,7 +443,40 @@ const handleAddToCart = async (productId: string, quantity: number) => {
                 </div>
               </div>
               <div className="flex my-5 space-x-4 relative">
-                <button className="border border-black h-[50px] hover:bg-black hover:text-white duration-300 flex gap-2 items-center text-black px-6 py-2 rounded-full ">
+                <button
+                  onClick={() => BuyNow(productData?.id, quantity)}
+                  disabled={isLoading && clicktype == "buynow"}
+                  className={`border border-black h-[50px] hover:bg-black hover:text-white duration-300 flex gap-2 items-center text-black px-6 py-2 rounded-full ${
+    isLoading && clicktype == "addtocart"
+      ? "opacity-70 cursor-not-allowed"
+      : ""
+  }`}
+                >
+                    {isLoading && clicktype == "buynow" ? (
+                    <>
+                      <svg
+                        className="w-5 h-5 animate-spin"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-20"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        />
+                        <path
+                          className="opacity-80"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                        />
+                      </svg>
+                      Buy Now
+                    </>
+                  ) : ( <>
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
@@ -427,89 +491,87 @@ const handleAddToCart = async (productId: string, quantity: number) => {
                       d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"
                     />
                   </svg>
-                  By Now
+                  Buy Now</> )}
                 </button>
 
-    <button
-  onClick={() => handleAddToCart(productData?.id, quantity)}
-  disabled={isLoading}
-  className={`bg-black h-[50px] flex gap-2 items-center justify-center
+                <button
+                  onClick={() => handleAddToCart(productData?.id, quantity)}
+                  disabled={isLoading && clicktype == "addtocart"}
+                  className={`bg-black h-[50px] flex gap-2 items-center justify-center
   text-white px-6 py-2 rounded-full transition-all duration-300
   ${
-    isLoading
+    isLoading && clicktype == "addtocart"
       ? "opacity-70 cursor-not-allowed"
       : "hover:scale-[1.02] active:scale-95"
   }`}
->
-  {isLoading ? (
-    <>
-      <svg
-        className="w-5 h-5 animate-spin"
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-      >
-        <circle
-          className="opacity-20"
-          cx="12"
-          cy="12"
-          r="10"
-          stroke="currentColor"
-          strokeWidth="4"
-        />
-        <path
-          className="opacity-80"
-          fill="currentColor"
-          d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-        />
-      </svg>
-
-      Adding...
-    </>
-  ) : (
-    <>
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        strokeWidth="1.5"
-        stroke="currentColor"
-        className="size-6"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"
-        />
-      </svg>
-
-      Add to Cart
-    </>
-  )}
-</button>
-                
+                >
+                  {isLoading && clicktype == "addtocart" ? (
+                    <>
+                      <svg
+                        className="w-5 h-5 animate-spin"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-20"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        />
+                        <path
+                          className="opacity-80"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                        />
+                      </svg>
+                      Adding...
+                    </>
+                  ) : (
+                    <>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth="1.5"
+                        stroke="currentColor"
+                        className="size-6"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"
+                        />
+                      </svg>
+                      Add to Cart
+                    </>
+                  )}
+                </button>
               </div>
-              
-              
+
               {productData?.description && (
                 <div className="mb-6">
-                  <h3 className="text-lg font-semibold mb-2">About this product:</h3>
+                  <h3 className="text-lg font-semibold mb-2">
+                    About this product:
+                  </h3>
                   <div
                     className="text-gray-700 leading-relaxed text-sm"
-                    dangerouslySetInnerHTML={{ __html: productData.description }}
+                    dangerouslySetInnerHTML={{
+                      __html: productData.description,
+                    }}
                   />
                 </div>
               )}
-              
 
               <div>
                 <h3 className="text-lg font-semibold mb-2">Key Features:</h3>
-                <ul className="list-disc list-inside text-gray-700">                  
+                <ul className="list-disc list-inside text-gray-700">
                   <li>Publication: {productData?.production?.name}</li>
                   <li>Edition: {productData?.model}</li>
                   <li>Publication Year: {productData?.year}</li>
-                  <li>Book Language: {productData?.book_language}</li>                              
-                  
+                  <li>Book Language: {productData?.book_language}</li>
                 </ul>
               </div>
             </div>
@@ -520,10 +582,10 @@ const handleAddToCart = async (productId: string, quantity: number) => {
         similarProducts={similarProducts}
         onItemsCountUpdate={handleItemsCountUpdate}
       />
-    <FrequentlyBougth
+      <FrequentlyBougth
         similarProducts={FBTProducts}
         onItemsCountUpdate={handleItemsCountUpdate}
-      />  
+      />
 
       {/* {showWishlistModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm transition-all duration-300">
@@ -567,7 +629,6 @@ const handleAddToCart = async (productId: string, quantity: number) => {
           </div>
         </div>
       )} */}
-
     </>
   );
 }

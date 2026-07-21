@@ -124,16 +124,13 @@ export function BookCard({
   if (viewMode === "list") {
     return (
       <motion.div
-        layout
-        initial={{ opacity: 0, y: 15 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, x: -50 }}
-        className="bg-white rounded-2xl border border-gray-200 p-4 sm:p-5 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-sm hover:shadow-md transition-all w-full relative group"
+      
+        className="bg-white rounded-2xl border  p-4 sm:p-5 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-sm hover:shadow-md transition-all w-full relative group"
       >
         {/* Book Cover Image */}
-        <div className="w-28 sm:w-36 flex-shrink-0 bg-gray-50 rounded-xl p-2">
+        <div className="w-28 sm:w-36 flex-shrink-0  rounded-xl">
           <Link href={`/product-detail/${slug}`}>
-            <ImageBook src={img} alt={title} size="small" />
+            <ImageBook src={img} alt={title} size={ viewMode === "list" ? "16px" : "30px" } />
           </Link>
         </div>
 
@@ -314,10 +311,7 @@ export function BookCard({
   return (
     <motion.div
       layout
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.9 }}
-      transition={{ duration: 0.2 }}
+
       className="group relative bg-white rounded-2xl border border-gray-200/80 hover:border-gray-300 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between overflow-hidden"
     >
       
@@ -365,8 +359,8 @@ export function BookCard({
       {/* Book Cover Image Container */}
       <div className="relative pt-4 px-4 bg-gray-50/60 group-hover:bg-gray-50 transition-colors">
         <Link href={`/product-detail/${slug}`}>
-          <div className="w-full flex justify-center transform group-hover:scale-[1.03] transition-transform duration-300">
-            <ImageBook src={img} alt={title} size="small" />
+          <div className="w-full flex justify-center transform transition-transform duration-300">
+            <ImageBook src={img} alt={title} size="30px" />
           </div>
         </Link>
       </div>

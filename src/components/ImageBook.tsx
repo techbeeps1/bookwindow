@@ -1,11 +1,11 @@
 import Image from "next/image";
 
 
-export function ImageBook({src,alt,size="small"}:{src:string,alt:string,size?:string}) {
+export function ImageBook({src,alt,size="30px"}:{src:string,alt:string,size?:string}) {
   return (
 
-    <div className="group relative block w-full h-full p-2 transition-all duration-300">
-          <div className={ `relative mb-4 bg-[#ededed]  ${size=="small"? "p-[30px]":"p-[70px]" }`}>
+    <div className="group relative block w-full h-full transition-all duration-300">
+          <div className={ `relative  bg-[#ededed] `} style={{padding:size}}>
             <div className="relative">
               <div className="relative aspect-[3/4]">
                 <div
