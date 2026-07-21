@@ -456,21 +456,15 @@ export default function WishlistPage() {
             {/* GRID VIEW */}
             {viewMode === "grid" ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                <AnimatePresence>
-                  {filteredAndSortedItems.map((item) => {
-                    const price = item.price;
-                    const offPrice = item.offPrice;
+                {filteredAndSortedItems.map((item) => {
+                  const price = item.price;
+                  const offPrice = item.offPrice;
 
-                    return (
-                      <motion.div
-                        key={item.id}
-                        layout
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.9 }}
-                        transition={{ duration: 0.2 }}
-                        className="group relative bg-white rounded-2xl border border-gray-200/80 hover:border-gray-300 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between overflow-hidden"
-                      >
+                  return (
+                    <div
+                      key={item.id}
+                      className="group relative bg-white rounded-2xl border border-gray-200/80 hover:border-gray-300 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between overflow-hidden"
+                    >
                         {/* Remove Button Badge */}
                         <button
                           onClick={() => handleRemoveItem(item.id)}
@@ -607,28 +601,22 @@ export default function WishlistPage() {
                             </div>
                           </div>
                         </div>
-                      </motion.div>
+                      </div>
                     );
                   })}
-                </AnimatePresence>
               </div>
             ) : (
               /* LIST VIEW */
               <div className="space-y-4">
-                <AnimatePresence>
-                  {filteredAndSortedItems.map((item) => {
-                    const price = item.price;
-                    const offPrice = item.offPrice;
+                {filteredAndSortedItems.map((item) => {
+                  const price = item.price;
+                  const offPrice = item.offPrice;
 
-                    return (
-                      <motion.div
-                        key={item.id}
-                        layout
-                        initial={{ opacity: 0, y: 15 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, x: -50 }}
-                        className="bg-white rounded-2xl border border-gray-200  sm:p-5 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-sm hover:shadow-md transition-all"
-                      >
+                  return (
+                    <div
+                      key={item.id}
+                      className="bg-white rounded-2xl border border-gray-200  sm:p-5 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-sm hover:shadow-md transition-all"
+                    >
                         {/* Book Image */}
                         <div className="w-28 sm:w-36 flex-shrink-0 bg-gray-50 rounded-xl ">
                           <Link href={`/product-detail/${item.slug || item.id}`}>
@@ -684,7 +672,7 @@ export default function WishlistPage() {
                             <button
                               onClick={() => handleAddToCart(item)}
                               disabled={loadingItemId === String(item.id) || item.inStock === false}
-                              className="relative p-2 border border-gray-200 text-gray-500 hover:text-black hover:border-black hover:bg-gray-50 rounded-full transition-all duration-200 active:scale-95 flex items-center justify-center overflow-hidden"
+                              className="relative p-2 border border-gray-200 text-gray-500 hover:text-white hover:border-black hover:bg-black rounded-full transition-all duration-200 active:scale-95 flex items-center justify-center overflow-hidden"
                               aria-label="Add to cart"
                             >
                               <div className="relative w-[18px] h-[18px] flex items-center justify-center">
@@ -765,10 +753,9 @@ export default function WishlistPage() {
                             </button>
                           </div>
                         </div>
-                      </motion.div>
+                      </div>
                     );
                   })}
-                </AnimatePresence>
               </div>
             )}
           </div>

@@ -145,7 +145,7 @@ export default function ContactSection() {
           
           {/* Left Column: Ask questions and Contact Cards */}
           <div className="flex flex-col">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4 tracking-tight">
+            <h2 className="text-[28px] md:text-4xl font-bold text-gray-900 mb-4 tracking-tight">
               You can ask us questions !
             </h2>
             <div className="w-20 h-[2px] bg-black mb-6 rounded-full" />

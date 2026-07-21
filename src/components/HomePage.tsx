@@ -2,13 +2,9 @@
 
 import Hero from "@/components/hero";
 import TopBookCategories from "@/components/top-book-categories";
-
-
 import { useRef, useState } from "react";
 import { motion } from "framer-motion";
 import React from "react";
-import axios from "axios";
-
 import { BestSubjects } from "@/components/BestSubjects";
 import PublicationsCategory from "@/components/PublicationsCategory";
 import HobbyCategory from "@/components/HobbyCategory";

@@ -66,7 +66,7 @@ function Hero({ bannerData }: any) {
   return (
     <>
       <section className="relative w-full overflow-hidden bg-gray-900 group">
-        <div className="relative w-full xl:h-[90vh] lg:h-[80vh] sm:h-[60vh] h-[40vh] overflow-hidden">
+        <div className="relative w-full xl:h-[90vh] lg:h-[80vh] sm:h-[50vh] h-[25vh] overflow-hidden">
           {/* Slider Content Row */}
           <div 
             className={`flex h-full ${isDragging ? "" : "transition-transform duration-700 ease-in-out"}`}

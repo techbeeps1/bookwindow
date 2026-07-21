@@ -9,7 +9,7 @@ export function FrequentlyBougth({  similarProducts, onItemsCountUpdate }: any) 
   return (
   <section className="px-[20px] mb-[60px]">
         <div className="container mx-auto">
-        <h2 className="text-2xl md:text-4xl "> Frequently Bougth Together</h2>
+        <h2 className="text-2xl md:text-4xl "> Frequently Bought Together</h2>
           <div className="w-20 h-[2px] bg-black my-4 rounded-full" />
           <div className="grid grid-cols-1 sm:grid-cols-2 items-start md:gap-6 gap-2 xl:grid-cols-3 mb-10">        
                 {similarProducts && similarProducts.length > 0

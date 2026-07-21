@@ -371,7 +371,7 @@ const dispatch = useAppDispatch();
                                         <div key={child?.id || cidx} className="flex flex-col text-left">
                                           <Link
                                             href={resolveUrl(child.url)}
-                                            className="font-bold text-[12px] uppercase tracking-wider !text-black border-b border-neutral-100 pb-1.5 mb-2.5 hover:!text-neutral-700 transition-colors"
+                                            className="font-bold text-[12px] capitalize tracking-wider !text-black border-b border-neutral-100 pb-1.5 mb-2.5 hover:!text-neutral-700 transition-colors"
                                           >
                                             {child.name}
                                           </Link>

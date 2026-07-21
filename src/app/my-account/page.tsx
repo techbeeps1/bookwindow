@@ -216,7 +216,7 @@ export default function AccountPage() {
               {/* User block info styled at bottom */}
               {customer && (
                 <div className="pt-4 border-t border-neutral-200/80 flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-full bg-neutral-900 text-white flex items-center justify-center font-bold text-xs shadow-sm">
+                  <div className="w-9 h-9 rounded-full bg-neutral-900 text-black flex items-center justify-center font-bold text-xs shadow-sm">
                     {customer.first_name?.[0] || "U"}
                   </div>
                   <div className="flex-1 min-w-0">

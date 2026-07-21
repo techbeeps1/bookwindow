@@ -8,7 +8,7 @@ export function FixedPlugin() {
 
   
   return (
-    <Link href="https://wa.me/+919602368227" target="_blank" className="!fixed md:bottom-4 bottom-[70px] bg-transparent bg-none right-4 items-center rounded-full z-50">       
+    <Link href="https://wa.me/+919602368227" target="_blank" className="!fixed lg:bottom-4 bottom-[70px] bg-transparent bg-none right-4 items-center rounded-full z-50">       
         <Image src={whatsapp} className="w-[50px] h-[50px]" alt="whatsapp icon"/>
     </Link>
   );

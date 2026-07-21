@@ -60,7 +60,7 @@ export default function Detail({ params }: any) {
   return (
     <>
 
-            <section className="container mx-auto mb-10 mt-10 md:flex min-h-screen">
+            <section className="container mx-auto mb-10 mt-10 flex flex-col lg:flex-row px-4 sm:px-6 lg:px-8 gap-6 max-w-full overflow-x-hidden min-h-screen">
         {currentAffairsData && currentAffairsList?.length ? (
           <>
             <div className="grid grid-cols-1 gap-x-6 gap-y-20 col-8 p-4 shadow-lg">

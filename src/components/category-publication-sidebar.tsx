@@ -90,7 +90,7 @@ export default function CategoryPublicationSidebar({
   );
 
   return (
-    <div className="w-full md:w-[300px] flex-shrink-0 md:p-6 p-0 py-6 flex flex-col gap-8 bg-white md:border-r md:border-neutral-100 border-0">
+    <div className="w-full md:w-[230px] lg:w-[270px] xl:w-[290px] flex-shrink-0 md:p-4 lg:p-6 p-0 py-4 flex flex-col gap-6 bg-white md:border-r md:border-neutral-100 border-0 overflow-hidden">
       
       {/* ================= Categories Section ================= */}
       <div className="flex flex-col gap-3">
