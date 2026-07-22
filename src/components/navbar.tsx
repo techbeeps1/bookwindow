@@ -14,12 +14,23 @@ import {  logout } from "@/lib/slices/authSlice";
 import { useRouter } from "next/navigation";
 
 const resolveUrl = (url: string) => {
+
   if (!url) return "#";
+
   const cleanUrl = url.trim();
+
   if (cleanUrl === "current-affairs") return "/current-affairs";
+
   if (cleanUrl.startsWith("/") || cleanUrl.startsWith("http://") || cleanUrl.startsWith("https://")) {
     return cleanUrl;
   }
+  
+ if (cleanUrl.includes("?page=")) {
+
+  
+ const urld = cleanUrl.split("?")[0];
+  return `/${urld}`
+}
   if (cleanUrl === "#") return "#";
   return `/category/${cleanUrl}`;
 };
@@ -37,7 +48,6 @@ export function Navbar({  menuData }: any) {
    const products = productdatas;
    const { user, isAuthenticated ,loading } = useAppSelector((state) => state.auth);
    
-
 
   const { data } = useCart();
 const dispatch = useAppDispatch();
