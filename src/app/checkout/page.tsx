@@ -545,7 +545,7 @@ export default function ShoppingCart() {
 
                 <div className="mt-6 md:gap-8 lg:flex lg:items-start">
                   {/* Left Column: Cart Items List */}
-                  <div className="mx-auto w-full flex-none lg:max-w-2xl xl:max-w-3xl p-4">
+                  <div className="me-auto w-full flex-none xl:max-w-3xl lg:max-w-[500px]">
                     {/* Cart Items List Container */}
                     <div className="bg-white rounded-2xl border border-neutral-200/80 p-5 shadow-sm space-y-4">
                       {cartItems?.map((item) => {
@@ -762,7 +762,7 @@ export default function ShoppingCart() {
                   </div>
 
                   {/* Right Column: Order Summary */}
-                  <div className="w-full lg:max-w-md flex-1 p-4">
+                  <div className="w-full lg:max-w-md flex-1">
                     <div className="bg-neutral-50/50 border border-neutral-150/60 rounded-2xl p-6 sm:p-8 shadow-sm space-y-6 lg:sticky lg:top-8">
                       <p className="text-lg font-bold text-neutral-900">
                         Order Summary

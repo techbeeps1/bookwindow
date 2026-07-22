@@ -101,7 +101,7 @@ export default function Blogs() {
                       src={`${config.apiUrl}storage/app/public/${blog?.image}`}
                       alt={blog?.title}
                       fill
-                      className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+                      className="rounded-xl transition-transform duration-500 ease-out group-hover:scale-105"
                       sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                     />
                   </a>

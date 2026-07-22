@@ -116,31 +116,27 @@ const isWishlisted = wishlistSet.has(id);
   if (viewMode === "list") {
     return (
       <motion.div
-      
-        className="bg-white rounded-2xl border  p-4 sm:p-5 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-sm hover:shadow-md transition-all w-full relative group"
+        className="bg-white rounded-2xl border p-3 sm:p-5 flex flex-row items-center justify-between gap-3 sm:gap-6 shadow-sm hover:shadow-md transition-all w-full relative group"
       >
         {/* Book Cover Image */}
-        <div className="w-28 sm:w-36 flex-shrink-0  rounded-xl">
+        <div className="w-28 xs:w-32 sm:w-36 flex-shrink-0 rounded-xl">
           <Link href={`/product-detail/${slug}`}>
-            <ImageBook src={img} alt={title} size={ viewMode === "list" ? "16px" : "30px" } />
+            <ImageBook src={img} alt={title} size={ viewMode === "list" ? "10px" : "30px" } />
           </Link>
         </div>
 
         {/* Book Information */}
-        <div className="flex-1 space-y-2 text-center sm:text-left">
-          <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
+        <div className="flex-1 min-w-0 space-y-1 sm:space-y-2 text-left">
+          <div className="flex flex-wrap items-center justify-start gap-2">
             {(subcategoryName || category) && (
-              <span className="text-[11px] font-bold text-black bg-gray-100 px-2.5 py-0.5 rounded uppercase">
+              <span className="text-[10px] sm:text-[11px] font-bold text-black bg-gray-100 px-2 py-0.5 rounded uppercase">
                 {subcategoryName || category || "Publication"}
               </span>
             )}
-            {/* <span className="text-[11px] font-semibold text-green-700 bg-green-50 px-2 py-0.5 rounded flex items-center gap-1">
-              <FiCheckCircle className="w-3 h-3" /> In Stock
-            </span> */}
           </div>
 
           <Link href={`/product-detail/${slug}`}>
-            <h3 className="font-bold text-base text-gray-900 hover:text-black transition-colors">
+            <h3 className="font-bold text-xs sm:text-base text-gray-900 hover:text-black transition-colors line-clamp-2 leading-tight">
               {formattedTitle}
             </h3>
           </Link>
@@ -150,10 +146,145 @@ const isWishlisted = wishlistSet.has(id);
               {desc?.replace(/<[^>]*>?/gm, '')}
             </p>
           )}
+
+          {/* Pricing & Actions for Mobile (<640px) */}
+          <div className="flex sm:hidden items-center justify-between pt-2 border-t border-gray-100 gap-2 mt-1">
+            <div className="flex gap-1.5 items-center flex-wrap">
+              {offPrice && (
+                <span className="text-xs font-bold">
+                  ₹{offPrice}
+                </span>
+              )}
+              {price && price != 0 && price != offPrice && (
+                <span className={`${offPrice ? "text-red-500 line-through text-[10px] font-bold" : "text-xs font-bold mr-1"}`}>
+                  ₹{price}
+                </span>
+              )}
+            </div>
+
+            <div className="flex items-center gap-1.5">
+              {/* Add to Cart Button */}
+              <button
+                onClick={() => handleAddToCart(id, 1)}
+                disabled={isLoading}
+                className={`relative w-8 h-8 border border-gray-200 text-gray-700 bg-gray-100/80 hover:bg-black hover:text-white hover:border-black rounded-full transition-all duration-200 hover:scale-105 active:scale-95 shadow-sm flex items-center justify-center overflow-hidden ${
+                  isAddedToCart ? "bg-green-600 border-green-600 text-white hover:bg-green-700 hover:border-green-700 shadow-md" : ""
+                }`}
+                style={{
+                  transform: `scale(${cartButtonScale})`,
+                }}
+                aria-label="Add to cart"
+                title="Add to cart"
+              >
+                <div className="relative w-4 h-4 flex items-center justify-center">
+                  {isLoading ? (
+                    <svg
+                      className="animate-spin h-4 w-4"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      />
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      />
+                    </svg>
+                  ) : (
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth={1.8}
+                      stroke="currentColor"
+                      className={`w-4 h-4 transition-all duration-300 ${
+                        isAddedToCart ? "scale-110 text-white" : ""
+                      } ${cartBounce ? "animate-bounce" : ""}`}
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"
+                      />
+                    </svg>
+                  )}
+                </div>
+              </button>
+
+              {/* Quick View Button */}
+              <button
+                onClick={handleOpen}
+                className="w-8 h-8 border border-gray-200 text-gray-700 bg-gray-100/80 hover:bg-black hover:text-white hover:border-black rounded-full transition-all duration-200 hover:scale-105 active:scale-95 shadow-sm flex items-center justify-center"
+                aria-label="Quick view product"
+                title="Quick view"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.8}
+                  stroke="currentColor"
+                  className="w-4 h-4"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"
+                  />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
+                  />
+                </svg>
+              </button>
+
+              {/* Wishlist Toggle Heart Button */}
+              <button
+                onClick={handleWishlistClick}
+                className="w-8 h-8 border border-gray-200 text-gray-500 bg-gray-100/80 hover:bg-red-50 hover:text-red-500 hover:border-red-200 rounded-full transition-all duration-200 hover:scale-105 active:scale-95 shadow-sm flex items-center justify-center"
+                title="Toggle Wishlist"
+              >
+                {isWishlisted ? (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    className="w-4 h-4 text-red-500 transition-transform scale-110 drop-shadow-sm"
+                  >
+                    <path d="M11.645 20.91l-.007-.003-.022-.012a15.247 15.247 0 01-.383-.218 25.18 25.18 0 01-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0112 5.052 5.5 5.5 0 0116.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 01-4.244 3.17 15.247 15.247 0 01-.383.219l-.022.012-.007.004-.003.001a.752.752 0 01-.704 0l-.003-.001z" />
+                  </svg>
+                ) : (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.8}
+                    stroke="currentColor"
+                    className="w-4 h-4 text-gray-600 hover:text-red-500 transition-colors"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"
+                    />
+                  </svg>
+                )}
+              </button>
+            </div>
+          </div>
         </div>
 
-        {/* Pricing & Action Buttons */}
-        <div className="w-full sm:w-auto flex sm:flex-col items-center justify-between sm:justify-center border-t sm:border-t-0 sm:border-l border-gray-100 pt-4 sm:pt-0 sm:pl-6 gap-4">
+        {/* Pricing & Action Buttons for Desktop (>=640px) */}
+        <div className="hidden sm:flex sm:w-auto sm:flex-col items-center justify-center border-l border-gray-100 sm:pl-6 gap-4">
           <div className="flex gap-2 justify-between items-center">
             {offPrice && (
               <span className="text-sm font-bold">

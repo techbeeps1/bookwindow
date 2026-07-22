@@ -214,7 +214,7 @@ export default function ProductDialog({ open, handleOpen, slug }: any) {
               
                   <button
                     onClick={() => router.push(`/product-detail/${slug}`)}
-                    className="bg-transparent border hover:bg-black hover:text-white duration-300 border-black flex gap-2 items-center text-black px-6 py-2 rounded-full focus:outline-none"
+                    className="bg-transparent justify-center border hover:bg-black hover:text-white duration-300 border-black flex gap-2 items-center text-black px-6 py-2 rounded-full focus:outline-none"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
