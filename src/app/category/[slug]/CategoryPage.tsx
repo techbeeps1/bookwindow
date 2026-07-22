@@ -1,18 +1,15 @@
 "use client";
-
 import BookCard from "@/components/book-card";
 import { useEffect, useState, useMemo } from "react";
-import { use } from "react";
+
 
 import config from "../../config";
 import CategoryPublicationSidebar from "@/components/category-publication-sidebar";
 import { FiSearch, FiFilter, FiGrid, FiList } from "react-icons/fi";
-import { useViewCategoryQuery } from "@/lib/api/categoryApi";
 
 export default function CategoryPage({ categoryData }: { categoryData: any }) {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 12;
-
 
   const [selectedCategoryIds, setSelectedCategoryIds] = useState<number[]>([]);
   const [selectedPublicationIds, setSelectedPublicationIds] = useState<number[]>([]);
@@ -124,7 +121,7 @@ const publicationData = useMemo(
           products={products}
           publications={publicationData}
           category_id={childCategory[0]?.parent_id}
-          isFetched={true}
+          isFetched={false}
         
         />
 
@@ -199,17 +196,7 @@ const publicationData = useMemo(
             </div>
           </div>
 
-          {true  ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {[1, 2, 3, 4].map((_i) => (
-                <div key={_i} className="animate-pulse bg-white p-4 rounded-2xl border border-gray-200">
-                  <div className="w-full h-48 bg-gray-200 rounded-xl mb-4" />
-                  <div className="h-4 bg-gray-200 rounded w-3/4 mb-2" />
-                  <div className="h-3 bg-gray-200 rounded w-1/2" />
-                </div>
-              ))}
-            </div>
-          ) : displayedProducts?.length === 0 ? (
+          { displayedProducts?.length === 0 ? (
             <div className="bg-white rounded-2xl border border-gray-200 p-12 text-center text-xl font-bold text-gray-600">
              <div className="text-4xl mb-4">
               Products not found
