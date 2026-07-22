@@ -42,8 +42,8 @@ export default function SignIn() {
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
-    const email = formData.get("email");
-    const password = formData.get("password")?.toString() || "";
+    const email = formData.get("login_email");
+    const password = formData.get("login_password")?.toString() || "";
     if (!email) {
       toast.error("Email is required.");
       return;
@@ -166,9 +166,9 @@ export default function SignIn() {
     const formData = new FormData(event.currentTarget);
     const first_name = formData.get("first_name")?.toString().trim() || "";
     const last_name = formData.get("last_name")?.toString().trim() || "";
-    const email = formData.get("email")?.toString().trim() || "";
+    const email = formData.get("register_email")?.toString().trim() || "";
     const phone = formData.get("phone")?.toString().trim() || "";
-    const password = formData.get("password")?.toString() || "";
+    const password = formData.get("register_password")?.toString() || "";
 
     if (first_name.length > 255) {
       
@@ -333,7 +333,7 @@ export default function SignIn() {
                   </div>
                   <input
                     type="email"
-                    name="email"
+                    name="login_email"
                     required
                     placeholder="name@mail.com"
                     autoComplete="username"
@@ -365,11 +365,11 @@ export default function SignIn() {
                   </div>
                   <input
                     type="password"
-                    name="password"
+                    name="login_password"
                     required
                     placeholder="********"
                     autoComplete="current-password"
-                    inputMode="text"
+                    
                     className="w-full pl-11 pr-4 py-3 text-sm text-black bg-[#f4f4f4] hover:bg-neutral-100/50 focus:bg-white border border-neutral-200/80 rounded-xl outline-none focus:border-black focus:ring-2 focus:ring-black/5 transition-all duration-200"
                   />
                 </div>
@@ -464,10 +464,10 @@ export default function SignIn() {
                   </div>
                   <input
                     type="email"
-                    name="email"
+                    name="register_email"
                     required
                     placeholder="name@mail.com"
-                     autoComplete="off"
+                    autoComplete="email"
                     inputMode="email"
                     className="w-full pl-11 pr-4 py-3 text-sm text-black bg-[#f4f4f4] hover:bg-neutral-100/50 focus:bg-white border border-neutral-200/80 rounded-xl outline-none focus:border-black focus:ring-2 focus:ring-black/5 transition-all duration-200"
                   />
@@ -507,7 +507,7 @@ export default function SignIn() {
                   </div>
                   <input
                     type="password"
-                    name="password"
+                    name="register_password"
                     required
                     placeholder="********"
                     autoComplete="new-password"

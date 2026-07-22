@@ -195,7 +195,7 @@ export default function Checkout({
         zip_code: source.zip_code || "",
         state: source.state || "",
         city: source.city || "",
-        country: source.country ?? "India",
+        country:  "India",
       };
     });
   }, [shippingData]);
@@ -228,7 +228,7 @@ export default function Checkout({
       email: email || formValues?.email || "",
       password: password || "",
       is_guest: !password,
-      country: formValues?.country || "India",
+      country:  "India",
     };
 
     onNext(data);
@@ -610,14 +610,15 @@ export default function Checkout({
                       <path strokeLinecap="round" strokeLinejoin="round" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 002 2h2a2.5 2.5 0 002.5-2.5V9a2 2 0 00-2-2h-1.03a3.374 3.374 0 00-3-3V3.545M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                   </div>
-                  <select
-                    className="w-full pl-11 pr-4 py-3 text-sm text-black bg-[#f4f4f4] hover:bg-neutral-100/50 focus:bg-white border border-neutral-200/80 rounded-xl outline-none focus:border-black focus:ring-2 focus:ring-black/5 transition-all duration-200 cursor-pointer"
-                    name="country"
-                    value={formValues.country}
-                    onChange={handleInputChange}
+                  <div
+                 className="w-full pl-11 pr-4 py-3 text-sm text-black bg-[#f4f4f4] hover:bg-neutral-100/50 focus:bg-white border border-neutral-200/80 rounded-xl outline-none focus:border-black focus:ring-2 focus:ring-black/5 transition-all duration-200 cursor-not-allowed"
+                 
                   >
-                    <option defaultValue="India">India</option>
-                  </select>
+                    {formValues?.country|| "India"}
+                    </div>
+                  
+                   
+                  
                   
                 </div>
               </div>
