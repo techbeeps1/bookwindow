@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useMemo } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { motion, AnimatePresence } from "framer-motion";
+
 import { 
   FiHeart, 
   FiTrash2, 
@@ -14,171 +14,60 @@ import {
   FiFilter, 
   FiArrowRight, 
   FiCheckCircle, 
-  FiStar, 
-  FiTag, 
+
   FiRefreshCw, 
   FiChevronRight,
   FiShoppingBag,
-  FiShare2,
-  FiCheck
+
 } from "react-icons/fi";
 import { useAddToCartMutation } from "@/lib/api/cartApi";
-import { useViewProductsQuery } from "@/lib/api/productsApi";
+
 import { useSession } from "@/hooks/useSession";
 import { useCart } from "@/hooks/useCart";
-import { useAppDispatch } from "@/hooks/useStore";
+import { useAppDispatch, useAppSelector } from "@/hooks/useStore";
 import { openCartDrawer } from "@/lib/slices/uiSlice";
 import { ImageBook } from "@/components/ImageBook";
 import ProductDialog from "@/components/product-detail-popup";
 import config from "@/app/config";
-
-// Fallback demo items if localStorage wishlist is empty initially
-const DEMO_WISHLIST_ITEMS = [
-  {
-    id: "demo-1",
-    title: "CS Executive Secretarial Audit & Compliance Management",
-    author: "CS Anoop Jain",
-    category: "Company Secretary",
-    price: 850,
-    offPrice: 680,
-    discount: "20% OFF",
-    rating: 4.9,
-    reviewsCount: 142,
-    inStock: true,
-    img: "https://admin.bookwindow.in/storage/app/public/publication/01KXNC99363D5BDCKMHXBR5J6Q.webp",
-    slug: "cs-executive-secretarial-audit",
-    description: "Comprehensive guide for CS Executive students covering Secretarial Audit, Due Diligence and Compliance Management according to ICSI latest syllabus."
-  },
-  {
-    id: "demo-2",
-    title: "RAS Pre & Mains General Knowledge Handbook 2026",
-    author: "Samyak Institute",
-    category: "RPSC Exams",
-    price: 650,
-    offPrice: 499,
-    discount: "23% OFF",
-    rating: 4.8,
-    reviewsCount: 98,
-    inStock: true,
-    img: "https://admin.bookwindow.in/storage/app/public/publication/01KXNC99363D5BDCKMHXBR5J6Q.webp",
-    slug: "ras-pre-mains-gk-handbook",
-    description: "Exhaustive Rajasthan GK & Current Affairs reference book prepared by Samyak RAS experts for all competitive exams."
-  },
-  {
-    id: "demo-3",
-    title: "CA Intermediate Income Tax Laws & Practice Edition",
-    author: "Aadhya Prakashan",
-    category: "CA Professional",
-    price: 990,
-    offPrice: 790,
-    discount: "20% OFF",
-    rating: 4.7,
-    reviewsCount: 65,
-    inStock: true,
-    img: "https://admin.bookwindow.in/storage/app/public/publication/01KXNC99363D5BDCKMHXBR5J6Q.webp",
-    slug: "ca-inter-income-tax-laws",
-    description: "Latest updated Income Tax Laws & Indirect Tax Compiler with solved papers and numerical practice sets for CA Inter."
-  },
-  {
-    id: "demo-4",
-    title: "Complete Company Law & Secretarial Practice Guide",
-    author: "Dr. V.K. Singhania",
-    category: "Law & Corporate",
-    price: 1200,
-    offPrice: 899,
-    discount: "25% OFF",
-    rating: 4.9,
-    reviewsCount: 210,
-    inStock: false,
-    img: "https://admin.bookwindow.in/storage/app/public/publication/01KXNC99363D5BDCKMHXBR5J6Q.webp",
-    slug: "company-law-secretarial-practice",
-    description: "Authoritative handbook on Indian Companies Act 2013 with case laws, tribunal judgments, and practical circulars."
-  }
-];
+import { useViewWishlistQuery,useRemoveWishlistMutation } from "@/lib/api/wishlistApi";
+import toast from "react-hot-toast";
 
 export default function WishlistPage() {
   const sessionId = useSession();
   const dispatch = useAppDispatch();
   const { refetch } = useCart();
   const [addToCart] = useAddToCartMutation();
-  const { data: apiProductsData, isLoading: isProductsLoading } = useViewProductsQuery();
 
-  const [wishlistItems, setWishlistItems] = useState<any[]>([]);
-  const [isInitialized, setIsInitialized] = useState(false);
+  const { data: wishlistData, isLoading: isWishlistLoading , isSuccess, refetch: refetchWishlist } = useViewWishlistQuery();
+
+
+
   const [searchQuery, setSearchQuery] = useState("");
+  const [clearAllpopupOpen, setClearAllPopupOpen] = useState(false);
   const [sortBy, setSortBy] = useState<string>("default");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [loadingItemId, setLoadingItemId] = useState<string | null>(null);
   const [movingAllToCart, setMovingAllToCart] = useState(false);
   const [quickViewSlug, setQuickViewSlug] = useState<string | null>(null);
-  const [toast, setToast] = useState<{ message: string; type: "success" | "info" } | null>(null);
-
-  // Auto hide toast after 3 seconds
-  useEffect(() => {
-    if (toast) {
-      const timer = setTimeout(() => setToast(null), 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [toast]);
-
-  // Load wishlist from localStorage or API
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      try {
-        const storedWishlist = localStorage.getItem("wishlist");
-        const parsed = storedWishlist ? JSON.parse(storedWishlist) : null;
-
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          // Check if parsed contains strings (IDs) or objects
-          if (typeof parsed[0] === "string" || typeof parsed[0] === "number") {
-            // It's a list of IDs. Try to match with API products or build from DEMO
-            if (apiProductsData?.data && Array.isArray(apiProductsData.data)) {
-              const matched = apiProductsData.data.filter((prod: any) => 
-                parsed.includes(prod.id) || parsed.includes(String(prod.id))
-              );
-              setWishlistItems(matched.length > 0 ? matched : DEMO_WISHLIST_ITEMS);
-            } else {
-              setWishlistItems(DEMO_WISHLIST_ITEMS);
-            }
-          } else {
-            // It's an array of product objects
-            setWishlistItems(parsed);
-          }
-        } else {
-          // LocalStorage is empty: load DEMO items so user sees a rich interactive wishlist!
-          setWishlistItems(DEMO_WISHLIST_ITEMS);
-        }
-      } catch (err) {
-        console.error("Error loading wishlist:", err);
-        setWishlistItems(DEMO_WISHLIST_ITEMS);
-      } finally {
-        setIsInitialized(true);
-      }
-    }
-  }, [apiProductsData]);
-
-  // Update localStorage whenever wishlist items change
-  const saveWishlist = (items: any[]) => {
-    setWishlistItems(items);
-    if (typeof window !== "undefined") {
-      const itemIds = items.map((item) => item.id);
-      localStorage.setItem("wishlist", JSON.stringify(itemIds));
-    }
-  };
+ const [removeWishlist] = useRemoveWishlistMutation();
+  const {  isAuthenticated ,loading } = useAppSelector((state) => state.auth);
 
   // Remove single item from wishlist
-  const handleRemoveItem = (id: string | number) => {
-    const updated = wishlistItems.filter((item) => item.id !== id);
-    saveWishlist(updated);
-    setToast({ message: "Item removed from your wishlist", type: "info" });
+  async function handleRemoveItem(id: string | number) {
+    await removeWishlist(id).unwrap();
+    await refetchWishlist();
+    toast.success("Item removed from your wishlist");
   };
 
   // Clear entire wishlist
   const handleClearAll = () => {
-    if (window.confirm("Are you sure you want to clear your entire wishlist?")) {
-      saveWishlist([]);
-      setToast({ message: "Wishlist cleared", type: "info" });
-    }
+      wishlistData?.data?.forEach(async (item: any) => {
+        await removeWishlist(item.id).unwrap();
+      });
+      refetchWishlist();
+      setClearAllPopupOpen(false);
+      toast.success("Wishlist cleared");
+    
   };
 
   // Add individual item to Cart
@@ -193,12 +82,12 @@ export default function WishlistPage() {
 
       await refetch();
       dispatch(openCartDrawer());
-      setToast({ message: `"${product.title?.substring(0, 30)}..." added to cart!`, type: "success" });
+      toast.success(`"${product.name?.substring(0, 30)}..." added to cart!`);
     } catch (error) {
       console.error("Failed to add to cart:", error);
       // Even if API fails in demo mode, trigger open cart drawer for responsive feel
       dispatch(openCartDrawer());
-      setToast({ message: "Added item to cart", type: "success" });
+      toast.success("Added item to cart");
     } finally {
       setLoadingItemId(null);
     }
@@ -206,9 +95,9 @@ export default function WishlistPage() {
 
   // Move all in-stock items to cart
   const handleMoveAllToCart = async () => {
-    const inStockItems = wishlistItems.filter(item => item.inStock !== false);
+    const inStockItems = wishlistData?.data?.filter((item: any) => item.inStock !== false) || [];
     if (inStockItems.length === 0) {
-      setToast({ message: "No in-stock items to move!", type: "info" });
+      toast.success("No in-stock items to move!");
       return;
     }
 
@@ -223,7 +112,7 @@ export default function WishlistPage() {
       }
       await refetch();
       dispatch(openCartDrawer());
-      setToast({ message: `Moved ${inStockItems.length} items to your shopping cart!`, type: "success" });
+    
     } catch (err) {
       console.error(err);
     } finally {
@@ -233,96 +122,74 @@ export default function WishlistPage() {
 
   // Filter and sort items
   const filteredAndSortedItems = useMemo(() => {
-    let result = [...wishlistItems];
+    let result = wishlistData?.data || [];
 
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
       result = result.filter(
-        (item) =>
-          item.title?.toLowerCase().includes(q) ||
-          item.author?.toLowerCase().includes(q) ||
-          item.category?.toLowerCase().includes(q)
+        (item:any) =>
+          item.name?.toLowerCase().includes(q) ||
+          item.production?.toLowerCase().includes(q) ||
+          item.categories?.toLowerCase().includes(q)
       );
     }
 
     switch (sortBy) {
       case "price-low":
-        result.sort((a, b) => Number(a.offPrice || a.price) - Number(b.offPrice || b.price));
+        result.sort((a:any, b:any) => Number(a.offPrice || a.price) - Number(b.offPrice || b.price));
         break;
       case "price-high":
-        result.sort((a, b) => Number(b.offPrice || b.price) - Number(a.offPrice || a.price));
+        result.sort((a:any, b:any) => Number(b.offPrice || b.price) - Number(a.offPrice || a.price));
         break;
       case "discount":
-        result.sort((a, b) => {
+        result.sort((a:any, b:any) => {
           const discA = Number(a.price || 0) - Number(a.offPrice || a.price || 0);
           const discB = Number(b.price || 0) - Number(b.offPrice || b.price || 0);
           return discB - discA;
         });
         break;
       case "name":
-        result.sort((a, b) => (a.title || "").localeCompare(b.title || ""));
+        result.sort((a:any, b:any) => (a.name || "").localeCompare(b.name || ""));
         break;
       default:
         break;
     }
 
     return result;
-  }, [wishlistItems, searchQuery, sortBy]);
-
-  // Wishlist Financial Summary Stats
-  const wishlistStats = useMemo(() => {
-    let totalValue = 0;
-    let totalMRP = 0;
-    let inStockCount = 0;
-
-    wishlistItems.forEach((item) => {
-      const price = Number(item.offPrice || item.price || 0);
-      const mrp = Number(item.price || item.offPrice || 0);
-      totalValue += price;
-      totalMRP += Math.max(price, mrp);
-      if (item.inStock !== false) inStockCount++;
-    });
-
-    const totalSavings = totalMRP - totalValue;
-
-    return {
-      totalValue,
-      totalMRP,
-      totalSavings,
-      inStockCount,
-      totalCount: wishlistItems.length,
-    };
-  }, [wishlistItems]);
+  }, [isSuccess, searchQuery, sortBy,wishlistData]);
 
   const getImageSrc = (item: any) => {
-    if (item.img) return item.img;
-    if (item.book_image) {
-      return item.book_image.startsWith("http")
-        ? item.book_image
-        : `${config.apiUrl}storage/${item.book_image}`;
-    }
-    return "https://admin.bookwindow.in/storage/app/public/publication/01KXNC99363D5BDCKMHXBR5J6Q.webp";
+    if (item.image){
+      return config.apiUrl +"storage/app/public/"+ item.image;
+    }else{
+ return config.apiUrl+"storage/app/public/01KXJ7GG8CMSJSZRAVV4KFRF28.png";
+    } 
+
   };
 
+   if (!isAuthenticated && !loading) {
+    return (
+   <div className="min-h-[calc(100vh-140px)] bg-gray-50 flex items-center justify-center p-4 ">
+  <div className="max-w-md w-full bg-white rounded-2xl shadow-lg p-8 text-center">
+    <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+      <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+      </svg>
+    </div>
+    <h2 className="text-2xl font-semibold text-gray-900 mb-2">Sign in required</h2>
+    <p className="text-gray-500 mb-6">Please sign in to access your wishlist</p>
+    <Link 
+      href="/sign-in" 
+      className="inline-block w-full bg-black text-white font-medium px-6 py-3 rounded-lg hover:bg-gray-800 transition-colors"
+    >
+      Sign In
+    </Link>
+  </div>
+</div>
+    );
+ }
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 via-white to-gray-50 text-gray-800 pb-16">
-      {/* Toast Notification Banner */}
-      <AnimatePresence>
-        {toast && (
-          <motion.div
-            initial={{ opacity: 0, y: 50, scale: 0.9 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 20, scale: 0.9 }}
-            className="fixed bottom-6 right-6 z-50 flex items-center gap-3 bg-gray-900 text-white px-5 py-3.5 rounded-xl shadow-2xl border border-gray-800"
-          >
-            <div className="p-1.5 bg-white/20 text-white rounded-lg">
-              <FiCheck className="w-5 h-5 text-white" />
-            </div>
-            <span className="text-sm font-medium">{toast.message}</span>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
       {/* Main Container */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
         
@@ -340,8 +207,8 @@ export default function WishlistPage() {
           My Wishlist
         </h1> 
 
-        {/* Content Section */}
-        {wishlistItems.length > 0 ? (
+
+        {(isSuccess && wishlistData?.data?.length > 0 ) ? (
           <div>
             {/* Filter & Action Toolbar */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-6 flex flex-col md:flex-row items-center justify-between gap-4">
@@ -428,7 +295,7 @@ export default function WishlistPage() {
                   </button>
 
                   <button
-                    onClick={handleClearAll}
+                    onClick={() => setClearAllPopupOpen(true)}
                     className="p-2 text-gray-400 hover:text-black hover:bg-gray-100 rounded-lg transition-colors"
                     title="Clear Wishlist"
                   >
@@ -456,10 +323,9 @@ export default function WishlistPage() {
             {/* GRID VIEW */}
             {viewMode === "grid" ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {filteredAndSortedItems.map((item) => {
-                  const price = item.price;
-                  const offPrice = item.offPrice;
-
+                {filteredAndSortedItems.map((item: any) => {
+                 const price = item.mrp;
+                  const offPrice =  item.price;
                   return (
                     <div
                       key={item.id}
@@ -492,7 +358,7 @@ export default function WishlistPage() {
                         <div className="relative pt-4 px-4 bg-gray-50/60 group-hover:bg-gray-50 transition-colors">
                           <Link href={`/product-detail/${item.slug || item.id}`}>
                             <div className="w-full flex justify-center transform group-hover:scale-[1.03] transition-transform duration-300">
-                              <ImageBook src={getImageSrc(item)} alt={item.title || "Book"} size="30px" />
+                              <ImageBook src={getImageSrc(item)} alt={item.name || "Book"} size="30px" />
                             </div>
                           </Link>
                         </div>
@@ -503,7 +369,7 @@ export default function WishlistPage() {
                             {/* Title */}
                             <Link href={`/product-detail/${item.slug || item.id}`}>
                               <h3 className="font-bold text-gray-900 text-sm line-clamp-2 hover:text-black transition-colors mb-3">
-                                {item.title?.replace(/#COMMA#/g, ",")}
+                                {item.name?.replace(/#COMMA#/g, ",")}
                               </h3>
                             </Link>
                           </div>
@@ -608,9 +474,9 @@ export default function WishlistPage() {
             ) : (
               /* LIST VIEW */
               <div className="space-y-4">
-                {filteredAndSortedItems.map((item) => {
-                  const price = item.price;
-                  const offPrice = item.offPrice;
+                {filteredAndSortedItems.map((item: any) => {
+                  const price = item.mrp;
+                  const offPrice =  item.price;
 
                   return (
                     <div
@@ -620,7 +486,7 @@ export default function WishlistPage() {
                         {/* Book Image */}
                         <div className="w-28 sm:w-36 flex-shrink-0 bg-gray-50 rounded-xl ">
                           <Link href={`/product-detail/${item.slug || item.id}`}>
-                            <ImageBook src={getImageSrc(item)} alt={item.title || "Book"} size={viewMode === "list" ? "16px" : "30px"} />
+                            <ImageBook src={getImageSrc(item)} alt={item.name || "Book"} size={viewMode === "list" ? "16px" : "30px"} />
                           </Link>
                         </div>
 
@@ -628,9 +494,9 @@ export default function WishlistPage() {
                         <div className="flex-1 space-y-2 text-center sm:text-left">
                           <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
                             <span className="text-[11px] font-bold text-black bg-gray-100 px-2.5 py-0.5 rounded uppercase">
-                              {item.category || "Publication"}
+                              {item.categories || ""}
                             </span>
-                            {item.inStock !== false ? (
+                            {/* {item.quantity > 0 ? (
                               <span className="text-[11px] font-semibold text-green-700 bg-green-50 px-2 py-0.5 rounded flex items-center gap-1">
                                 <FiCheckCircle className="w-3 h-3" /> In Stock
                               </span>
@@ -638,18 +504,20 @@ export default function WishlistPage() {
                               <span className="text-[11px] font-semibold text-gray-500 bg-gray-100 px-2 py-0.5 rounded">
                                 Out of Stock
                               </span>
-                            )}
+                            )} */}
                           </div>
 
                           <Link href={`/product-detail/${item.slug || item.id}`}>
                             <h3 className="font-bold text-base text-gray-900 hover:text-black transition-colors">
-                              {item.title?.replace(/#COMMA#/g, ",")}
+                              {item.name?.replace(/#COMMA#/g, ",")}
                             </h3>
                           </Link>
 
-                          <p className="text-xs text-gray-500">
-                            By <span className="font-semibold text-gray-700">{item.author || "Bookwindow Publisher"}</span>
-                          </p>
+                          {item.production && (
+                            <p className="text-xs text-gray-500">
+                              By <span className="font-semibold text-gray-700">{item.production || ""}</span>
+                            </p>
+                          )}
                         </div>
 
                         {/* Pricing & Actions matching BookCard */}
@@ -759,7 +627,7 @@ export default function WishlistPage() {
               </div>
             )}
           </div>
-        ) : (
+        ) : (isSuccess && wishlistData?.data?.length == 0 ) ? (
           /* EMPTY WISHLIST STATE */
           <div className="bg-white rounded-3xl border border-gray-200/80 p-8 sm:p-16 text-center my-8 shadow-sm">
             <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center text-black shadow-inner">
@@ -782,7 +650,25 @@ export default function WishlistPage() {
               <FiArrowRight className="w-4 h-4" />
             </Link>
           </div>
-        )}
+        ):(<div className="bg-white rounded-3xl  p-8 sm:p-16 text-center my-8">
+           
+           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <div
+                key={i}
+                className="bg-white rounded-2xl border border-gray-300 p-4 space-y-4 animate-pulse shadow-xs"
+              >
+                <div className="h-40 bg-gray-300 rounded-xl" />
+                <div className="h-5 bg-gray-300 rounded w-3/4" />
+                <div className="space-y-2">
+                  <div className="h-3 bg-gray-300 rounded w-full" />
+                  <div className="h-3 bg-gray-300 rounded w-5/6" />
+                </div>
+                <div className="h-9 bg-gray-300 rounded-xl w-full" />
+              </div>
+            ))}
+          </div>
+          </div>)}
 
         {/* Quick View Product Dialog */}
         {quickViewSlug && (
@@ -792,6 +678,19 @@ export default function WishlistPage() {
             slug={quickViewSlug}
           />
         )}
+
+        {/* confirm popup */}
+        {clearAllpopupOpen && <div id="confirm-popup" className="fixed inset-0 z-50 items-center justify-center bg-black/50 left-0 top-0 flex overflow-y-auto overflow-x-hidden outline-none focus:outline-none transition-all duration-300 ">
+          <div className="bg-white rounded-lg p-6 w-90 text-center ">
+            <h2 className="text-lg font-semibold mb-4">Confirm Action</h2>
+            <p className="mb-6">Are you sure you want to clear your entire wishlist?</p>
+            <div className="flex justify-center gap-4 ">
+              <button onClick={handleClearAll} className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition ">Yes</button>
+              <button onClick={() => setClearAllPopupOpen(false)} className="bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400 transition ">No</button>
+            </div>
+          </div>
+        </div> 
+}
 
       </div>
     </div>

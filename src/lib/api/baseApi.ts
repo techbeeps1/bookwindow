@@ -1,24 +1,48 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import type { RootState } from "../store";
+import type { BaseQueryFn, FetchArgs, FetchBaseQueryError } from "@reduxjs/toolkit/query";
 
-const API_URL = "https://admin.bookwindow.in/api";
+const adminBaseQuery = fetchBaseQuery({
+  baseUrl: "/api", // Current domain
+  prepareHeaders: (headers) => {
+    headers.set("Accept", "application/json");
+    headers.set("Content-Type", "application/json");
+    return headers;
+  },
+});
+
+const websiteBaseQuery = fetchBaseQuery({
+  baseUrl: "https://admin.bookwindow.in/api",
+
+  prepareHeaders: (headers) => {
+    headers.set("Accept", "application/json");
+    headers.set("Content-Type", "application/json");
+    return headers;
+  },
+});
+
+type CustomFetchArgs = FetchArgs & {
+  admin?: boolean;
+};
+
+const dynamicBaseQuery: BaseQueryFn<
+  string | CustomFetchArgs,
+  unknown,
+  FetchBaseQueryError
+> = async (args, api, extraOptions) => {
+  const isAdmin =
+    typeof args !== "string" && args.admin === true;
+
+  if (isAdmin) {
+    const { admin, ...rest } = args;
+    return adminBaseQuery(rest, api, extraOptions);
+  }
+
+  return websiteBaseQuery(args, api, extraOptions);
+};
 
 export const baseApi = createApi({
   reducerPath: "api",
-  
-
-  baseQuery: fetchBaseQuery({
-    baseUrl: API_URL,
-
-    prepareHeaders: (headers) => {
-
-      headers.set("Accept", "application/json");
-      headers.set("Content-Type", "application/json");
- 
-
-      return headers;
-    },
-  }),
+  baseQuery: dynamicBaseQuery,
 
   tagTypes: [
     "Auth",
@@ -29,9 +53,9 @@ export const baseApi = createApi({
     "Order",
     "Wishlist",
     "Settings",
-    'Menu',
+    "Menu",
     "products",
-    "Publication"
+    "Publication",
   ],
 
   endpoints: () => ({}),

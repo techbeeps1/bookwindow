@@ -5,9 +5,12 @@ import { useDispatch } from "react-redux";
 import { setSessionId } from "@/lib/slices/authSlice";
 
 import { login, logout } from "@/lib/slices/authSlice";
+import { useViewWishlistIdQuery } from "@/lib/api/wishlistApi";
 
 export default function AppInitializer() {
   const dispatch = useDispatch();
+
+   const { data  } = useViewWishlistIdQuery()
 
   
   useEffect(() => {

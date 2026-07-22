@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useAppDispatch } from "@/hooks/useStore";
 import ProductDialog from "./product-detail-popup";
@@ -12,6 +12,8 @@ import { useCart } from "@/hooks/useCart";
 import { openCartDrawer } from "@/lib/slices/uiSlice";
 import { motion } from "framer-motion";
 import { FiCheckCircle } from "react-icons/fi";
+import { useAddToWishlistMutation, useViewWishlistIdQuery } from "@/lib/api/wishlistApi";
+import toast from "react-hot-toast";
 
 interface BookCardProps {
   img: string;
@@ -47,38 +49,27 @@ export function BookCard({
   const sessionId = useSession();
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(!open);
-  const router = useRouter();
-  const [isWishlisted, setIsWishlisted] = useState(false);
-  
+
   // Add to cart animation states
   const [isAddedToCart, setIsAddedToCart] = useState(false);
   const [cartButtonScale, setCartButtonScale] = useState(1);
   const [cartBounce, setCartBounce] = useState(false);
+const [addToWishlist,{isLoading:addWishlistLoading}] = useAddToWishlistMutation();
+ const { data:wishlistIds , refetch:refetchWishlist } = useViewWishlistIdQuery()
 
-  useEffect(() => {
 
-    if (typeof window !== "undefined" && id) {
-      const storedWishlist = localStorage.getItem("wishlist");
-      const wishlist = storedWishlist ? JSON.parse(storedWishlist) : [];
-      setIsWishlisted(wishlist.includes(id));
-    }
-  }, [id]);
+ const wishlistSet = useMemo(
+  () => new Set(wishlistIds?.data ?? []),
+  [wishlistIds]
+);
 
-  const handleWishlistClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (typeof window !== "undefined") {
-      const storedWishlist = localStorage.getItem("wishlist");
-      let wishlist = storedWishlist ? JSON.parse(storedWishlist) : [];
-      if (wishlist.includes(id)) {
-        wishlist = wishlist.filter((itemId: string) => itemId !== id);
-        setIsWishlisted(false);
-      } else {
-        wishlist.push(id);
-        setIsWishlisted(true);
-      }
-      localStorage.setItem("wishlist", JSON.stringify(wishlist));
-    }
+const isWishlisted = wishlistSet.has(id);
+
+ async function handleWishlistClick()  {
+    await addToWishlist(id)
+   await refetchWishlist()
+    toast.success("Product added to wishlist")
+
   };
 
   const [addToCart, { isLoading }] = useAddToCartMutation();
@@ -143,9 +134,9 @@ export function BookCard({
                 {subcategoryName || category || "Publication"}
               </span>
             )}
-            <span className="text-[11px] font-semibold text-green-700 bg-green-50 px-2 py-0.5 rounded flex items-center gap-1">
+            {/* <span className="text-[11px] font-semibold text-green-700 bg-green-50 px-2 py-0.5 rounded flex items-center gap-1">
               <FiCheckCircle className="w-3 h-3" /> In Stock
-            </span>
+            </span> */}
           </div>
 
           <Link href={`/product-detail/${slug}`}>
