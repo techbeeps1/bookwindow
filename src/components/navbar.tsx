@@ -439,7 +439,7 @@ const dispatch = useAppDispatch();
                   );
                 })}
               </div>
-            </div>
+            </div>          
           </div>
         </div>
 
@@ -569,6 +569,9 @@ const dispatch = useAppDispatch();
         </div>
       </div>
     </nav>
+    <div className="lg:block hidden p-4 bg-black border-t border-white/20 ">
+      <p className="text-white text-center">“ सर्वं सम्भाव्यते त्वयि। ”</p>
+    </div>
 
     {/* ================= MOBILE SEARCH PANEL ================= */}
     {searchTerm.trim() !== "" && (
