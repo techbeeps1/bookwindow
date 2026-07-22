@@ -1,7 +1,7 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { useSession } from "@/hooks/useSession";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { useAppDispatch } from "@/hooks/useStore";
 import OtherBookOffers from "@/components/other-book-offers";
 import { openCartDrawer } from "@/lib/slices/uiSlice";
@@ -15,6 +15,8 @@ import { useAddToCartMutation } from "@/lib/api/cartApi";
 import { ImageBook } from "@/components/ImageBook";
 
 import { FrequentlyBougth } from "@/components/FrequentlyBougth";
+import { useAddToWishlistMutation, useViewWishlistIdQuery } from "@/lib/api/wishlistApi";
+import toast from "react-hot-toast";
 
 const parseGallery = (gallery: any): string[] => {
   if (!gallery) return [];
@@ -70,9 +72,6 @@ export default function ProductDetail({
   const [mainImage, setMainImage] = useState("");
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-  const [isWishlisted, setIsWishlisted] = useState(false);
-  const [showWishlistModal, setShowWishlistModal] = useState(false);
-
   const [loading, setLoading] = useState(true);
 
   const [productData, setProductData] = useState([] as any);
@@ -93,8 +92,19 @@ export default function ProductDetail({
 
   const [addToCart, { isLoading }] = useAddToCartMutation();
   const [clicktype, setClicktype] = useState("");
-
+const [addToWishlist,{isLoading:addWishlistLoading}] = useAddToWishlistMutation();
   const { refetch } = useCart();
+
+   const { data:wishlistIds , refetch:refetchWishlist } = useViewWishlistIdQuery()
+  
+  
+  const wishlistSet = useMemo(
+   () => new Set(wishlistIds?.data ?? []),
+   [wishlistIds]
+ );
+ 
+ const isWishlisted = wishlistSet.has(productData.id);
+  
 
   const handlePrevImage = () => {
     if (allImages.length > 0) {
@@ -113,32 +123,11 @@ export default function ProductDetail({
     }
   };
 
-  useEffect(() => {
-    if (typeof window !== "undefined" && productData?.id) {
-      const storedWishlist = localStorage.getItem("wishlist");
-      const wishlist = storedWishlist ? JSON.parse(storedWishlist) : [];
-      setIsWishlisted(wishlist.includes(productData.id));
-    }
-  }, [productData]);
 
-  const handleWishlistClick = () => {
-    if (typeof window !== "undefined") {
-      const customer = localStorage.getItem("customer");
-      if (!customer) {
-        // setShowWishlistModal(true);
-        //  return;
-      }
-
-      const storedWishlist = localStorage.getItem("wishlist");
-      let wishlist = storedWishlist ? JSON.parse(storedWishlist) : [];
-      if (wishlist.includes(productData?.id)) {
-        wishlist = wishlist.filter((id: string) => id !== productData?.id);
-        setIsWishlisted(false);
-      } else {
-        wishlist.push(productData?.id);
-        setIsWishlisted(true);
-      }
-      localStorage.setItem("wishlist", JSON.stringify(wishlist));
+  async function handleWishlistClick()  {
+    if(productData?.id){
+   await addToWishlist(productData?.id)
+   toast.success("Product added to wishlist")
     }
   };
 
