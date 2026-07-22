@@ -1,6 +1,7 @@
 import Image from "next/image";
 import config from "../config";
 import { Metadata } from "next";
+import { truncateDescription } from "@/helper/helperfun";
 interface PageProps {
   params: Promise<{
     slug: string;
@@ -28,11 +29,24 @@ export async function generateMetadata({
 
   return {
     title: page.meta_title || page.title,
-    description: page.meta_description || page.short_description,
+    description: truncateDescription(page.meta_description) || truncateDescription(page.short_description),
+
+     keywords: page.meta_keywords
+        ?.split(",")
+        .map((item: string) => item.trim()),
+
+    alternates: {
+        canonical: "/"+slug,
+      },
+
+      robots: {
+        index: true,
+        follow: true,
+      },
 
     openGraph: {
       title: page.meta_title || page.title,
-      description: page.meta_description || page.short_description,
+      description: truncateDescription(page.meta_description) || truncateDescription(page.short_description),
       images: page.banner_images
         ? [
             `${config.apiUrl}storage/app/public/${page.banner_images}`,

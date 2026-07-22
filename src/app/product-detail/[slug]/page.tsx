@@ -1,6 +1,7 @@
 import { Metadata } from "next";
 import ProductDetail from "./ProductDetail";
 import config from "@/app/config";
+import { truncateDescription } from "@/helper/helperfun";
 
 type Props = {
   params: Promise<{
@@ -9,7 +10,12 @@ type Props = {
 };
 
 async function getProduct(slug: string) {
-  const res = await fetch(`${config.apiUrl}api/products/${slug}`);
+  const res = await fetch(`${config.apiUrl}api/products/${slug}`,
+ {   next: {
+  revalidate: 600
+}
+}
+);
 
   if (!res.ok) {
     throw new Error("Failed to fetch product");
@@ -27,17 +33,22 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
  
     return {
       title: product.meta_tag_title || product.name || "Bookwindow - Product",
-      description:
-        product.meta_tag_description ||
-        product.description ||
+      description: truncateDescription(product.meta_tag_description) ||
+        truncateDescription(product.description) ||
         "Bookwindow - product details page",
       keywords: product.meta_tag_keywords
         ?.split(",")
         .map((k: string) => k.trim()),
-
+alternates: {
+  canonical: `/product-detail/${slug}`,
+},
+    robots: {
+        index: true,
+        follow: true,
+      },
       openGraph: {
         title: product.meta_tag_title || product.name || "Bookwindow - Product" ,
-        description: product.meta_tag_description || product.description || "Bookwindow - product details page",
+        description: truncateDescription(product.meta_tag_description) || truncateDescription(product.description) || "Bookwindow - product details page",
         images: [`${config.apiUrl}storage/app/public/${product.image}`],
       },
     };

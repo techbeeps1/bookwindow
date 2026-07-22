@@ -30,7 +30,9 @@ const roboto = Roboto({
 export const metadata: Metadata = {
   title: "Bookwindow",
   description: "Bookwindow",
+  metadataBase: new URL("https://bookwindow.in"),
 };
+
 
 export default async function RootLayout({
   children,
