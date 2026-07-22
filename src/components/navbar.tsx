@@ -181,7 +181,7 @@ const dispatch = useAppDispatch();
                     placeholder="What are you looking for?"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full text-sm text-white bg-white/5 placeholder-white border border-white rounded-full py-2.5 pl-11 pr-12 transition-all duration-300 outline-none"
+                    className="w-full text-sm text-white bg-white/5 placeholder-white border-2 border-white/50  rounded-full py-2.5 pl-11 pr-12 transition-all duration-300 outline-none"
                   />
 
                   {/* Clear Search Button */}

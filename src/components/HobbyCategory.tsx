@@ -36,7 +36,7 @@ export function HobbyCategory({
         </div>      
 
       {/* Grid Layout (2 columns centered) */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 max-w-[700px] mx-auto">
         {data?.hobby_category.map((item:any, index:any) => (
           <motion.div
             key={index}

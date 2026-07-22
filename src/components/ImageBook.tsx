@@ -9,7 +9,7 @@ export function ImageBook({src,alt,size="30px"}:{src:string,alt:string,size?:str
             <div className="relative">
               <div className="relative aspect-[3/4]">
                 <div
-                  className="absolute top-[1%] right-0 h-[96%] w-[111.25px] rounded-[2px_6px_6px_2px] border border-gray-400 bg-white"
+                  className="absolute top-[1%] right-0 h-[96%] w-[96%] rounded-[2px_6px_6px_2px] border border-gray-400 bg-white"
                   style={{
                     boxShadow:
                       "10px 20px 10px -10px rgba(77,77,77,.126), inset -2px 0 0 gray, inset -3px 0 0 #dbdbdb, inset -4px 0 0 #fff, inset -5px 0 0 #dbdbdb, inset -6px 0 0 #fff, inset -7px 0 0 #dbdbdb, inset -8px 0 0 #fff, inset -9px 0 0 #dbdbdb",

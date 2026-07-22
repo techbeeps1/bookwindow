@@ -92,11 +92,11 @@ export default function BlogDetail({ params }:  {
             <div className="w-20 h-1 bg-black rounded mb-8" />
 
             {blogData?.image && (
-              <div className="relative w-full h-[250px] md:h-[450px] overflow-hidden rounded-2xl mb-8 bg-slate-100 shadow-sm">
+              <div className="relative w-full overflow-hidden rounded-2xl mb-8 bg-slate-100 ">
                 <img
                   src={`${config.apiUrl}storage/app/public/${blogData?.image}`}
                   alt={blogData?.title}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full rounded-2xl"
                 />
               </div>
             )}
