@@ -500,7 +500,7 @@ export default function ShoppingCart() {
         {!cartFetched ? (
           <FadeLoaderOverlay />
         ) : cartItems?.length > 0 && items_count > 0 ? (
-          <div className="mx-auto container p-4 sm:p-6 lg:p-8 2xl:px-0">
+          <div className="mx-auto container px-5">
             {/* Step Progress Tracker (Centered, Clean Minimal Segment stepper) */}
             <div className="flex w-full items-center justify-center border-b border-neutral-200/80 mb-12 max-w-4xl mx-auto pb-4">
               <div className="flex w-full max-w-2xl justify-between text-center select-none font-bold uppercase tracking-wider text-xs sm:text-sm">
