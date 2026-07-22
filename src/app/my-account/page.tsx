@@ -8,6 +8,7 @@ import { useAppSelector } from "@/hooks/useStore";
 import {  logout } from "@/lib/slices/authSlice";
 import { useDispatch } from "react-redux";
 import { IconBase } from "react-icons";
+import toast from "react-hot-toast";
 type AccountTab =
   | "dashboard"
   | "orders"
@@ -65,7 +66,19 @@ export default function AccountPage() {
      router.push("/sign-in");
     }
   };
-
+  const CustomerDataFetch = async () => {
+      try {
+        const response = await axios({
+          method: "get",
+          url: `/api/my-account/view-address/${user?.id}`,
+          responseType: "json",
+        });
+        const Customerdata = response?.data;
+        setCustomer(Customerdata?.data);
+      } catch (error) {
+        console.error("Error fetching orders:", error);
+      }
+    };
   useEffect(() => {
     const fetchOrdersData = async () => {
       try {
@@ -81,23 +94,11 @@ export default function AccountPage() {
       }
     };
 
-     const CustomerData = async () => {
-      try {
-        const response = await axios({
-          method: "get",
-          url: `/api/my-account/view-address/${user?.id}`,
-          responseType: "json",
-        });
-        const Customerdata = response?.data;
-        setCustomer(Customerdata?.data);
-      } catch (error) {
-        console.error("Error fetching orders:", error);
-      }
-    };
+
 
     if (user?.id) {
       fetchOrdersData();
-      CustomerData();
+      CustomerDataFetch();
     }
   }, [user?.id]);
 
@@ -110,9 +111,9 @@ export default function AccountPage() {
       case "password":
         return <PasswordTab customer={customer} />;
       case "addresses":
-        return <AddressesTab customer={customer} />;
+        return <AddressesTab customer={customer} isEdited={CustomerDataFetch} />;
       case "account-details":
-        return <AccountDetailsTab customer={customer} />;
+        return <AccountDetailsTab customer={customer} isEdited={CustomerDataFetch} />;
       case "logout":
         logoutUser();
         return (
@@ -779,15 +780,15 @@ function PasswordTab({ customer }: any) {
     const password = formData.get("password")?.toString() || "";
 
     if (!customer?.email) {
-      alert("Customer email is not available.");
+      toast.error("Customer email is not available.");
       return;
     }
     if(password !== password_confirmation) {
-      alert("Passwords do not match.");
+      toast.error("Passwords do not match.");
       return;
     }
     if(password.length < 8) {
-      alert("Password must be at least 8 characters long.");
+      toast.error("Password must be at least 8 characters long.");
       return;
     }
     const response = await fetch(`/api/my-account/passwordchange`, {
@@ -796,9 +797,9 @@ function PasswordTab({ customer }: any) {
       body: JSON.stringify({ email, password, password_confirmation }),
     });
     if (response.ok) {
-      alert("Password updated!");
+      toast.success("Password updated!");
     } else {
-      alert("Failed to update password.");
+      toast.error("Failed to update password.");
     }
    const data = await response.json();
     console.log("Password change response:", data);
@@ -862,14 +863,14 @@ function PasswordTab({ customer }: any) {
   );
 }
 
-function AddressesTab({ customer }: any) {
+function AddressesTab({ customer, isEdited }: any) {
   const [isEdit, setIsEdit] = useState(false);
   const [address, setAddress] = useState("");
   const [address_2, setAddress2] = useState("");
   const [city, setCity] = useState("");
   const [state, setState] = useState("");
   const [zipcode, setZipCode] = useState("");
-  const [country, setCountry] = useState("India");
+
   const [customerData, setCustomerData] = useState({} as any);
 
   async function updateUser(event: FormEvent<HTMLFormElement>) {
@@ -888,16 +889,18 @@ function AddressesTab({ customer }: any) {
         city: city ? city : customer?.city,
         state: state ? state : customer?.state,
         zip_code: zipcode ? zipcode : customer?.zip_code,
-        country: country ? country : customer?.country,
+        country: "India",
       }),
     });
     if (response.ok) {
       const data = await response.json();
       setCustomerData(data);
-      alert("Address updated!");
+      toast.success("Address updated!");
+      isEdited();
       setIsEdit(false);
+      
     } else {
-      console.log("something went wrong!!");
+      toast.error("Failed to update address.");
     }
   }
     const [selectedState, setSelectedState] = useState<string>("");
@@ -915,7 +918,7 @@ function AddressesTab({ customer }: any) {
         setStates(response?.data);
         setStatesFatched(true);
         if (customer?.state) {
-          console.log("customer state:", customer.state);
+          
           setSelectedState(customer.state);
         }
       } catch (error) {
@@ -934,7 +937,7 @@ function AddressesTab({ customer }: any) {
         allCities = selectedStateValue?.cities || [];
       }
       setFilteredCities(allCities);
-      console.log("filteredCities:", allCities);
+     
     }, [selectedState, states]);
   
   useEffect(() => {
@@ -1011,7 +1014,7 @@ function AddressesTab({ customer }: any) {
 
             {/* Country and State grid */}
             <div className="grid grid-cols-2 gap-4">
-              {/* Country */}
+       
               <div className="flex flex-col gap-1.5">
                 <label className="text-sm font-semibold text-neutral-800 uppercase tracking-wider">Country</label>
                 <div className="relative">
@@ -1020,14 +1023,12 @@ function AddressesTab({ customer }: any) {
                       <path fillRule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zM6.262 6.07a8.21 8.21 0 00-1.845 4.18c.115.045.233.089.352.132l1.61.577a1.5 1.5 0 001.902-.754l.544-1.223a1.5 1.5 0 00-.22-1.627L6.262 6.07zm9.93 1.528a1.5 1.5 0 00-1.06-.44H13.5a1.5 1.5 0 00-1.5 1.5v1.22c0 .414.336.75.75.75h1.22a1.5 1.5 0 001.06-.44l1.662-1.662a8.27 8.27 0 00-1.47-1.37zM4.103 12.24A8.254 8.254 0 0012 20.25a8.254 8.254 0 007.897-8.01c-.139-.057-.28-.112-.419-.165l-2.707-1.015a1.5 1.5 0 00-1.902.754l-.544 1.223a1.5 1.5 0 00.22 1.627l2.347 2.347c-.524.32-1.077.597-1.662.825l-.75-1.5a1.5 1.5 0 00-1.342-.83h-1.5a1.5 1.5 0 00-1.5 1.5v2.247a8.232 8.232 0 01-4.18-1.845l2.347-2.347a1.5 1.5 0 00-.44-2.56l-2.247-.75a1.5 1.5 0 00-1.627.22l-1.662 1.662z" clipRule="evenodd" />
                     </svg>
                   </div>
-                  <select
-                    className="w-full pl-11 pr-4 py-3.5 text-base text-black bg-[#f4f4f4] hover:bg-neutral-100/50 focus:bg-white border border-neutral-200/80 rounded-xl outline-none focus:border-black focus:ring-2 focus:ring-black/5 transition-all duration-200 appearance-none cursor-pointer"
-                    name="country"
-                    onChange={(e: any) => setCountry(e.target.value)}
-                    defaultValue={customer?.country}
+                  <div 
+                  className="w-full pl-11 pr-4 py-3.5 text-base text-black bg-[#f4f4f4] hover:bg-neutral-100/50 focus:bg-white border border-neutral-200/80 rounded-xl outline-none focus:border-black focus:ring-2 focus:ring-black/5 transition-all duration-200 appearance-none cursor-not-allowed"           
                   >
-                    <option value="India">India</option>
-                  </select>
+                    India
+                    </div>
+
                 </div>
               </div>
 
@@ -1182,7 +1183,7 @@ function AddressesTab({ customer }: any) {
                 {customer?.city || "City"}, {customer?.zip_code || "Zip"}
               </p>
               <p className="pl-6">
-                {customer?.state || "State"}, {customer?.country || "India"}
+                {customer?.state || "State"}, { "India"}
               </p>
             </div>
           </div>
@@ -1193,7 +1194,7 @@ function AddressesTab({ customer }: any) {
   );
 }
 
-function AccountDetailsTab({ customer }: any) {
+function AccountDetailsTab({ customer , isEdited }: any) {
   const [isEdit, setIsEdit] = useState(false);
   const [lastName, setLastName] = useState("");
   const [firstName, setFirstName] = useState("");
@@ -1217,14 +1218,17 @@ function AccountDetailsTab({ customer }: any) {
         city: customer?.city,
         state: customer?.state,
         zip_code: customer?.zip_code,
-        country: customer?.country || "India",
+        country:  "India",
       }),
     });
     if (response.ok) {
       const data = await response.json();
       setCustomerData(data);
-      alert("User details updated!");
+
+      toast.success("User details updated!");
       setIsEdit(false);
+      isEdited();
+  
     } else {
       console.log("something went wrong!!");
     }
