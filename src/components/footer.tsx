@@ -134,38 +134,42 @@ export function Footer({menuData}:any) {
       <div className="border-t border-gray-900 bg-black py-10">
         <div className="mx-auto max-w-7xl px-8 flex flex-col lg:flex-row justify-between items-center gap-8">
           {/* Left: Follow Us and Social Icons */}
-          <div className="flex items-center gap-6">
-            <span className="text-white font-sans text-base font-semibold">Follow Us</span>
-            <div className="flex gap-4">
+          <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
+            <span className="text-white font-sans text-sm sm:text-base font-semibold tracking-wide uppercase text-gray-300">
+              Follow Us
+            </span>
+            <div className="flex items-center gap-3">
+              {/* Facebook */}
               <Link
                 href="https://m.facebook.com/100064054598576/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-gray-400 hover:text-white transition-colors duration-200"
+                className="group relative flex items-center justify-center w-10 h-10 rounded-full bg-gray-900 border border-gray-800 text-gray-400 hover:text-white hover:bg-[#1877F2] hover:border-[#1877F2] transition-all duration-300 hover:scale-110 active:scale-95 shadow-md hover:shadow-[0_0_18px_rgba(24,119,242,0.5)]"
                 aria-label="Facebook"
               >               
-                <FaFacebookF className="h-5 w-5"/>
+                <FaFacebookF className="h-4 w-4 transition-transform duration-300 group-hover:scale-110"/>
               </Link>
+
+              {/* Instagram */}
               <Link
                 href="https://www.instagram.com/bookwindow_2.0?igsh=MXV5ZTVmcTIxcGRyNA=="
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-gray-400 hover:text-white transition-colors duration-200"
+                className="group relative flex items-center justify-center w-10 h-10 rounded-full bg-gray-900 border border-gray-800 text-gray-400 hover:text-white hover:bg-gradient-to-tr hover:from-[#f09433] hover:via-[#dc2743] hover:to-[#bc1888] hover:border-transparent transition-all duration-300 hover:scale-110 active:scale-95 shadow-md hover:shadow-[0_0_18px_rgba(220,39,67,0.5)]"
                 aria-label="Instagram"
               >
-
-                <FaInstagram className="h-5 w-5" />
-
+                <FaInstagram className="h-4.5 w-4.5 transition-transform duration-300 group-hover:scale-110" />
               </Link>
+
+              {/* YouTube */}
               <Link
                 href="https://youtube.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-gray-400 hover:text-white transition-colors duration-200"
+                className="group relative flex items-center justify-center w-10 h-10 rounded-full bg-gray-900 border border-gray-800 text-gray-400 hover:text-white hover:bg-[#FF0000] hover:border-[#FF0000] transition-all duration-300 hover:scale-110 active:scale-95 shadow-md hover:shadow-[0_0_18px_rgba(255,0,0,0.5)]"
                 aria-label="Youtube"
               >               
-                <FaYoutube className="h-5 w-5" />
-
+                <FaYoutube className="h-4.5 w-4.5 transition-transform duration-300 group-hover:scale-110" />
               </Link>
             </div>
           </div>
