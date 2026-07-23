@@ -12,6 +12,8 @@ import { useCart } from "@/hooks/useCart";
 import { useViewProductsQuery } from "@/lib/api/productsApi";
 import {  logout } from "@/lib/slices/authSlice";
 import { useRouter } from "next/navigation";
+import { IoSearchSharp } from "react-icons/io5";
+
 
 const resolveUrl = (url: string) => {
 
@@ -159,21 +161,8 @@ const dispatch = useAppDispatch();
               <div className="flex-grow flex justify-center">
                 <div className="relative w-full max-w-3xl group">
                   {/* Search icon */}
-                  <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      strokeWidth="2"
-                      stroke="rgba(255, 255, 255, 1)"
-                      className="w-4 h-4 transition-colors"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
-                      />
-                    </svg>
+                  <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">                    
+                    <IoSearchSharp className="w-[18px] h-[18px] transition-colors text-white"/>
                   </div>
 
                   <input
@@ -475,7 +464,7 @@ const dispatch = useAppDispatch();
             </Link>
 
             <span className="text-white text-center text-xs sm:text-sm font-medium px-2 flex-1">
-              “ सर्वं सम्भाव्यते त्वयि। ”
+              “ सर्वं सम्भाव्यते त्वयि।2 ”
             </span>
 
             <button
