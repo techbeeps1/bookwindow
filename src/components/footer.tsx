@@ -10,10 +10,11 @@ import toast from "react-hot-toast";
 import { FaFacebookF } from "react-icons/fa";
 import { FaInstagram } from "react-icons/fa6";
 import { FaYoutube } from "react-icons/fa";
+import { RiShieldCheckLine } from "react-icons/ri";
+import { HiMiniUserGroup } from "react-icons/hi2";
+import { IoCubeOutline } from "react-icons/io5";
 
-
-
-export function Footer({menuData}:any) {
+export function Footer({ menuData }: any) {
   const [email, setEmail] = React.useState("");
   const [loading, setLoading] = React.useState(false);
   function chunkArray(array: any[], size: number) {
@@ -25,39 +26,39 @@ export function Footer({menuData}:any) {
   }
 
   async function SubmitNewsLetter() {
- 
 
 
-  if (!email) {
-    toast.error("Please enter a valid email address.");
-    return;
-  }
-  if (!/\S+@\S+\.\S+/.test(email)) {
-    toast.error("Please enter a valid email address.");
-    return;
-  }
-  if (loading) return; 
+
+    if (!email) {
+      toast.error("Please enter a valid email address.");
+      return;
+    }
+    if (!/\S+@\S+\.\S+/.test(email)) {
+      toast.error("Please enter a valid email address.");
+      return;
+    }
+    if (loading) return;
 
     setLoading(true);
-   const res = await fetch(`${config.apiUrl}api/newsletter`, {
-     method: "POST",
-     headers: {
-       "Content-Type": "application/json"
-     },
-     body: JSON.stringify({ email })
-   });
-   const data = await res.json();
-   console.log(data);
-   setLoading(false);
-   if (data.success) {
-    toast.success("Thank you for subscribe!");
-    setEmail("");
-   } if (data.mailchimp.title ==="Member Exists") {
-    toast.success("You are already subscribed to our newsletter.");
-   }
-   else {
-    toast.error("Failed to subscribe. Please try again.");
-   }
+    const res = await fetch(`${config.apiUrl}api/newsletter`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ email })
+    });
+    const data = await res.json();
+    console.log(data);
+    setLoading(false);
+    if (data.success) {
+      toast.success("Thank you for subscribe!");
+      setEmail("");
+    } if (data.mailchimp.title === "Member Exists") {
+      toast.success("You are already subscribed to our newsletter.");
+    }
+    else {
+      toast.error("Failed to subscribe. Please try again.");
+    }
   }
 
   const chunkedMenu = chunkArray(
@@ -146,8 +147,8 @@ export function Footer({menuData}:any) {
                 rel="noopener noreferrer"
                 className="group relative flex items-center justify-center w-10 h-10 rounded-full bg-gray-900 border border-gray-800 text-gray-400 hover:text-white hover:bg-[#1877F2] hover:border-[#1877F2] transition-all duration-300 hover:scale-110 active:scale-95 shadow-md hover:shadow-[0_0_18px_rgba(24,119,242,0.5)]"
                 aria-label="Facebook"
-              >               
-                <FaFacebookF className="h-4 w-4 transition-transform duration-300 group-hover:scale-110"/>
+              >
+                <FaFacebookF className="h-4 w-4 transition-transform duration-300 group-hover:scale-110" />
               </Link>
 
               {/* Instagram */}
@@ -168,7 +169,7 @@ export function Footer({menuData}:any) {
                 rel="noopener noreferrer"
                 className="group relative flex items-center justify-center w-10 h-10 rounded-full bg-gray-900 border border-gray-800 text-gray-400 hover:text-white hover:bg-[#FF0000] hover:border-[#FF0000] transition-all duration-300 hover:scale-110 active:scale-95 shadow-md hover:shadow-[0_0_18px_rgba(255,0,0,0.5)]"
                 aria-label="Youtube"
-              >               
+              >
                 <FaYoutube className="h-4.5 w-4.5 transition-transform duration-300 group-hover:scale-110" />
               </Link>
             </div>
@@ -177,21 +178,15 @@ export function Footer({menuData}:any) {
           {/* Right: Trust Badges */}
           <div className="flex flex-wrap justify-center lg:justify-end gap-6 md:gap-8 text-gray-400 text-xs md:text-sm font-sans font-semibold">
             <div className="flex items-center gap-2">
-              <svg className="w-5 h-5 text-white stroke-current fill-none" viewBox="0 0 24 24" strokeWidth="2">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-              </svg>
+              <RiShieldCheckLine className="w-5 h-5 text-white" />
               <span>Authentic and Genuine Brands</span>
             </div>
             <div className="flex items-center gap-2">
-              <svg className="w-5 h-5 text-white stroke-current fill-none" viewBox="0 0 24 24" strokeWidth="2">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-              </svg>
+              <HiMiniUserGroup className="w-5 h-5 text-white" />
               <span>Bookwindow Promise</span>
             </div>
             <div className="flex items-center gap-2">
-              <svg className="w-5 h-5 text-white stroke-current fill-none" viewBox="0 0 24 24" strokeWidth="2">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-              </svg>
+              <IoCubeOutline className="w-5 h-5 text-white" />
               <span>Easy Returns And Exchanges</span>
             </div>
           </div>
