@@ -161,7 +161,7 @@ export function BestSubjects({data}: any) {
           className="flex gap-6 overflow-x-auto no-scrollbar px-8 md:px-16 lg:px-24 active:cursor-grabbing select-none"
         >
           {data?.mock_test_category.map((brand:any, index:any) => (
-                    <Link href="#">   <motion.div
+                    <Link href={"/category/"+brand.slug || "#"}>   <motion.div
               key={index}
               initial={{ opacity: 0, scale: 0.95 }}
               whileInView={{ opacity: 1, scale: 1 }}

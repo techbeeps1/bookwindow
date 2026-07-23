@@ -41,7 +41,7 @@ export default function ShoppingCart() {
   const sessionId = useSession();
   const initialStep = "cart";
   const [cartFetched, setCartFetched] = useState(false);
-
+ const [updatingItemId, setUpdatingItemId] = useState<string | null>(null);
   const [cartItems, setCartItems] = useState([] as CartItem[] | any[]);
   const [items_count, setItemsCount] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -69,13 +69,14 @@ export default function ShoppingCart() {
 
   const [coupon_code, setCouponCode] = useState("");
   const [couponData, setCouponData] = useState({} as any);
-  const [mainCategories, setMainCategories] = useState([] as any);
+ 
   const [loginUpdated, setLoginUpdated] = useState(0);
   
   
   const { data } = useCart();
-  const [updateCart, { isLoading: updating }] = useUpdateCartMutation();
-  const [removeCart, { isLoading: removing }] = useRemoveCartMutation();
+  const [updateCart] = useUpdateCartMutation();
+  const [removeCart] = useRemoveCartMutation();
+
 
   useEffect(() => {
     fetch("/api/my-account/user")
@@ -148,19 +149,20 @@ export default function ShoppingCart() {
 
   useEffect(() => {
     const viewCart = async () => {
-      setLoading(true);
+    
       try {
         setCartItems(data?.items || []);
         setItemsCount(data?.items_count || 0);
         setCartFetched(true);
+        
       } catch (error) {
         console.error("Error loading cart:", error);
         setCartItems([]);
         setItemsCount(0);
         setCartFetched(true);
-      } finally {
+      } 
         setLoading(false);
-      }
+        setUpdatingItemId(null);
     };
     if (sessionId) {
       viewCart();
@@ -169,6 +171,8 @@ export default function ShoppingCart() {
 
   const updateCartQuantity = async (productId: number, quantity: number) => {
     try {
+      setUpdatingItemId(productId.toString());
+      setLoading(true);
       updateCart({
         product_id: productId,
         session_id: sessionId,
@@ -181,6 +185,8 @@ export default function ShoppingCart() {
 
   const removeCartItem = async (productId: number) => {
     try {
+      setUpdatingItemId(productId.toString());
+      setLoading(true);
       removeCart({
         product_id: productId,
         session_id: sessionId,
@@ -205,7 +211,7 @@ export default function ShoppingCart() {
     setCartItems(cartItems?.filter((item) => item.product_id !== id));
     setItemsCount(newItemsCount);
 
-    
+    setUpdatingItemId(null);
   };
 
   const calculateTotal = () => {
@@ -328,26 +334,8 @@ export default function ShoppingCart() {
     }
   };
 
-  useEffect(() => {
-    const fetchProductsByCategory = async () => {
-      setLoading(true);
-      try {
-        const response2 = await axios({
-          method: "get",
-          url: `${config.apiUrl}api/category`,
-          responseType: "json",
-        });
-        setMainCategories(response2?.data);
-      } catch (error) {
-        console.error("Error loading products:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchProductsByCategory();
-  }, []);
 
-  useEffect(() => {}, [couponData, mainCategories]);
+
 
   const handlePlaceOrder = async () => {
     if (isorderProcess) return; // Prevent multiple submissions
@@ -553,14 +541,11 @@ export default function ShoppingCart() {
                           ? JSON.parse(couponData.category_id)
                           : null;
 
-                        const isCategoryMatched =
-                          !couponCategories ||
-                          couponCategories.includes(String(item.category_id));
 
                         return (
                           <div
                             key={item.product_id}
-                            className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-neutral-100 last:border-b-0 last:pb-0"
+                            className={`${loading && updatingItemId == item.product_id ? "opacity-20 animate-pulse cursor-not-allowed" : ""} transition-all duration-300 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-neutral-100 last:border-b-0 last:pb-0`}
                           >
                             {/* Product Cover and Title */}
                             <div className="flex items-center gap-4 flex-1">
@@ -589,7 +574,7 @@ export default function ShoppingCart() {
                             {/* Adjuster, Price, Trash */}
                             <div className="flex items-center justify-between sm:justify-end gap-6 w-full sm:w-auto border-t sm:border-t-0 pt-3 sm:pt-0">
                               {/* Quantity selector */}
-                              <div className="flex items-center gap-1">
+                              <div className="flex items-center gap-1 relative">
                                 <button
                                   onClick={() =>
                                     updateQuantity(item.product_id, "decrement")
@@ -609,6 +594,7 @@ export default function ShoppingCart() {
                                 >
                                   +
                                 </button>
+
                               </div>
 
                               {/* Subtotal */}
@@ -705,12 +691,7 @@ export default function ShoppingCart() {
                         </button>
                       </div>
 
-                      <button
-                        onClick={() => router.refresh()}
-                        className="text-xs font-bold text-neutral-400 hover:text-black transition-colors border-b border-neutral-300 hover:border-black cursor-pointer pb-0.5 uppercase tracking-wider"
-                      >
-                        Update Cart
-                      </button>
+ 
                     </div>
 
                     <div className="mt-2">
@@ -892,7 +873,7 @@ export default function ShoppingCart() {
                         return (
                           <div
                             key={item.product_id}
-                            className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-neutral-100 last:border-b-0 last:pb-0"
+                            className={`${loading && updatingItemId == item.product_id ? "opacity-20 animate-pulse cursor-not-allowed" : ""} transition-all duration-300 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-neutral-100 last:border-b-0 last:pb-0`}
                           >
                             {/* Product Cover and details */}
                             <div className="flex items-center gap-4 flex-1">

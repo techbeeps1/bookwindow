@@ -15,7 +15,8 @@ type AccountTab =
   | "addresses"
   | "account-details"
   | "password"
-  | "logout";
+  | "logout"
+  | "wishlist";
 
 interface TabItem {
   key: AccountTab;
@@ -24,11 +25,13 @@ interface TabItem {
 
 const tabs: TabItem[] = [
   { key: "dashboard", label: "Dashboard" },
-  { key: "orders", label: "Orders" },
+    { key: "orders", label: "Orders" },
+   { key: "wishlist", label: "Wishlist" },
   { key: "addresses", label: "Addresses" },
   { key: "account-details", label: "Account Details" },
   { key: "password", label: "Password" },
-  { key: "logout", label: "Log Out" },
+  { key: "logout", label: "Log Out" }
+ 
 ];
 
 export default function AccountPage() {
@@ -114,6 +117,9 @@ export default function AccountPage() {
         return <AddressesTab customer={customer} isEdited={CustomerDataFetch} />;
       case "account-details":
         return <AccountDetailsTab customer={customer} isEdited={CustomerDataFetch} />;
+      case "wishlist":
+          router.push("/wishlist");
+          break;
       case "logout":
         logoutUser();
         return (
@@ -163,7 +169,14 @@ export default function AccountPage() {
                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.2">
                           <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
                         </svg>
+                      );}
+                      else if (tab.key === "wishlist") {
+                      icon = (
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.2">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                        </svg>
                       );
+
                     } else if (tab.key === "addresses") {
                       icon = (
                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.2">
@@ -875,6 +888,30 @@ function AddressesTab({ customer, isEdited }: any) {
 
   async function updateUser(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if(!address ) {
+      toast.error("Address Line 1 is required.");
+      return;
+    }
+    if(!customer?.email) {
+      toast.error("Customer email is not available.");
+      return;
+    }
+    if(zipcode && !/^\d{6}$/.test(zipcode)) {
+      toast.error("Please enter a valid 6-digit Indian postal code.");
+      return;
+    }
+    if(state && !states.some((s: any) => s.name === state)) {
+      toast.error("Please select a valid state from the list.");
+      return;
+    }
+    if(!city ) {
+      toast.error("City is required.");
+      return;
+    }
+    if(address && (address.length < 5 || address.length > 100)) {
+      toast.error("Address Line 1 must be between 5 and 100 characters long.");
+      return;
+    }
     const response = await fetch(`${config.apiUrl}api/v1/updateuser`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -1044,7 +1081,7 @@ function AddressesTab({ customer, isEdited }: any) {
                   <select
                     className="w-full pl-11 pr-4 py-3.5 text-base text-black bg-[#f4f4f4] hover:bg-neutral-100/50 focus:bg-white border border-neutral-200/80 rounded-xl outline-none focus:border-black focus:ring-2 focus:ring-black/5 transition-all duration-200 appearance-none cursor-pointer"
                     name="state"
-                    onChange={(e: any) => { setState(e.target.value);  setSelectedState(e.target.value);}}
+                    onChange={(e: any) => { setState(e.target.value);  setSelectedState(e.target.value); setCity(""); customer.city = ""; }}
                     defaultValue={customer?.state}
                   >
                     <option defaultValue={customer?.state || ""}>
@@ -1084,11 +1121,12 @@ function AddressesTab({ customer, isEdited }: any) {
                   <select
                     className="w-full pl-11 pr-4 py-3.5 text-base text-black bg-[#f4f4f4] hover:bg-neutral-100/50 focus:bg-white border border-neutral-200/80 rounded-xl outline-none focus:border-black focus:ring-2 focus:ring-black/5 transition-all duration-200 appearance-none cursor-pointer"
                     name="city"
+                    required
                     onChange={(e: any) => setCity(e.target.value)}
                     defaultValue={customer?.city}
                   >
                        <option defaultValue={customer.city || ""}>
-                        {selectedState ? customer.city : "Select city"  }
+                        {customer.city ? customer.city : "Select city"  }
 
                       </option>
                       {filteredCities?.map((city: any) => (
@@ -1180,7 +1218,7 @@ function AddressesTab({ customer, isEdited }: any) {
                 <p className="pl-6 text-neutral-455">{customer?.address_2}</p>
               )}
               <p className="pl-6">
-                {customer?.city || "City"}, {customer?.zip_code || "Zip"}
+                {customer?.city || ""}, {customer?.zip_code || "Zip"}
               </p>
               <p className="pl-6">
                 {customer?.state || "State"}, { "India"}
@@ -1204,6 +1242,25 @@ function AccountDetailsTab({ customer , isEdited }: any) {
 
   async function updateUser(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+
+     if (firstName === "" && !customer?.first_name) {  
+       toast.error("First name is required.");
+       return;
+     }
+     if (lastName === "" && !customer?.last_name) {
+       toast.error("Last name is required.");
+       return;
+     }
+     if (phone === "" && !customer?.phone) {
+       toast.error("Phone is required.");
+       return;
+     }
+     if (DOB === "" && !customer?.date_of_birth) {
+       toast.error("Date of birth is required.");
+       return;
+     }
+
+
     const response = await fetch(`${config.apiUrl}api/v1/updateuser`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -1224,7 +1281,6 @@ function AccountDetailsTab({ customer , isEdited }: any) {
     if (response.ok) {
       const data = await response.json();
       setCustomerData(data);
-
       toast.success("User details updated!");
       setIsEdit(false);
       isEdited();
