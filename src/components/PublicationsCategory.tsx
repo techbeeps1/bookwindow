@@ -6,6 +6,7 @@ import Image from "next/image";
 
 import config from "@/app/config";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 
 
@@ -34,8 +35,8 @@ export function PublicationsCategory({
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
         {data?.publication.map((pub:any, index:number) => (
           <div  >
+              <Link href={`/publication/${pub.slug}`} >
           <motion.div
-            onClick={() => router.push(`/publication/${pub.slug}`)}
             key={index}
             initial={{ opacity: 0, scale: 0.95 }}
             whileInView={{ opacity: 1, scale: 1 }}
@@ -44,6 +45,7 @@ export function PublicationsCategory({
             className="aspect-[3/4] relative overflow-hidden rounded-[24px] cursor-pointer group shadow-sm hover:shadow-xl transition-all duration-300 w-full"
           >
             {/* Background Image */}
+          
             <Image
               fill
               alt={pub.name}
@@ -63,7 +65,9 @@ export function PublicationsCategory({
                 {pub.name}
               </h3>
             </div>
+          
           </motion.div>
+            </Link>
           </div>
         ))}
       </div>

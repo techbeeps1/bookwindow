@@ -8,6 +8,7 @@ import { useAppSelector } from "@/hooks/useStore";
 import { useDispatch } from "react-redux";
 import { login } from "@/lib/slices/authSlice";
 import { count } from "node:console";
+import toast from "react-hot-toast";
 
 type CheckoutProps = {
   onBack: () => void;
@@ -78,6 +79,7 @@ export default function Checkout({
   const handleStateChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const { value } = e.target;
     setSelectedState(value);
+    formValues.city = ""; // Reset city when state changes
     setFormValues((prev: any) => ({ ...prev, state: value })); // Update form values
   };
 
@@ -209,13 +211,16 @@ export default function Checkout({
       "phone",
       "address",
       "zip_code",
+      "state",
+      "city",
+   
     ];
 
     for (const field of requiredFields) {
       const value =
         formValues[field as keyof typeof formValues] 
       if (!value?.toString().trim()) {
-        alert(`${field.replace(/_/g, " ")} is required`);
+        toast.error(`${field.replace(/_/g, " ")} is required`);
         return;
       }
     }

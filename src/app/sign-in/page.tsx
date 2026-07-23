@@ -198,7 +198,7 @@ export default function SignIn() {
         setIsloading(true);
 
     try {
-      const response = await fetch(`${config.apiUrl}api/v1/register`, {
+      const response = await fetch(`/api/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ first_name, last_name, phone, email, password }),
@@ -207,7 +207,16 @@ export default function SignIn() {
       const data = await response.json();
        setIsloading(false);
       if (response.ok) {
+              setCustomerData(data);
+       dispatch(
+              login({
+                user: data,
+              })
+            );
+      router.push("/my-account");
+  
        toast.success("Registration successful!");
+      
         form.reset();
         setCaptchaInput("");
       } else {

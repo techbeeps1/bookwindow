@@ -291,7 +291,7 @@ export default function WishlistPage() {
                     ) : (
                       <FiShoppingCart className="w-3.5 h-3.5" />
                     )}
-                    <span>Move All to Cart</span>
+                    <span>Add All to Cart</span>
                   </button>
 
                   <button
