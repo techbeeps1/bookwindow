@@ -2,12 +2,11 @@
 
 import BookCard from "@/components/book-card";
 import { useEffect, useState } from "react";
-import axios from "axios";
 import config from "../config";
-
 import AllProductSidebar from "@/components/all-products-sidebar";
 import { useViewProductsQuery } from "@/lib/api/productsApi";
 import { FiSearch, FiFilter, FiGrid, FiList } from "react-icons/fi";
+import { MdKeyboardArrowLeft, MdKeyboardArrowRight } from "react-icons/md";
 
 export default function Category() {
   const [currentPage, setCurrentPage] = useState(1);
@@ -248,20 +247,8 @@ export default function Category() {
                     : "bg-white text-black border-neutral-300 hover:bg-neutral-50 hover:border-neutral-400 hover:shadow-sm"
                 }`}
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={2.5}
-                  stroke="currentColor"
-                  className="w-4 h-4 pointer-events-none"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M15.75 19.5 8.25 12l7.5-7.5"
-                  />
-                </svg>
+                <MdKeyboardArrowLeft className="w-6 h-6" />
+
                 <span>Previous</span>
               </button>
 
@@ -286,20 +273,8 @@ export default function Category() {
                 }`}
               >
                 <span>Next</span>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={2.5}
-                  stroke="currentColor"
-                  className="w-4 h-4 pointer-events-none"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="m8.25 4.5 7.5 7.5-7.5 7.5"
-                  />
-                </svg>
+                <MdKeyboardArrowRight className="w-6 h-6" />
+
               </button>
             </div>
           )}

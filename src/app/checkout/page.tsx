@@ -2,19 +2,16 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-// components
-
 import { useRouter } from "next/navigation";
 import config from "@/app/config";
 import axios from "axios";
-
 import Checkout from "@/components/Checkout";
 import { ThankYouDialog } from "@/components/thank-you-popup";
 import { NotificationDialog } from "@/components/notification";
-
 import Link from "next/link";
 import FadeLoaderOverlay from "@/components/loader";
 import { useCart } from "@/hooks/useCart";
+import { RiDeleteBinLine } from "react-icons/ri";
 import {
   useRemoveCartMutation,
   useUpdateCartMutation,
@@ -640,20 +637,8 @@ export default function ShoppingCart() {
                                 onClick={() => removeItem(item.product_id)}
                                 className="text-red-500 hover:text-red-700 transition-colors p-1 cursor-pointer"
                                 title="Remove Item"
-                              >
-                                <svg
-                                  className="w-5 h-5"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  viewBox="0 0 24 24"
-                                  strokeWidth="2"
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                                  />
-                                </svg>
+                              >                               
+                                <RiDeleteBinLine className="w-6 h-6" />
                               </button>
                             </div>
                           </div>

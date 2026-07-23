@@ -1,11 +1,10 @@
 "use client";
 import BookCard from "@/components/book-card";
 import { useEffect, useState, useMemo } from "react";
-
-
 import config from "../../config";
 import CategoryPublicationSidebar from "@/components/category-publication-sidebar";
 import { FiSearch, FiFilter, FiGrid, FiList } from "react-icons/fi";
+import { MdKeyboardArrowLeft, MdKeyboardArrowRight } from "react-icons/md";
 
 export default function CategoryPage({ categoryData }: { categoryData: any }) {
   const [currentPage, setCurrentPage] = useState(1);
@@ -255,20 +254,7 @@ const publicationData = useMemo(
                     : "bg-white text-black border-neutral-300 hover:bg-neutral-50 hover:border-neutral-400 hover:shadow-sm"
                 }`}
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={2.5}
-                  stroke="currentColor"
-                  className="w-4 h-4 pointer-events-none"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M15.75 19.5 8.25 12l7.5-7.5"
-                  />
-                </svg>
+                <MdKeyboardArrowLeft className="w-6 h-6" />
                 <span>Previous</span>
               </button>
 
@@ -293,20 +279,7 @@ const publicationData = useMemo(
                 }`}
               >
                 <span>Next</span>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={2.5}
-                  stroke="currentColor"
-                  className="w-4 h-4 pointer-events-none"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="m8.25 4.5 7.5 7.5-7.5 7.5"
-                  />
-                </svg>
+                <MdKeyboardArrowRight className="w-6 h-6" />
               </button>
             </div>
           )}
