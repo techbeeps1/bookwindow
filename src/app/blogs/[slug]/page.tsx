@@ -6,6 +6,7 @@ import config from "@/app/config";
 import axios from "axios";
 import { use } from "react";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function BlogDetail({ params }:  {
   params: Promise<{ slug: string }>;
@@ -93,7 +94,9 @@ export default function BlogDetail({ params }:  {
 
             {blogData?.image && (
               <div className="relative w-full overflow-hidden rounded-2xl mb-8 bg-slate-100 ">
-                <img
+                <Image
+                  width={738}
+                  height={530}
                   src={`${config.apiUrl}storage/app/public/${blogData?.image}`}
                   alt={blogData?.title}
                   className="w-full h-full rounded-2xl"

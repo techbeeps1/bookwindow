@@ -16,6 +16,7 @@ import {
   FiGrid,
 } from "react-icons/fi";
 import config from "@/app/config";
+import Image from "next/image";
 
 interface Publication {
   name: string;
@@ -46,11 +47,13 @@ function PublisherCard({
       {/* Publisher Image Banner */}
       <div className="relative h-44 w-full bg-gradient-to-br from-gray-50 via-white to-gray-100 flex items-center justify-center p-5 overflow-hidden border-b border-gray-100 group-hover:bg-gray-50/80 transition-colors">
         {!imgError && pub.publication_img ? (
-          <img
+          <Image
             src={imgSrc}
             alt={pub.name}
             onError={() => setImgError(true)}
             className="max-h-32 max-w-[85%] object-contain group-hover:scale-105 transition-transform duration-300 drop-shadow-sm"
+            width={200}
+            height={200}
           />
         ) : (
           <div className="flex flex-col items-center justify-center text-gray-400 p-4 text-center">

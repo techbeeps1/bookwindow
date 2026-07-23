@@ -33,8 +33,7 @@ export default function HomePage({homePageData}:any) {
         transition={{ duration: 0.6, ease: "easeOut" }}
         viewport={{ once: true }}
        >
-        <Hero
-          
+        <Hero          
           bannerData={homePageData?.sldier_section}
         />
       </motion.div> 
@@ -57,7 +56,7 @@ export default function HomePage({homePageData}:any) {
         transition={{ duration: 0.85, ease: "easeOut" }}
         viewport={{ once: true }}
       >
-        <BestSubjects data={homePageData?.mock_test_section }/>
+      <BestSubjects data={homePageData?.mock_test_section }/>
         
       </motion.div>
       <motion.div
@@ -74,7 +73,7 @@ export default function HomePage({homePageData}:any) {
         transition={{ duration: 0.9, ease: "easeOut" }}
         viewport={{ once: true }}
       >
-        <HobbyCategory data={ homePageData?.hobby_section} />
+        <HobbyCategory data={ homePageData?.hobby_section} />       
       </motion.div>
       <motion.div
         initial={{ opacity: 0, y: 50 }}

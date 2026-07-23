@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import config from "@/app/config";
+import Image from "next/image";
 
 export interface HobbyItem {
   name: string;
@@ -54,28 +55,16 @@ export function HobbyCategory({
               <div className={`flex-grow rounded-[25px] flex flex-col items-center justify-between aspect-square relative overflow-hidden`}>              
               <div className=" w-full h-full">              
                 <div className="relative h-full w-full flex justify-center items-center">
-                  <img              
+                  <Image
+                  
                     src={`${config.apiUrl}storage/app/public/${item.cat_image}`}
                     alt={item.name}
+                    width={242}
+                    height={302}                    
                     className="h-full rounded-[25px] w-auto z-10 pointer-events-none"
                     draggable={false}
                     loading="lazy"
                   />
-                </div>
-
-                {/* Mirrored Reflection Image */}
-                <div className="relative w-full h-[25%] overflow-hidden flex justify-center opacity-[0.25] select-none pointer-events-none mt-2">
-                  <div className="relative w-full h-full flex justify-center">
-                    <img
-                      src={item.cat_image}
-                      alt={`${item.name} reflection`}
-                      className="h-[220%] w-auto max-w-[85%] object-contain transform scale-y-[-1] origin-top pointer-events-none"
-                      draggable={false}
-                      loading="lazy"
-                    />
-                  </div>
-                  {/* Fade Gradient Overlay over the reflection */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-white/20 via-transparent to-transparent pointer-events-none" />
                 </div>
               </div>
             </div>

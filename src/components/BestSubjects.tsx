@@ -171,10 +171,11 @@ export function BestSubjects({data}: any) {
             >
               {/* Background Image */}
    
-              <img
+              <Image
                 src={`${config.apiUrl}storage/app/public/${brand.cat_image}`}
                 alt={brand.name}
-                
+                width={494}
+                height={660}
                 sizes="(max-width: 768px) 75vw, (max-width: 1024px) 45vw, 30vw"
                 className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105 pointer-events-none"
                 draggable={false}
