@@ -578,7 +578,7 @@ const [addToWishlist,{isLoading:addWishlistLoading}] = useAddToWishlistMutation(
                 <button
                   onClick={() => {
                     setShowWishlistModal(false);
-                    router.push("/sign-in?tab=register");
+                    router.push("/sign-up");
                   }}
                   className="flex-1 py-3 px-5 border border-gray-300 hover:border-gray-400 text-gray-700 hover:bg-gray-50 transition-all rounded-full text-sm font-semibold uppercase tracking-wider"
                 >
