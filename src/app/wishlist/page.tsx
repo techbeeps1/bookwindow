@@ -29,9 +29,9 @@ import { openCartDrawer } from "@/lib/slices/uiSlice";
 import { ImageBook } from "@/components/ImageBook";
 import ProductDialog from "@/components/product-detail-popup";
 import config from "@/app/config";
+import ProductFilterBar from "@/components/ProductFilterBar";
 import { useViewWishlistQuery,useRemoveWishlistMutation } from "@/lib/api/wishlistApi";
 import toast from "react-hot-toast";
-
 export default function WishlistPage() {
   const sessionId = useSession();
   const dispatch = useAppDispatch();
@@ -209,99 +209,47 @@ export default function WishlistPage() {
         {(isSuccess && wishlistData?.data?.length > 0 ) ? (
           <div>
             {/* Filter & Action Toolbar */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-3 sm:p-4 mb-6 flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3 w-full overflow-hidden">
-              
-              {/* Search Bar */}
-              <div className="relative w-full lg:w-72 xl:w-80">
-                <FaSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                <input
-                  type="text"
-                  placeholder="Search in wishlist..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-8 py-2 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:bg-white transition-all"
-                />
-                {searchQuery && (
-                  <button
-                    onClick={() => setSearchQuery("")}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400 hover:text-gray-600"
-                  >
-                    Clear
-                  </button>
-                )}
-              </div>
-
-              {/* Sorting & Layout Toggles */}
-              <div className="flex flex-wrap items-center justify-between lg:justify-end gap-2 sm:gap-3 w-full lg:w-auto">
-                {/* Sort Dropdown */}
-                <div className="flex items-center gap-1.5 sm:gap-2">
-                  <span className="text-xs font-semibold text-gray-500 flex items-center gap-1 flex-shrink-0">
-                    <FaFilter className="w-3.5 h-3.5" /> Sort:
-                  </span>
-                  <select
-                    value={sortBy}
-                    onChange={(e) => setSortBy(e.target.value)}
-                    className="text-xs bg-gray-50 border border-gray-200 rounded-lg px-2.5 py-2 font-medium focus:outline-none focus:ring-2 focus:ring-black cursor-pointer"
-                  >
-                    <option value="default">Default</option>
-                    <option value="price-low">Price: Low to High</option>
-                    <option value="price-high">Price: High to Low</option>
-                    <option value="discount">Biggest Discount</option>
-                    <option value="name">Book Title (A-Z)</option>
-                  </select>
-                </div>
-
-                {/* View Mode Switches */}
-                <div className="flex items-center bg-gray-100 p-1 rounded-lg border border-gray-200 flex-shrink-0">
-                  <button
-                    onClick={() => setViewMode("grid")}
-                    className={`p-1.5 rounded-md transition-all ${
-                      viewMode === "grid"
-                        ? "bg-white text-black shadow-sm font-semibold"
-                        : "text-gray-500 hover:text-gray-800"
-                    }`}
-                    title="Grid View"
-                  >
-                    <BsGridFill className="w-4 h-4" />
-                  </button>
-                  <button
-                    onClick={() => setViewMode("list")}
-                    className={`p-1.5 rounded-md transition-all ${
-                      viewMode === "list"
-                        ? "bg-white text-black shadow-sm font-semibold"
-                        : "text-gray-500 hover:text-gray-800"
-                    }`}
-                    title="List View"
-                  >
-                    <FaList className="w-4 h-4" />
-                  </button>
-                </div>
-
-                {/* Global Actions */}
-                <div className="flex items-center gap-2 border-l border-gray-200 pl-2 sm:pl-3 flex-shrink-0">
+            <ProductFilterBar
+              searchQuery={searchQuery}
+              setSearchQuery={setSearchQuery}
+              searchPlaceholder="Search in wishlist..."
+              sortBy={sortBy}
+              setSortBy={setSortBy}
+              sortOptions={[
+                { label: "Default", value: "default" },
+                { label: "Price: Low to High", value: "price-low" },
+                { label: "Price: High to Low", value: "price-high" },
+                { label: "Biggest Discount", value: "discount" },
+                { label: "Book Title (A-Z)", value: "name" },
+              ]}
+              viewMode={viewMode}
+              setViewMode={setViewMode}
+              extraActions={
+                <>
                   <button
                     onClick={handleMoveAllToCart}
                     disabled={movingAllToCart}
-                    className="flex items-center gap-1.5 text-xs font-semibold bg-black hover:bg-gray-800 active:scale-95 text-white px-3.5 py-2 rounded-lg transition-all shadow-sm disabled:opacity-50"
+                    className="flex-1 sm:flex-initial flex items-center justify-center gap-2 text-xs font-bold bg-black hover:bg-neutral-800 active:scale-[0.98] text-white px-4 py-2.5 rounded-xl transition-all shadow-sm disabled:opacity-50 whitespace-nowrap cursor-pointer"
                   >
                     {movingAllToCart ? (
                       <FaRedo className="w-3.5 h-3.5 animate-spin" />
                     ) : (
-                      <HiShoppingCart className="w-3.5 h-3.5" />
+                      <HiShoppingCart className="w-4 h-4" />
                     )}
                     <span>Add All to Cart</span>
                   </button>
 
                   <button
                     onClick={() => setClearAllPopupOpen(true)}
-                    className="p-2 text-gray-400 hover:text-black hover:bg-gray-100 rounded-lg transition-colors"
+                    className="flex items-center justify-center gap-1.5 text-xs font-semibold text-rose-600 bg-rose-50 hover:bg-rose-100 border border-rose-200/70 active:scale-[0.98] px-3 py-2.5 rounded-xl transition-all flex-shrink-0 cursor-pointer"
                     title="Clear Wishlist"
                   >
-                    <FaTrash className="w-4 h-4" />
+                    <FaTrash className="w-3.5 h-3.5 text-rose-500" />
+                    <span className="hidden xs:inline">Clear</span>
                   </button>
-                </div>
-              </div>
-            </div>
+                </>
+              }
+            />
 
             {/* Filter Result Notification */}
             {filteredAndSortedItems.length === 0 && searchQuery && (

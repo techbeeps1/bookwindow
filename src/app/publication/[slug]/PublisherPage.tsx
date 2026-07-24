@@ -5,6 +5,7 @@ import { useEffect, useState, useMemo } from "react";
 
 import config from "../../config";
 import CategoryPublicationSidebar from "@/components/category-publication-sidebar";
+import ProductFilterBar from "@/components/ProductFilterBar";
 import { FaSearch, FaFilter, FaList } from "react-icons/fa";
 import { BsGridFill } from "react-icons/bs";
 
@@ -130,74 +131,15 @@ const publicationData = useMemo(
 
         <div className="flex-1 w-full min-w-0">
           {/* Top Filter & Toolbar matching Wishlist header */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-3 sm:p-4 mb-6 flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3 w-full overflow-hidden">
-            
-            {/* Search Bar */}
-            <div className="relative w-full lg:w-72 xl:w-80">
-              <FaSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Search products..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-8 py-2 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:bg-white transition-all"
-              />
-              {searchQuery && (
-                <button
-                  onClick={() => setSearchQuery("")}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400 hover:text-gray-600"
-                >
-                  Clear
-                </button>
-              )}
-            </div>
-
-            {/* Sort Dropdown & View Mode Switches */}
-            <div className="flex items-center justify-between lg:justify-end gap-3 w-full lg:w-auto">
-              {/* Sort Selection */}
-              <div className="flex items-center gap-1.5 sm:gap-2">
-                <span className="text-xs font-semibold text-gray-500 flex items-center gap-1 flex-shrink-0">
-                  <FaFilter className="w-3.5 h-3.5" /> Sort:
-                </span>
-                <select
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value)}
-                  className="text-xs bg-gray-50 border border-gray-200 rounded-lg px-2.5 py-2 font-medium focus:outline-none focus:ring-2 focus:ring-black cursor-pointer"
-                >
-                  <option value="default">Default</option>
-                  <option value="price-low">Price: Low to High</option>
-                  <option value="price-high">Price: High to Low</option>
-                  <option value="name">Book Title (A-Z)</option>
-                </select>
-              </div>
-
-              {/* View Mode Switchers */}
-              <div className="flex items-center bg-gray-100 p-1 rounded-lg border border-gray-200 flex-shrink-0">
-                <button
-                  onClick={() => setViewMode("grid")}
-                  className={`p-1.5 rounded-md transition-all ${
-                    viewMode === "grid"
-                      ? "bg-white text-black shadow-sm font-semibold"
-                      : "text-gray-500 hover:text-gray-800"
-                  }`}
-                  title="Grid View"
-                >
-                  <BsGridFill className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => setViewMode("list")}
-                  className={`p-1.5 rounded-md transition-all ${
-                    viewMode === "list"
-                      ? "bg-white text-black shadow-sm font-semibold"
-                      : "text-gray-500 hover:text-gray-800"
-                  }`}
-                  title="List View"
-                >
-                  <FaList className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-          </div>
+          <ProductFilterBar
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            searchPlaceholder="Search products..."
+            sortBy={sortBy}
+            setSortBy={setSortBy}
+            viewMode={viewMode}
+            setViewMode={setViewMode}
+          />
          {displayedProducts?.length === 0 ? (
             <div className="bg-white rounded-2xl border border-gray-200 p-12 text-center text-xl font-bold text-gray-600">
              <div className="text-4xl mb-4">
