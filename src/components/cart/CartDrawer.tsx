@@ -18,6 +18,9 @@ import { FiX } from "react-icons/fi";
 import { IoBagOutline } from "react-icons/io5";
 import { BsCartCheck } from "react-icons/bs";
 import { useState, useEffect } from "react";
+import { IoIosArrowUp, IoIosArrowDown } from "react-icons/io";
+import { HiShoppingCart } from "react-icons/hi2";
+
 
 // Loading Skeleton Component - Only shown on initial load
 const CartSkeleton = () => (
@@ -39,31 +42,30 @@ const CartSkeleton = () => (
 );
 
 // Cart Item Component with per-item loading states
-const CartItem = ({ 
-  item, 
-  onIncrease, 
-  onDecrease, 
+const CartItem = ({
+  item,
+  onIncrease,
+  onDecrease,
   onRemove,
   isUpdatingThisItem,
   isRemovingThisItem,
-}:any) => {
+}: any) => {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      exit={{ 
-        opacity: 0, 
+      exit={{
+        opacity: 0,
         x: -100,
         transition: { duration: 0.2 }
       }}
       layout
-      className={`flex items-start gap-4 p-5 border-b border-gray-100 hover:bg-gray-50/30 transition-colors duration-200 group relative ${
-        isUpdatingThisItem ? 'bg-blue-50/10' : ''
-      }`}
+      className={`flex items-start gap-4 p-5 border-b border-gray-100 hover:bg-gray-50/30 transition-colors duration-200 group relative ${isUpdatingThisItem ? 'bg-blue-50/10' : ''
+        }`}
     >
       {/* Subtle update indicator overlay */}
       {isUpdatingThisItem && (
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           className="absolute inset-0 bg-white/40 backdrop-blur-[1px] flex items-center justify-center z-10"
@@ -77,7 +79,7 @@ const CartItem = ({
 
       {/* Removing overlay */}
       {isRemovingThisItem && (
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           className="absolute inset-0 bg-white/60 backdrop-blur-[1px] flex items-center justify-center z-10"
@@ -131,16 +133,8 @@ const CartItem = ({
               className="p-0.5 hover:text-black text-neutral-400 transition-colors active:scale-95 disabled:opacity-40 disabled:pointer-events-none"
               aria-label="Increase quantity"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={3}
-                stroke="currentColor"
-                className="w-2.5 h-2.5"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 15.75 7.5-7.5 7.5 7.5" />
-              </svg>
+              <IoIosArrowUp className="w-3 h-3" />
+
             </button>
             <button
               type="button"
@@ -149,16 +143,7 @@ const CartItem = ({
               className="p-0.5 hover:text-black text-neutral-400 transition-colors active:scale-95 disabled:opacity-40 disabled:pointer-events-none"
               aria-label="Decrease quantity"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={3}
-                stroke="currentColor"
-                className="w-2.5 h-2.5"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
-              </svg>
+              <IoIosArrowDown className="w-3 h-3" />
             </button>
           </div>
         </div>
@@ -191,7 +176,7 @@ export default function CartDrawer() {
   const { data: cart, isLoading, isFetching, refetch } = useViewCartQuery(sessionId, {
     skip: !sessionId,
   });
-  
+
   const [updateCart] = useUpdateCartMutation();
   const [removeCart] = useRemoveCartMutation();
 
@@ -204,7 +189,7 @@ export default function CartDrawer() {
 
   const handleIncrease = async (productId: string) => {
     if (updatingItemId || removingItemId) return;
-    
+
     setUpdatingItemId(productId);
     try {
       await updateCart({
@@ -223,7 +208,7 @@ export default function CartDrawer() {
 
   const handleDecrease = async (productId: string) => {
     if (updatingItemId || removingItemId) return;
-    
+
     setUpdatingItemId(productId);
     try {
       await updateCart({
@@ -241,7 +226,7 @@ export default function CartDrawer() {
 
   const handleRemove = async (productId: string) => {
     if (updatingItemId || removingItemId) return;
-    
+
     setRemovingItemId(productId);
     try {
       await removeCart({
@@ -258,7 +243,7 @@ export default function CartDrawer() {
 
   const isCartEmpty = !isLoading && cart?.items?.length === 0;
   const hasItems = !isLoading && cart?.items?.length > 0;
-  
+
   // Only show skeleton on initial load, not on subsequent fetches
   const showSkeleton = isLoading && isInitialLoad;
 
@@ -270,9 +255,8 @@ export default function CartDrawer() {
         animate={{ opacity: cartDrawer ? 1 : 0 }}
         transition={{ duration: 0.3 }}
         onClick={() => dispatch(closeCartDrawer())}
-        className={`fixed inset-0 bg-black/40 backdrop-blur-sm z-40 ${
-          cartDrawer ? "visible" : "invisible"
-        }`}
+        className={`fixed inset-0 bg-black/40 backdrop-blur-sm z-40 ${cartDrawer ? "visible" : "invisible"
+          }`}
       />
 
       {/* Drawer */}
@@ -284,13 +268,13 @@ export default function CartDrawer() {
       >
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 shrink-0">
-          <motion.h2 
+          <motion.h2
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             className="text-lg font-bold flex items-center gap-3"
           >
             <div className="relative flex items-center justify-center w-8 h-8">
-              <IoBagOutline className="w-5 h-5 text-black" />
+              <HiShoppingCart className="w-5 h-5" />
               {!isLoading && cart?.items_count > 0 && (
                 <motion.span
                   key={cart?.items_count}

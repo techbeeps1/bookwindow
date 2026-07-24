@@ -5,7 +5,8 @@ import { useEffect, useState, useMemo } from "react";
 
 import config from "../../config";
 import CategoryPublicationSidebar from "@/components/category-publication-sidebar";
-import { FiSearch, FiFilter, FiGrid, FiList } from "react-icons/fi";
+import { FaSearch, FaFilter, FaList } from "react-icons/fa";
+import { BsGridFill } from "react-icons/bs";
 
 export default function PublisherPage({ categoryData }: { categoryData: any }) {
   const [currentPage, setCurrentPage] = useState(1);
@@ -133,7 +134,7 @@ const publicationData = useMemo(
             
             {/* Search Bar */}
             <div className="relative w-full lg:w-72 xl:w-80">
-              <FiSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <FaSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
               <input
                 type="text"
                 placeholder="Search products..."
@@ -156,7 +157,7 @@ const publicationData = useMemo(
               {/* Sort Selection */}
               <div className="flex items-center gap-1.5 sm:gap-2">
                 <span className="text-xs font-semibold text-gray-500 flex items-center gap-1 flex-shrink-0">
-                  <FiFilter className="w-3.5 h-3.5" /> Sort:
+                  <FaFilter className="w-3.5 h-3.5" /> Sort:
                 </span>
                 <select
                   value={sortBy}
@@ -181,7 +182,7 @@ const publicationData = useMemo(
                   }`}
                   title="Grid View"
                 >
-                  <FiGrid className="w-4 h-4" />
+                  <BsGridFill className="w-4 h-4" />
                 </button>
                 <button
                   onClick={() => setViewMode("list")}
@@ -192,7 +193,7 @@ const publicationData = useMemo(
                   }`}
                   title="List View"
                 >
-                  <FiList className="w-4 h-4" />
+                  <FaList className="w-4 h-4" />
                 </button>
               </div>
             </div>

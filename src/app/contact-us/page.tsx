@@ -6,7 +6,10 @@ import { Alert } from "@material-tailwind/react";
 import config from "../config";
 import axios from "axios";
 import Image from "next/image";
-import Link from "next/link";
+import { ImLocation2 } from "react-icons/im";
+import { IoCallSharp } from "react-icons/io5";
+import { FaImage } from "react-icons/fa6";
+
 
 export default function ContactSection() {
   const [alertMessage, setAlertMessage] = React.useState("");
@@ -135,14 +138,14 @@ export default function ContactSection() {
           </h1>
           <p className="text-gray-300 text-sm md:text-base lg:text-lg max-w-3xl leading-relaxed mb-8 font-light">
             We are always here to help. Reach out to us for any queries, book orders, support, or general inquiries. Our team will get back to you shortly.
-          </p>          
+          </p>
         </div>
       </section>
 
       {/* Main Info and Contact Form Section */}
       <section className="container mx-auto px-4 max-w-6xl my-16 md:my-24">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
-          
+
           {/* Left Column: Ask questions and Contact Cards */}
           <div className="flex flex-col">
             <h2 className="text-[28px] md:text-4xl font-bold text-gray-900 mb-4 tracking-tight">
@@ -157,25 +160,8 @@ export default function ContactSection() {
               {/* Address Card */}
               <div className="bg-gray-50 border border-gray-100 rounded-2xl p-6 flex items-start gap-5 shadow-sm">
                 <div className="flex-shrink-0 border-2 border-black text-black rounded-full p-2.5 bg-white w-12 h-12 flex items-center justify-center">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth="2"
-                    stroke="currentColor"
-                    className="w-5 h-5 text-black"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"
-                    />
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"
-                    />
-                  </svg>
+
+                  <ImLocation2 className="w-5 h-5 text-black" />
                 </div>
                 <div className="flex-grow min-w-0">
                   <h4 className="text-base font-bold text-gray-950 mb-2">
@@ -198,20 +184,7 @@ export default function ContactSection() {
               {/* Direct Info Card */}
               <div className="bg-gray-50 border border-gray-100 rounded-2xl p-6 flex items-start gap-5 shadow-sm">
                 <div className="flex-shrink-0 border-2 border-black text-black rounded-full p-2.5 bg-white w-12 h-12 flex items-center justify-center">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth="2"
-                    stroke="currentColor"
-                    className="w-5 h-5 text-black"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-2.824-1.802-5.14-4.117-6.942-6.942l1.293-.97c.362-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z"
-                    />
-                  </svg>
+                  <IoCallSharp className="w-5 h-5 text-black" />
                 </div>
                 <div className="flex-grow min-w-0">
                   <h4 className="text-base font-bold text-gray-950 mb-2">
@@ -318,15 +291,7 @@ export default function ContactSection() {
       <div className="w-full h-[450px] relative z-10 mt-16 [&>iframe]:w-full [&>iframe]:h-full [&>iframe]:border-none">
         {!contactPageData?.con_map ? (
           <div role="status" className="w-full h-full bg-gray-200 animate-pulse flex items-center justify-center text-gray-400">
-            <svg
-              className="w-12 h-12"
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="currentColor"
-              viewBox="0 0 20 18"
-            >
-              <path d="M18 0H2a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2Zm-5.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Zm4.376 10.481A1 1 0 0 1 16 15H4a1 1 0 0 1-.895-1.447l3.5-7A1 1 0 0 1 7.468 6a.965.965 0 0 1 .9.5l2.775 4.757 1.546-1.887a1 1 0 0 1 1.618.1l2.541 4a1 1 0 0 1 .028 1.011Z" />
-            </svg>
+            <FaImage className="w-12 h-12" />
           </div>
         ) : (
           <div

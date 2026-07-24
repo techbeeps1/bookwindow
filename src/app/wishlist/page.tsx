@@ -5,23 +5,23 @@ import Link from "next/link";
 import Image from "next/image";
 
 import { 
-  FiHeart, 
-  FiTrash2, 
-  FiShoppingCart, 
-  FiGrid, 
-  FiList, 
-  FiSearch, 
-  FiFilter, 
-  FiArrowRight, 
-  FiCheckCircle, 
-
-  FiRefreshCw, 
-  FiChevronRight,
-  FiShoppingBag,
-
-} from "react-icons/fi";
+  FaHeart, 
+  FaTrash, 
+  FaShoppingCart, 
+  FaList, 
+  FaSearch, 
+  FaFilter, 
+  FaArrowRight, 
+  FaCheckCircle, 
+  FaRedo, 
+  FaChevronRight,
+  FaShoppingBag,
+  FaLock,
+} from "react-icons/fa";
+import { BsGridFill } from "react-icons/bs";
+import { AiFillEye } from "react-icons/ai";
+import { HiShoppingCart } from "react-icons/hi2";
 import { useAddToCartMutation } from "@/lib/api/cartApi";
-
 import { useSession } from "@/hooks/useSession";
 import { useCart } from "@/hooks/useCart";
 import { useAppDispatch, useAppSelector } from "@/hooks/useStore";
@@ -172,9 +172,7 @@ export default function WishlistPage() {
    <div className="min-h-[calc(100vh-140px)] bg-gray-50 flex items-center justify-center p-4 ">
   <div className="max-w-md w-full bg-white rounded-2xl shadow-lg p-8 text-center">
     <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-      <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-      </svg>
+      <FaLock className="w-8 h-8 text-gray-400" />
     </div>
     <h2 className="text-2xl font-semibold text-gray-900 mb-2">Sign in required</h2>
     <p className="text-gray-500 mb-6">Please sign in to access your wishlist</p>
@@ -198,7 +196,7 @@ export default function WishlistPage() {
           <Link href="/" className="hover:text-black transition-colors">
             Home
           </Link>
-          <FiChevronRight className="w-3.5 h-3.5 text-gray-400" />
+          <FaChevronRight className="w-3.5 h-3.5 text-gray-400" />
           <span className="text-gray-900 font-semibold">My Wishlist</span>
         </nav>
 
@@ -215,7 +213,7 @@ export default function WishlistPage() {
               
               {/* Search Bar */}
               <div className="relative w-full lg:w-72 xl:w-80">
-                <FiSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <FaSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <input
                   type="text"
                   placeholder="Search in wishlist..."
@@ -238,7 +236,7 @@ export default function WishlistPage() {
                 {/* Sort Dropdown */}
                 <div className="flex items-center gap-1.5 sm:gap-2">
                   <span className="text-xs font-semibold text-gray-500 flex items-center gap-1 flex-shrink-0">
-                    <FiFilter className="w-3.5 h-3.5" /> Sort:
+                    <FaFilter className="w-3.5 h-3.5" /> Sort:
                   </span>
                   <select
                     value={sortBy}
@@ -264,7 +262,7 @@ export default function WishlistPage() {
                     }`}
                     title="Grid View"
                   >
-                    <FiGrid className="w-4 h-4" />
+                    <BsGridFill className="w-4 h-4" />
                   </button>
                   <button
                     onClick={() => setViewMode("list")}
@@ -275,7 +273,7 @@ export default function WishlistPage() {
                     }`}
                     title="List View"
                   >
-                    <FiList className="w-4 h-4" />
+                    <FaList className="w-4 h-4" />
                   </button>
                 </div>
 
@@ -287,9 +285,9 @@ export default function WishlistPage() {
                     className="flex items-center gap-1.5 text-xs font-semibold bg-black hover:bg-gray-800 active:scale-95 text-white px-3.5 py-2 rounded-lg transition-all shadow-sm disabled:opacity-50"
                   >
                     {movingAllToCart ? (
-                      <FiRefreshCw className="w-3.5 h-3.5 animate-spin" />
+                      <FaRedo className="w-3.5 h-3.5 animate-spin" />
                     ) : (
-                      <FiShoppingCart className="w-3.5 h-3.5" />
+                      <HiShoppingCart className="w-3.5 h-3.5" />
                     )}
                     <span>Add All to Cart</span>
                   </button>
@@ -299,7 +297,7 @@ export default function WishlistPage() {
                     className="p-2 text-gray-400 hover:text-black hover:bg-gray-100 rounded-lg transition-colors"
                     title="Clear Wishlist"
                   >
-                    <FiTrash2 className="w-4 h-4" />
+                    <FaTrash className="w-4 h-4" />
                   </button>
                 </div>
               </div>
@@ -337,7 +335,7 @@ export default function WishlistPage() {
                           className="absolute top-3 right-3 z-20 p-2 bg-white/90 backdrop-blur-md hover:bg-gray-100 text-gray-400 hover:text-black rounded-full shadow-md transition-all duration-200 border border-gray-100 active:scale-90"
                           title="Remove from wishlist"
                         >
-                          <FiTrash2 className="w-4 h-4" />
+                          <FaTrash className="w-4 h-4" />
                         </button>
 
                         {/* Top Badge: Sale / Stock */}
@@ -420,20 +418,7 @@ export default function WishlistPage() {
                                       />
                                     </svg>
                                   ) : (
-                                    <svg
-                                      xmlns="http://www.w3.org/2000/svg"
-                                      fill="none"
-                                      viewBox="0 0 24 24"
-                                      strokeWidth="1.5"
-                                      stroke="currentColor"
-                                      className="w-[18px] h-[18px]"
-                                    >
-                                      <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"
-                                      />
-                                    </svg>
+                                    <HiShoppingCart className="w-[18px] h-[18px]" />
                                   )}
                                 </div>
                               </button>
@@ -535,7 +520,7 @@ export default function WishlistPage() {
                                 {loadingItemId === String(item.id) ? (
                                   <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" /></svg>
                                 ) : (
-                                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-4 h-4"><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" /></svg>
+                                  <HiShoppingCart className="w-4 h-4" />
                                 )}
                               </div>
                             </button>
@@ -544,14 +529,14 @@ export default function WishlistPage() {
                               className="p-1.5 border border-gray-200 text-gray-500 hover:text-white hover:border-black hover:bg-black rounded-full transition-all duration-200 active:scale-95 flex items-center justify-center"
                               aria-label="Quick view product"
                             >
-                              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4"><path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" /><path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" /></svg>
+                              <AiFillEye className="w-4 h-4" />
                             </button>
                             <button
                               onClick={() => handleRemoveItem(item.id)}
                               className="p-1.5 border border-gray-200 text-gray-400 hover:text-red-600 hover:border-red-200 hover:bg-red-50 rounded-full transition-all duration-200 active:scale-95 flex items-center justify-center"
                               title="Remove from wishlist"
                             >
-                              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4"><path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" /></svg>
+                              <FaTrash className="w-3.5 h-3.5" />
                             </button>
                           </div>
                         </div>
@@ -566,9 +551,9 @@ export default function WishlistPage() {
                           )}
                         </div>
                         <div className="flex items-center gap-2">
-                          <button onClick={() => handleAddToCart(item)} disabled={loadingItemId === String(item.id) || item.inStock === false} className="relative p-2 border border-gray-200 text-gray-500 hover:text-white hover:border-black hover:bg-black rounded-full transition-all duration-200 active:scale-95 flex items-center justify-center overflow-hidden" aria-label="Add to cart"><div className="relative w-[18px] h-[18px] flex items-center justify-center">{loadingItemId === String(item.id) ? <svg className="animate-spin h-[18px] w-[18px]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" /></svg> : <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-[18px] h-[18px]"><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" /></svg>}</div></button>
-                          <button onClick={() => setQuickViewSlug(item.slug || item.id)} className="p-2 border border-gray-200 text-gray-500 hover:text-white hover:border-black hover:bg-black rounded-full transition-all duration-200 active:scale-95 flex items-center justify-center" aria-label="Quick view product"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-[18px]"><path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" /><path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" /></svg></button>
-                          <button onClick={() => handleRemoveItem(item.id)} className="p-2 border border-gray-200 text-gray-400 hover:text-red-600 hover:border-red-200 hover:bg-red-50 rounded-full transition-all duration-200 active:scale-95 flex items-center justify-center" title="Remove from wishlist"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-[18px] h-[18px]"><path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" /></svg></button>
+                          <button onClick={() => handleAddToCart(item)} disabled={loadingItemId === String(item.id) || item.inStock === false} className="relative p-2 border border-gray-200 text-gray-500 hover:text-white hover:border-black hover:bg-black rounded-full transition-all duration-200 active:scale-95 flex items-center justify-center overflow-hidden" aria-label="Add to cart"><div className="relative w-[18px] h-[18px] flex items-center justify-center">{loadingItemId === String(item.id) ? <svg className="animate-spin h-[18px] w-[18px]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" /></svg> : <HiShoppingCart className="w-[18px] h-[18px]" />}</div></button>
+                          <button onClick={() => setQuickViewSlug(item.slug || item.id)} className="p-2 border border-gray-200 text-gray-500 hover:text-white hover:border-black hover:bg-black rounded-full transition-all duration-200 active:scale-95 flex items-center justify-center" aria-label="Quick view product"><AiFillEye className="size-[18px]" /></button>
+                          <button onClick={() => handleRemoveItem(item.id)} className="p-2 border border-gray-200 text-gray-400 hover:text-red-600 hover:border-red-200 hover:bg-red-50 rounded-full transition-all duration-200 active:scale-95 flex items-center justify-center" title="Remove from wishlist"><FaTrash className="w-[18px] h-[18px]" /></button>
                         </div>
                       </div>
                     </div>
@@ -581,7 +566,7 @@ export default function WishlistPage() {
           /* EMPTY WISHLIST STATE */
           <div className="bg-white rounded-3xl border border-gray-200/80 p-8 sm:p-16 text-center my-8 shadow-sm">
             <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center text-black shadow-inner">
-              <FiHeart className="w-12 h-12 stroke-[1.5]" />
+              <FaHeart className="w-12 h-12 text-gray-400" />
             </div>
 
             <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 mb-2">
@@ -595,9 +580,9 @@ export default function WishlistPage() {
               href="/all-products"
               className="inline-flex items-center gap-2.5 bg-black hover:bg-gray-800 text-white font-bold text-sm px-8 py-3.5 rounded-xl transition-all shadow-lg hover:shadow-gray-500/25 active:scale-95"
             >
-              <FiShoppingBag className="w-4 h-4" />
+              <FaShoppingBag className="w-4 h-4" />
               <span>Explore Books</span>
-              <FiArrowRight className="w-4 h-4" />
+              <FaArrowRight className="w-4 h-4" />
             </Link>
           </div>
         ):(<div className="bg-white rounded-3xl  p-8 sm:p-16 text-center my-8">

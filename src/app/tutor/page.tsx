@@ -2,6 +2,13 @@
 
 import React, { FormEvent, useState, useEffect } from "react";
 import config from "../config";
+import { FaUser, FaChevronDown } from "react-icons/fa6";
+import { IoIosMail } from "react-icons/io";
+import { IoCall, IoLocationSharp } from "react-icons/io5";
+import { BsBriefcaseFill } from "react-icons/bs";
+import { PiCity } from "react-icons/pi";
+
+
 
 export default function Tutor() {
   const [alertMessage, setAlertMessage] = useState("");
@@ -92,14 +99,14 @@ export default function Tutor() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-neutral-50 via-neutral-100 to-neutral-200/50 flex items-center justify-center px-4 py-16 md:py-24 relative overflow-hidden">
-      
+
       {/* Decorative Background Orbs */}
       <div className="absolute top-10 left-10 w-96 h-96 bg-neutral-300/20 rounded-full filter blur-[80px] pointer-events-none animate-pulse"></div>
       <div className="absolute bottom-10 right-10 w-96 h-96 bg-neutral-400/10 rounded-full filter blur-[100px] pointer-events-none"></div>
 
       {/* Card Container */}
       <div className="w-full max-w-2xl bg-white rounded-[2.5rem] shadow-2xl border border-neutral-200/60 p-8 md:p-12 relative z-10">
-        
+
         {/* Header */}
         <div className="mb-10 text-center">
           <span className="text-xs font-bold uppercase  text-neutral-500">Join Bookwindow</span>
@@ -115,11 +122,10 @@ export default function Tutor() {
         {/* Alerts */}
         {alertMessage && (
           <div
-            className={`w-full p-4 mb-8 text-sm rounded-2xl border flex items-center justify-between transition-all duration-300 ${
-              alertType === "error"
-                ? "bg-red-50 text-red-800 border-red-200"
-                : "bg-green-50 text-green-800 border-green-200"
-            }`}
+            className={`w-full p-4 mb-8 text-sm rounded-2xl border flex items-center justify-between transition-all duration-300 ${alertType === "error"
+              ? "bg-red-50 text-red-800 border-red-200"
+              : "bg-green-50 text-green-800 border-green-200"
+              }`}
           >
             <span>{alertMessage}</span>
             <button
@@ -132,7 +138,7 @@ export default function Tutor() {
         )}
 
         <form className="flex flex-col gap-6" onSubmit={handleSubmit}>
-          
+
           {/* Row 1: Name and Email */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             <div className="flex flex-col gap-2">
@@ -141,9 +147,7 @@ export default function Tutor() {
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400">
-                  <svg className="w-5 h-5 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                  </svg>
+                  <FaUser className="w-4 h-4 pointer-events-none" />
                 </div>
                 <input
                   type="text"
@@ -161,9 +165,7 @@ export default function Tutor() {
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400">
-                  <svg className="w-5 h-5 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                  </svg>
+                  <IoIosMail className="w-5 h-5 pointer-events-none" />
                 </div>
                 <input
                   type="email"
@@ -184,9 +186,7 @@ export default function Tutor() {
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400">
-                  <svg className="w-5 h-5 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.725.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                  </svg>
+                  <IoCall className="w-5 h-5 pointer-events-none" />
                 </div>
                 <input
                   type="text"
@@ -204,9 +204,7 @@ export default function Tutor() {
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400">
-                  <svg className="w-5 h-5 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                  </svg>
+                  <BsBriefcaseFill className="w-4 h-4 pointer-events-none" />
                 </div>
                 <select
                   name="role"
@@ -219,9 +217,7 @@ export default function Tutor() {
                   <option value="Parent/Guardian">Parent/Guardian</option>
                 </select>
                 <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none text-neutral-400">
-                  <svg className="w-4 h-4 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-                  </svg>
+                  <FaChevronDown className="w-3.5 h-3.5 pointer-events-none" />
                 </div>
               </div>
             </div>
@@ -235,10 +231,7 @@ export default function Tutor() {
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400">
-                  <svg className="w-5 h-5 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
+                  <IoLocationSharp className="w-4 h-4 pointer-events-none" />
                 </div>
                 <input
                   type="text"
@@ -256,9 +249,7 @@ export default function Tutor() {
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400">
-                  <svg className="w-5 h-5 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                  </svg>
+                  <PiCity className="w-4 h-4 pointer-events-none" />
                 </div>
                 <input
                   type="text"

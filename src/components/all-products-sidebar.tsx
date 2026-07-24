@@ -3,6 +3,7 @@
 import config from "@/app/config";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
+import { FaChevronDown, FaSearch, FaCheck } from "react-icons/fa";
 
 export default function AllProductSidebar({
   products,
@@ -86,19 +87,8 @@ export default function AllProductSidebar({
   const visiblePubs = filteredPubs.slice(0, publicationLimit);
 
   const CheckedIcon = () => (
-    <div className="w-[18px] h-[18px] border border-black flex items-center justify-center bg-white flex-shrink-0 transition-all duration-200">
-      <svg
-        className="w-2.5 h-2.5 text-black"
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="4"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        <polyline points="20 6 9 17 4 12" />
-      </svg>
+    <div className="w-[18px] h-[18px] border border-black flex items-center justify-center bg-black text-white flex-shrink-0 transition-all duration-200">
+      <FaCheck className="w-2.5 h-2.5" />
     </div>
   );
 
@@ -131,18 +121,11 @@ export default function AllProductSidebar({
                 Clear
               </button>
             )}
-            <svg
-              className={`w-4 h-4 text-black transition-transform duration-200 ${
+            <FaChevronDown
+              className={`w-3.5 h-3.5 text-black transition-transform duration-200 ${
                 isCategoriesOpen ? "rotate-0" : "-rotate-90"
               }`}
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth="2.5"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-            </svg>
+            />
           </div>
         </div>
 
@@ -150,20 +133,9 @@ export default function AllProductSidebar({
           <div className="flex flex-col gap-3 mt-1">
             {/* Search Input */}
             <div className="relative">
-              <svg
-                className="absolute left-3 top-2.5 w-3.5 h-3.5 text-neutral-450"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth="2.5"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                />
-              </svg>
+              <FaSearch
+                className="absolute left-3 top-2.5 w-3.5 h-3.5 text-neutral-400"
+              />
               <input
                 type="text"
                 placeholder="Search categories..."
@@ -275,18 +247,11 @@ export default function AllProductSidebar({
                 Clear
               </button>
             )}
-            <svg
-              className={`w-4 h-4 text-black transition-transform duration-200 ${
+            <FaChevronDown
+              className={`w-3.5 h-3.5 text-black transition-transform duration-200 ${
                 isPublicationsOpen ? "rotate-0" : "-rotate-90"
               }`}
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth="2.5"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-            </svg>
+            />
           </div>
         </div>
 
@@ -294,20 +259,9 @@ export default function AllProductSidebar({
           <div className="flex flex-col gap-3 mt-1">
             {/* Search Input */}
             <div className="relative">
-              <svg
-                className="absolute left-3 top-2.5 w-3.5 h-3.5 text-neutral-450"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth="2.5"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                />
-              </svg>
+              <FaSearch
+                className="absolute left-3 top-2.5 w-3.5 h-3.5 text-neutral-400"
+              />
               <input
                 type="text"
                 placeholder="Search publications..."

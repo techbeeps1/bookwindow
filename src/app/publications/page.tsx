@@ -5,16 +5,15 @@ import axios from "axios";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import {
-  FiSearch,
-  FiBookOpen,
-  FiArrowRight,
-  FiLayers,
-  FiRefreshCw,
-  FiChevronDown,
-  FiChevronRight,
-  FiCheckCircle,
-  FiGrid,
-} from "react-icons/fi";
+  FaSearch,
+  FaBookOpen,
+  FaArrowRight,
+  FaRedo,
+  FaChevronDown,
+  FaChevronRight,
+  FaCheckCircle,
+} from "react-icons/fa";
+import { BsGridFill } from "react-icons/bs";
 import config from "@/app/config";
 import Image from "next/image";
 
@@ -58,7 +57,7 @@ function PublisherCard({
         ) : (
           <div className="flex flex-col items-center justify-center text-gray-400 p-4 text-center">
             <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mb-2 group-hover:bg-black group-hover:text-white transition-colors duration-300">
-              <FiBookOpen className="w-6 h-6" />
+              <FaBookOpen className="w-6 h-6" />
             </div>
             <span className="text-xs font-bold text-gray-600 uppercase tracking-wider line-clamp-1 px-2">
               {pub.name}
@@ -92,7 +91,7 @@ function PublisherCard({
           className="w-full mt-2 py-2.5 px-4 bg-gray-900 text-white hover:bg-black rounded-xl font-semibold text-xs transition-all duration-200 flex items-center justify-center gap-2 group/btn shadow-xs hover:shadow-md"
         >
           <span>View Books</span>
-          <FiArrowRight className="w-4 h-4 transition-transform group-hover/btn:translate-x-1" />
+          <FaArrowRight className="w-4 h-4 transition-transform group-hover/btn:translate-x-1" />
         </Link>
       </div>
     </motion.div>
@@ -195,7 +194,7 @@ export default function Publications() {
                 <Link href="/" className="hover:text-black transition-colors">
                   Home
                 </Link>
-                <FiChevronRight className="w-3.5 h-3.5 text-gray-400" />
+                <FaChevronRight className="w-3.5 h-3.5 text-gray-400" />
                 <span className="text-gray-900 font-semibold">Publications</span>
               </nav>
               <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 tracking-tight">
@@ -205,7 +204,7 @@ export default function Publications() {
 
             {/* Search Input */}
             <div className="w-full md:w-80 relative">
-              <FiSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <FaSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
               <input
                 type="text"
                 value={searchQuery}
@@ -228,7 +227,7 @@ export default function Publications() {
           {!loading && publications.length > 0 && (
             <div className="mt-8 pt-6 border-t border-gray-100 flex flex-wrap items-center gap-1.5">
               <span className="text-xs font-bold text-gray-400 uppercase tracking-wider mr-2 flex items-center gap-1">
-                <FiGrid className="w-3 h-3 text-gray-400" /> Filter:
+                <BsGridFill className="w-3 h-3 text-gray-400" /> Filter:
               </span>
               {alphabet.map((letter) => (
                 <button
@@ -301,7 +300,7 @@ export default function Publications() {
               onClick={fetchPublications}
               className="px-4 py-2 bg-red-600 text-white rounded-xl text-xs font-semibold hover:bg-red-700 transition-colors inline-flex items-center gap-2"
             >
-              <FiRefreshCw className="w-3.5 h-3.5" /> Retry Loading
+              <FaRedo className="w-3.5 h-3.5" /> Retry Loading
             </button>
           </div>
         )}
@@ -346,7 +345,7 @@ export default function Publications() {
                   className="px-8 py-3 bg-black hover:bg-gray-800 text-white rounded-xl font-bold text-xs shadow-md hover:shadow-lg transition-all duration-300 flex items-center gap-2 group cursor-pointer active:scale-95 border border-black"
                 >
                   <span>Load More Publications</span>
-                  <FiChevronDown className="w-4 h-4 group-hover:translate-y-0.5 transition-transform" />
+                  <FaChevronDown className="w-4 h-4 group-hover:translate-y-0.5 transition-transform" />
                 </button>
               </div>
             )}
@@ -355,7 +354,7 @@ export default function Publications() {
             {filteredPublications.length > 12 && visibleCount >= filteredPublications.length && (
               <div className="mt-12 text-center py-6 border-t border-gray-200/60">
                 <p className="text-xs text-gray-500 font-medium inline-flex items-center gap-2 bg-emerald-50 text-emerald-700 px-4 py-2 rounded-full border border-emerald-200">
-                  <FiCheckCircle className="w-4 h-4 text-emerald-600" />
+                  <FaCheckCircle className="w-4 h-4 text-emerald-600" />
                   You&apos;ve viewed all {filteredPublications.length} publications
                 </p>
               </div>
@@ -367,7 +366,7 @@ export default function Publications() {
         {!loading && !error && filteredPublications.length === 0 && (
           <div className="bg-white rounded-2xl border border-gray-200 p-12 text-center max-w-md mx-auto my-12 space-y-4 shadow-xs">
             <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto text-gray-400">
-              <FiSearch className="w-6 h-6" />
+              <FaSearch className="w-6 h-6" />
             </div>
             <h3 className="font-bold text-gray-800 text-lg">No Publications Found</h3>
             <p className="text-xs text-gray-500">

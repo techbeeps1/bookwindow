@@ -12,9 +12,9 @@ import { openCartDrawer } from "@/lib/slices/uiSlice";
 import { motion } from "framer-motion";
 import { useAddToWishlistMutation, useViewWishlistIdQuery } from "@/lib/api/wishlistApi";
 import toast from "react-hot-toast";
-import { HiOutlineShoppingCart } from "react-icons/hi2";
-import { AiOutlineEye } from "react-icons/ai";
-import { LuHeart } from "react-icons/lu";
+import { HiShoppingCart } from "react-icons/hi2";
+import { AiFillEye } from "react-icons/ai";
+import { FaHeart } from "react-icons/fa";
 
 
 interface BookCardProps {
@@ -179,9 +179,9 @@ export function BookCard({
               >
                 <div className="relative w-4 h-4 flex items-center justify-center">
                   {isLoading ? (
-                    <HiOutlineShoppingCart size={20} />
+                    <HiShoppingCart size={20} />
                   ) : (
-                    <HiOutlineShoppingCart size={20} />
+                    <HiShoppingCart size={20} />
                   )}
                 </div>
               </button>
@@ -193,7 +193,7 @@ export function BookCard({
                 aria-label="Quick view product"
                 title="Quick view"
               >
-                <AiOutlineEye />
+                <AiFillEye />
 
               </button>
 
@@ -204,9 +204,9 @@ export function BookCard({
                 title="Toggle Wishlist"
               >
                 {isWishlisted ? (
-                  <LuHeart className="w-4 h-4" />
+                  <FaHeart className="w-4 h-4 text-red-500" />
                 ) : (
-                  <LuHeart className="w-4 h-4" />
+                  <FaHeart className="w-4 h-4" />
                 )}
               </button>
             </div>
@@ -243,9 +243,9 @@ export function BookCard({
             >
               <div className="relative w-5 h-5 flex items-center justify-center">
                 {isLoading ? (
-                  <HiOutlineShoppingCart size={20} />
+                  <HiShoppingCart size={20} />
                 ) : (
-                  <HiOutlineShoppingCart size={20} />
+                  <HiShoppingCart size={20} />
                 )}
               </div>
             </button>
@@ -257,7 +257,7 @@ export function BookCard({
               aria-label="Quick view product"
               title="Quick view"
             >
-              <AiOutlineEye />
+              <AiFillEye />
             </button>
 
             {/* Wishlist Toggle Heart Button */}
@@ -267,9 +267,9 @@ export function BookCard({
               title="Toggle Wishlist"
             >
               {isWishlisted ? (
-                <LuHeart className="w-4 h-4" />
+                <FaHeart className="w-4 h-4 text-red-500" />
               ) : (
-                <LuHeart className="w-4 h-4" />
+                <FaHeart className="w-4 h-4" />
               )}
             </button>
           </div>
@@ -303,9 +303,9 @@ export function BookCard({
         title="Toggle Wishlist"
       >
         {isWishlisted ? (
-          <LuHeart size={18} />
+          <FaHeart size={18} className="text-red-500" />
         ) : (
-          <LuHeart size={18} />
+          <FaHeart size={18} />
         )}
       </button>
 
@@ -365,9 +365,9 @@ export function BookCard({
             >
               <div className="relative w-5 h-5 flex items-center justify-center">
                 {isLoading ? (
-                  <HiOutlineShoppingCart size={20} />
+                  <HiShoppingCart size={20} />
                 ) : (
-                  <HiOutlineShoppingCart size={20} />
+                  <HiShoppingCart size={20} />
                 )}
               </div>
             </button>
@@ -379,7 +379,7 @@ export function BookCard({
               aria-label="Quick view product"
               title="Quick view"
             >
-              <AiOutlineEye size={20} />
+              <AiFillEye size={20} />
             </button>
           </div>
         </div>

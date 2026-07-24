@@ -10,7 +10,7 @@ import Link from "next/link";
 
 
 
-export function PublicationsCategory({
+export function   PublicationsCategory({
   data
 }: any) {
 

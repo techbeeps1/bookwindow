@@ -19,22 +19,22 @@ export default function CategoryPage({ categoryData }: { categoryData: any }) {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
 
- 
 
-const products = useMemo(
-  () => categoryData?.products ?? [],
-  [categoryData]
-);
 
-const childCategory = useMemo(
-  () => categoryData?.category ?? [],
-  [categoryData]
-);
+  const products = useMemo(
+    () => categoryData?.products ?? [],
+    [categoryData]
+  );
 
-const publicationData = useMemo(
-  () => categoryData?.production ?? [],
-  [categoryData]
-);
+  const childCategory = useMemo(
+    () => categoryData?.category ?? [],
+    [categoryData]
+  );
+
+  const publicationData = useMemo(
+    () => categoryData?.production ?? [],
+    [categoryData]
+  );
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -44,8 +44,8 @@ const publicationData = useMemo(
     let filtered = products.filter((product: any) => {
       const categoryMatch =
         selectedCategoryIds.length === 0 ||
-        product.category_id.some((id:any) => selectedCategoryIds.includes(Number(id)) );
-     
+        product.category_id.some((id: any) => selectedCategoryIds.includes(Number(id)));
+
       const publicationMatch =
         selectedPublicationIds.length === 0 ||
         selectedPublicationIds.includes(product.production_id);
@@ -66,7 +66,7 @@ const publicationData = useMemo(
       filtered.sort((a: any, b: any) => (a.name || "").localeCompare(b.name || ""));
     }
 
-    
+
     return filtered;
   }, [products, selectedCategoryIds, selectedPublicationIds, searchQuery, sortBy]);
 
@@ -110,7 +110,7 @@ const publicationData = useMemo(
 
   return (
     <>
-      <section className="container mx-auto mb-10 mt-10 flex flex-col md:flex-row px-3 sm:px-5 lg:px-8 gap-4 lg:gap-6 overflow-x-hidden">
+      <section className="container mx-auto mb-10 mt-10 flex flex-col md:flex-row px-3 sm:px-5 lg:px-8 gap-4 lg:gap-6">
         <CategoryPublicationSidebar
           onCategorySelect={handleCategorySelect}
           onPublicationSelect={handlePublicationSelect}
@@ -121,13 +121,13 @@ const publicationData = useMemo(
           publications={publicationData}
           category_id={childCategory[0]?.parent_id}
           isFetched={false}
-        
+
         />
 
         <div className="flex-1 w-full min-w-0">
           {/* Top Filter & Toolbar matching Wishlist header */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-3 sm:p-4 mb-6 flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3 w-full overflow-hidden">
-            
+
             {/* Search Bar */}
             <div className="relative w-full lg:w-72 xl:w-80">
               <FiSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -171,22 +171,20 @@ const publicationData = useMemo(
               <div className="flex items-center bg-gray-100 p-1 rounded-lg border border-gray-200 flex-shrink-0">
                 <button
                   onClick={() => setViewMode("grid")}
-                  className={`p-1.5 rounded-md transition-all ${
-                    viewMode === "grid"
-                      ? "bg-white text-black shadow-sm font-semibold"
-                      : "text-gray-500 hover:text-gray-800"
-                  }`}
+                  className={`p-1.5 rounded-md transition-all ${viewMode === "grid"
+                    ? "bg-white text-black shadow-sm font-semibold"
+                    : "text-gray-500 hover:text-gray-800"
+                    }`}
                   title="Grid View"
                 >
                   <FiGrid className="w-4 h-4" />
                 </button>
                 <button
                   onClick={() => setViewMode("list")}
-                  className={`p-1.5 rounded-md transition-all ${
-                    viewMode === "list"
-                      ? "bg-white text-black shadow-sm font-semibold"
-                      : "text-gray-500 hover:text-gray-800"
-                  }`}
+                  className={`p-1.5 rounded-md transition-all ${viewMode === "list"
+                    ? "bg-white text-black shadow-sm font-semibold"
+                    : "text-gray-500 hover:text-gray-800"
+                    }`}
                   title="List View"
                 >
                   <FiList className="w-4 h-4" />
@@ -195,15 +193,15 @@ const publicationData = useMemo(
             </div>
           </div>
 
-          { displayedProducts?.length === 0 ? (
+          {displayedProducts?.length === 0 ? (
             <div className="bg-white rounded-2xl border border-gray-200 p-12 text-center text-xl font-bold text-gray-600">
-             <div className="text-4xl mb-4">
-              Products not found
-             </div>
+              <div className="text-4xl mb-4">
+                Products not found
+              </div>
             </div>
           ) : (
-            <div className={viewMode === "grid" 
-              ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4" 
+            <div className={viewMode === "grid"
+              ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
               : "flex flex-col gap-4"
             }>
               {currentItems.map((product: any) => {
@@ -211,8 +209,8 @@ const publicationData = useMemo(
                   (sub: any) => sub.id == product.category_id[0]
                 );
 
-   
-             
+
+
                 return (
                   <BookCard
                     key={product.id}
@@ -228,7 +226,7 @@ const publicationData = useMemo(
                     slug={product.slug}
                     id={product.id}
                     quantity={product.quantity}
-                    onItemsCountUpdate={()=>{}}
+                    onItemsCountUpdate={() => { }}
                     subcategoryName={subcategory?.name}
                     mainCategoryName={"slug"}
                     viewMode={viewMode}
@@ -248,11 +246,10 @@ const publicationData = useMemo(
                   window.scrollTo({ top: 0, behavior: "smooth" });
                 }}
                 disabled={currentPage === 1}
-                className={`flex items-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-full border transition-all duration-200 active:scale-95 ${
-                  currentPage === 1
-                    ? "bg-[#f5f5f5] text-neutral-400 border-transparent cursor-not-allowed opacity-60"
-                    : "bg-white text-black border-neutral-300 hover:bg-neutral-50 hover:border-neutral-400 hover:shadow-sm"
-                }`}
+                className={`flex items-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-full border transition-all duration-200 active:scale-95 ${currentPage === 1
+                  ? "bg-[#f5f5f5] text-neutral-400 border-transparent cursor-not-allowed opacity-60"
+                  : "bg-white text-black border-neutral-300 hover:bg-neutral-50 hover:border-neutral-400 hover:shadow-sm"
+                  }`}
               >
                 <MdKeyboardArrowLeft className="w-6 h-6" />
                 <span>Previous</span>
@@ -272,11 +269,10 @@ const publicationData = useMemo(
                   window.scrollTo({ top: 0, behavior: "smooth" });
                 }}
                 disabled={currentPage === totalPages}
-                className={`flex items-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-full border transition-all duration-200 active:scale-95 ${
-                  currentPage === totalPages
-                    ? "bg-[#f5f5f5] text-neutral-400 border-transparent cursor-not-allowed opacity-60"
-                    : "bg-white text-black border-neutral-300 hover:bg-neutral-50 hover:border-neutral-400 hover:shadow-sm"
-                }`}
+                className={`flex items-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-full border transition-all duration-200 active:scale-95 ${currentPage === totalPages
+                  ? "bg-[#f5f5f5] text-neutral-400 border-transparent cursor-not-allowed opacity-60"
+                  : "bg-white text-black border-neutral-300 hover:bg-neutral-50 hover:border-neutral-400 hover:shadow-sm"
+                  }`}
               >
                 <span>Next</span>
                 <MdKeyboardArrowRight className="w-6 h-6" />

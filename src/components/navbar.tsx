@@ -3,8 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useAppSelector } from "@/hooks/useStore";
 import config from "@/app/config";
-import { ChevronDownIcon } from "@heroicons/react/24/outline";
-import { XMarkIcon, Bars3Icon } from "@heroicons/react/24/solid";
+import { ChevronDownIcon, XMarkIcon, Bars3Icon } from "@heroicons/react/24/solid";
 import logo from "../../public/logos/logo.svg";
 import { useAppDispatch } from "@/hooks/useStore";
 import { openCartDrawer } from "@/lib/slices/uiSlice";
@@ -13,9 +12,8 @@ import { useViewProductsQuery } from "@/lib/api/productsApi";
 import { logout } from "@/lib/slices/authSlice";
 import { useRouter } from "next/navigation";
 import { IoSearchSharp, IoClose } from "react-icons/io5";
-import { LuHeart } from "react-icons/lu";
-import { FaRegUser } from "react-icons/fa";
-import { HiOutlineShoppingCart } from "react-icons/hi2";
+import { FaHeart, FaUser } from "react-icons/fa";
+import { HiShoppingCart } from "react-icons/hi2";
 
 
 const resolveUrl = (url: string) => {
@@ -232,14 +230,14 @@ export function Navbar({ menuData }: any) {
                   {/* Right Icons (Profile/Cart) */}
                   <div className="flex-shrink-0 flex items-center gap-6">
                     <Link href="/wishlist" className="text-white hover:text-white/80 transition-colors">
-                      <LuHeart className="w-5 h-5" />
+                      <FaHeart className="w-5 h-5" />
                     </Link>
                     {/* User Account Dropdown */}
                     {isAuthenticated ? (
                       <div className="relative group">
 
                         <button className="flex items-center gap-1 text-white hover:text-white/80 transition-colors focus:outline-none py-1">
-                          <FaRegUser className="w-4 h-4" />
+                          <FaUser className="w-4 h-4" />
                           <span className="text-xs font-medium max-w-[80px] truncate hidden md:inline ml-1">
                             {user?.name}
                           </span>
@@ -264,11 +262,11 @@ export function Navbar({ menuData }: any) {
                       </div>
                     ) : (
                       <Link href="/sign-in" className="text-white hover:text-white/80 transition-colors">
-                        <FaRegUser className="w-5 h-5" />
+                        <FaUser className="w-5 h-5" />
                       </Link>
                     )}
                     <button className="relative text-white hover:text-white/80 transition-colors" onClick={() => dispatch(openCartDrawer())}>
-                      <HiOutlineShoppingCart className="w-5 h-5" />
+                      <HiShoppingCart className="w-5 h-5" />
                       {data?.items_count > 0 && (
                         <span className="absolute -top-1.5 -right-1.5 bg-white text-black text-[9px] font-extrabold w-4 h-4 rounded-full flex items-center justify-center border border-black shadow-sm">
                           {data.items_count}
@@ -596,7 +594,7 @@ export function Navbar({ menuData }: any) {
             </Link>
           ) : (
             <Link href="/sign-in" className="flex items-center justify-center w-10 h-10 rounded-full bg-neutral-900 text-white border border-white/10 shadow-md hover:bg-neutral-800 transform active:scale-95 transition-all">
-              <FaRegUser className="w-4 h-4" />
+              <FaUser className="w-4 h-4" />
             </Link>
           )}
         </div>
@@ -619,7 +617,7 @@ export function Navbar({ menuData }: any) {
 
         <div className="flex-shrink-0">
           <Link href="/wishlist" className="text-white hover:text-white/80 transition-colors">
-            <LuHeart className="w-5 h-5" />
+            <FaHeart className="w-5 h-5" />
           </Link>
 
 
@@ -627,7 +625,7 @@ export function Navbar({ menuData }: any) {
         <div className="flex-shrink-0">
 
           <button className="flex items-center justify-center w-10 h-10 rounded-full bg-neutral-900 text-white border border-white/10 shadow-md hover:bg-neutral-800 transform active:scale-95 transition-all " onClick={() => dispatch(openCartDrawer())}>
-            <HiOutlineShoppingCart className="w-5 h-5" />
+            <HiShoppingCart className="w-5 h-5" />
             {data?.items_count > 0 && (
               <span className="absolute -top-1.5 -right-1.5 bg-white text-black text-[9px] font-extrabold w-4 h-4 rounded-full flex items-center justify-center border border-black shadow-sm">
                 {data.items_count}

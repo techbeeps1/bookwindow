@@ -4,6 +4,15 @@ import { FormEvent, useState, useEffect } from "react";
 import Image from "next/image";
 import React from "react";
 import config from "../config";
+import { FaUser } from "react-icons/fa";
+import { IoIosMail } from "react-icons/io";
+import { IoCall, IoLocationSharp } from "react-icons/io5";
+import { BiSolidMessageDetail } from "react-icons/bi";
+import { HiMiniPencilSquare } from "react-icons/hi2";
+import { FaUpload } from "react-icons/fa6";
+
+
+
 
 export default function RequestProduct() {
   const [image, setImage] = useState<File | null>(null);
@@ -130,9 +139,9 @@ export default function RequestProduct() {
 
         {/* Card Container */}
         <div className="w-full max-w-2xl bg-white rounded-3xl border border-neutral-200/80 shadow-sm p-6 sm:p-10">
-          
+
           <form className="flex flex-col gap-6" onSubmit={handleSubmit}>
-            
+
             {/* Your Name */}
             <div className="flex flex-col gap-1.5">
               <label className="text-xs font-semibold text-neutral-800 uppercase tracking-wider">
@@ -140,9 +149,7 @@ export default function RequestProduct() {
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400">
-                  <svg className="w-5 h-5 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                  </svg>
+                  <FaUser className="w-4 h-4 pointer-events-none" />
                 </div>
                 <input
                   type="text"
@@ -161,9 +168,7 @@ export default function RequestProduct() {
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400">
-                  <svg className="w-5 h-5 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                  </svg>
+                  <IoIosMail className="w-5 h-5 pointer-events-none" />
                 </div>
                 <input
                   type="email"
@@ -182,9 +187,7 @@ export default function RequestProduct() {
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400">
-                  <svg className="w-5 h-5 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.725.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                  </svg>
+                  <IoCall className="w-5 h-5 pointer-events-none" />
                 </div>
                 <input
                   type="tel"
@@ -203,9 +206,7 @@ export default function RequestProduct() {
               </label>
               <div className="relative">
                 <div className="absolute top-3 left-0 pl-3.5 flex pointer-events-none text-neutral-400">
-                  <svg className="w-5 h-5 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-                  </svg>
+                  <BiSolidMessageDetail className="w-5 h-5 pointer-events-none" />
                 </div>
                 <textarea
                   name="request"
@@ -224,9 +225,7 @@ export default function RequestProduct() {
               </label>
               <div className="relative">
                 <div className="absolute top-3 left-0 pl-3.5 flex pointer-events-none text-neutral-400">
-                  <svg className="w-5 h-5 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                  </svg>
+                  <HiMiniPencilSquare className="w-5 h-5 pointer-events-none" />
                 </div>
                 <textarea
                   name="remark"
@@ -240,9 +239,7 @@ export default function RequestProduct() {
             {/* Image Upload section */}
             <div className="flex flex-col items-center justify-center p-6 bg-[#fbfbfb] rounded-2xl border border-neutral-200/60 shadow-inner">
               <label className="cursor-pointer bg-black hover:bg-neutral-900 text-white font-extrabold text-xs uppercase tracking-widest px-5 py-3 rounded-xl transition-all duration-200 active:scale-97 shadow-md flex items-center gap-2">
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                </svg>
+                <FaUpload className="w-4 h-4" />
                 <span>Upload Image</span>
                 <input
                   type="file"
@@ -276,11 +273,10 @@ export default function RequestProduct() {
           {/* Alert Message */}
           {alertMessage && (
             <div
-              className={`w-full p-4 mt-6 text-sm rounded-2xl border flex items-center justify-between transition-all duration-300 ${
-                alertType === "error"
-                  ? "bg-red-50 text-red-800 border-red-200"
-                  : "bg-green-50 text-green-800 border-green-200"
-              }`}
+              className={`w-full p-4 mt-6 text-sm rounded-2xl border flex items-center justify-between transition-all duration-300 ${alertType === "error"
+                ? "bg-red-50 text-red-800 border-red-200"
+                : "bg-green-50 text-green-800 border-green-200"
+                }`}
             >
               <span>{alertMessage}</span>
               <button
