@@ -8,6 +8,13 @@ import ForgotPassword from "@/components/forgot-password";
 import { login } from "@/lib/slices/authSlice";
 import { useDispatch } from "react-redux";
 import toast from "react-hot-toast";
+import { FaCheckCircle, FaUser, FaPhoneAlt } from "react-icons/fa";
+import { IoMail } from "react-icons/io5";
+import { IoMdLock } from "react-icons/io";
+
+
+
+
 
 const generateCaptchaText = () => {
   const characters =
@@ -147,9 +154,8 @@ export default function AuthForm({ mode }: AuthFormProps) {
       }
 
       for (let i = 0; i < 5; i++) {
-        ctx.strokeStyle = `rgba(${Math.random() * 255},${Math.random() * 255},${
-          Math.random() * 255
-        },0.5)`;
+        ctx.strokeStyle = `rgba(${Math.random() * 255},${Math.random() * 255},${Math.random() * 255
+          },0.5)`;
         ctx.beginPath();
         ctx.moveTo(Math.random() * canvas.width, Math.random() * canvas.height);
         ctx.lineTo(Math.random() * canvas.width, Math.random() * canvas.height);
@@ -275,51 +281,15 @@ export default function AuthForm({ mode }: AuthFormProps) {
 
             <div className="mt-8 space-y-4">
               <div className="flex items-center gap-3 text-sm text-neutral-300">
-                <svg
-                  className="w-5 h-5 text-neutral-400 shrink-0 pointer-events-none"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth="2.5"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
+                <FaCheckCircle size={15} />
                 <span>Curated academic & literary collections</span>
               </div>
               <div className="flex items-center gap-3 text-sm text-neutral-300">
-                <svg
-                  className="w-5 h-5 text-neutral-400 shrink-0 pointer-events-none"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth="2.5"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
+                <FaCheckCircle size={15} />
                 <span>Fast, trackable home delivery</span>
               </div>
               <div className="flex items-center gap-3 text-sm text-neutral-300">
-                <svg
-                  className="w-5 h-5 text-neutral-400 shrink-0 pointer-events-none"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth="2.5"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
+                <FaCheckCircle size={15} />
                 <span>Safe & encrypted direct checkouts</span>
               </div>
             </div>
@@ -346,22 +316,20 @@ export default function AuthForm({ mode }: AuthFormProps) {
             <button
               type="button"
               onClick={() => handleTabChange("login")}
-              className={`py-3 flex-1 text-center text-sm font-bold rounded-full transition-all duration-300 active:scale-[0.97] focus:outline-none ${
-                activeTab === "login"
-                  ? "bg-black text-white shadow-lg shadow-black/10 scale-[1.01]"
-                  : "text-neutral-500 hover:text-neutral-900 hover:bg-neutral-200/40"
-              }`}
+              className={`py-3 flex-1 text-center text-sm font-bold rounded-full transition-all duration-300 active:scale-[0.97] focus:outline-none ${activeTab === "login"
+                ? "bg-black text-white shadow-lg shadow-black/10 scale-[1.01]"
+                : "text-neutral-500 hover:text-neutral-900 hover:bg-neutral-200/40"
+                }`}
             >
               Login
             </button>
             <button
               type="button"
               onClick={() => handleTabChange("register")}
-              className={`py-3 flex-1 text-center text-sm font-bold rounded-full transition-all duration-300 active:scale-[0.97] focus:outline-none ${
-                activeTab === "register"
-                  ? "bg-black text-white shadow-lg shadow-black/10 scale-[1.01]"
-                  : "text-neutral-500 hover:text-neutral-900 hover:bg-neutral-200/40"
-              }`}
+              className={`py-3 flex-1 text-center text-sm font-bold rounded-full transition-all duration-300 active:scale-[0.97] focus:outline-none ${activeTab === "register"
+                ? "bg-black text-white shadow-lg shadow-black/10 scale-[1.01]"
+                : "text-neutral-500 hover:text-neutral-900 hover:bg-neutral-200/40"
+                }`}
             >
               Register
             </button>
@@ -376,9 +344,7 @@ export default function AuthForm({ mode }: AuthFormProps) {
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400">
-                    <svg className="w-5 h-5 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                    </svg>
+                    <IoMail size={20} />
                   </div>
                   <input
                     type="email"
@@ -407,9 +373,9 @@ export default function AuthForm({ mode }: AuthFormProps) {
                 </div>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400">
-                    <svg className="w-5 h-5 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                    </svg>
+                    
+                    <IoMdLock size={20}/>
+
                   </div>
                   <input
                     type="password"
@@ -461,9 +427,7 @@ export default function AuthForm({ mode }: AuthFormProps) {
                   </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400">
-                      <svg className="w-5 h-5 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                      </svg>
+                      <FaUser className="w-4 h-4 pointer-events-none" />
                     </div>
                     <input
                       type="text"
@@ -482,9 +446,7 @@ export default function AuthForm({ mode }: AuthFormProps) {
                   </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400">
-                      <svg className="w-5 h-5 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                      </svg>
+                      <FaUser className="w-4 h-4 pointer-events-none" />
                     </div>
                     <input
                       type="text"
@@ -504,9 +466,7 @@ export default function AuthForm({ mode }: AuthFormProps) {
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400">
-                    <svg className="w-5 h-5 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                    </svg>
+                    <IoMail size={20} />
                   </div>
                   <input
                     type="email"
@@ -526,9 +486,7 @@ export default function AuthForm({ mode }: AuthFormProps) {
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400">
-                    <svg className="w-5 h-5 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.725.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                    </svg>
+                    <FaPhoneAlt className="w-4 h-4 pointer-events-none" />
                   </div>
                   <input
                     type="text"
@@ -547,9 +505,7 @@ export default function AuthForm({ mode }: AuthFormProps) {
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400">
-                    <svg className="w-5 h-5 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                    </svg>
+                    <IoMdLock size={20} />
                   </div>
                   <input
                     type="password"

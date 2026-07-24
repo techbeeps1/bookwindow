@@ -11,7 +11,8 @@ import { NotificationDialog } from "@/components/notification";
 import Link from "next/link";
 import FadeLoaderOverlay from "@/components/loader";
 import { useCart } from "@/hooks/useCart";
-import { RiDeleteBinLine } from "react-icons/ri";
+import { RiDeleteBinFill } from "react-icons/ri";
+import { IoClose, IoBag } from "react-icons/io5";
 import {
   useRemoveCartMutation,
   useUpdateCartMutation,
@@ -638,7 +639,7 @@ export default function ShoppingCart() {
                                 className="text-red-500 hover:text-red-700 transition-colors p-1 cursor-pointer"
                                 title="Remove Item"
                               >                               
-                                <RiDeleteBinLine className="w-6 h-6" />
+                                <RiDeleteBinFill className="w-6 h-6" />
                               </button>
                             </div>
                           </div>
@@ -706,14 +707,7 @@ export default function ShoppingCart() {
                                     }}
                                     className="p-0.5 hover:bg-green-100 rounded-full transition-colors text-green-600 hover:text-green-900 cursor-pointer"
                                   >
-                                    <svg
-                                      xmlns="http://www.w3.org/2000/svg"
-                                      viewBox="0 0 20 20"
-                                      fill="currentColor"
-                                      className="w-3.5 h-3.5"
-                                    >
-                                      <path d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z" />
-                                    </svg>
+                                    <IoClose className="w-4 h-4" />
                                   </button>
                                 </div>
                               )
@@ -1143,19 +1137,7 @@ export default function ShoppingCart() {
         ) : (
           <div className="mx-auto container p-4 sm:p-6 lg:p-8 flex flex-col items-center justify-center min-h-[60vh] bg-white border border-neutral-200/50 rounded-3xl shadow-sm">
             <div className="mb-6 p-5 bg-neutral-50 rounded-full border border-neutral-200/40 shadow-inner">
-              <svg
-                className="w-16 h-16 text-neutral-450"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                strokeWidth="1.5"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"
-                />
-              </svg>
+              <IoBag className="w-16 h-16 text-neutral-400" />
             </div>
 
             <h2 className="text-xl font-black text-neutral-800 uppercase tracking-widest">
