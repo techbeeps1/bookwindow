@@ -514,10 +514,8 @@ export function Navbar({ menuData }: any) {
           </div>
         </nav>
       </div>
-      {/* Spacer to prevent layout shift with fixed position */}
-      <div className="h-[74px] lg:h-[131px] w-full block pointer-events-none bg-black" />
 
-      <div className="lg:block hidden p-4 bg-black border-t border-white/20 ">
+      <div className="lg:block hidden p-4 bg-black border-t border-white/20 mt-[133px] ">
         <p className="text-white text-center">“ सर्वं सम्भाव्यते त्वयि। ”</p>
       </div>
 
