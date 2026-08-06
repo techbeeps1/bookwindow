@@ -2,6 +2,10 @@ import Image from "next/image";
 import config from "../config";
 import { Metadata } from "next";
 import { truncateDescription } from "@/helper/helperfun";
+import Link from "next/link";
+import { BiSearch } from "react-icons/bi";
+import { notFound } from "next/navigation";
+
 interface PageProps {
   params: Promise<{
     slug: string;
@@ -16,7 +20,10 @@ async function getPageData(slug: string) {
     }
   );
   if (!res.ok) {
-    throw new Error("Failed to fetch page");
+   return {
+    error:"Failed to fetch page data",
+    success:false
+   }
   }
   return res.json();
 }
@@ -26,7 +33,9 @@ export async function generateMetadata({
 }: PageProps): Promise<Metadata> {
   const { slug } = await params;
   const page = await getPageData(slug);
-
+  if (page.success === false) {
+    notFound();
+  }
   return {
     title: page.meta_title || page.title,
     description: truncateDescription(page.meta_description) || truncateDescription(page.short_description),
@@ -61,6 +70,10 @@ export async function generateMetadata({
 export default async function AboutUs({ params }: PageProps) {
   const { slug } = await params;
   const PageData = await getPageData(slug);
+  if (PageData.success === false) {
+    notFound();
+  }
+
 
   return (
     <>

@@ -3,6 +3,7 @@ import { Metadata } from "next";
 import config from "@/app/config";
 import CategoryPage from "./CategoryPage";
 import { truncateDescription } from "@/helper/helperfun";
+import { notFound } from "next/navigation";
 
 type Props = {
   params: Promise<{
@@ -18,7 +19,10 @@ async function getCategory(slug: string) {
   });
 
   if (!res.ok) {
-    throw new Error("Failed to fetch category");
+    return {
+    success: false,
+    error:"Failed to fetch category data",
+    }
   }
 
   return res.json();
@@ -31,6 +35,9 @@ export async function generateMetadata({
 
   try {
     const data = await getCategory(slug);
+     if (data.success === false) {
+        notFound();
+      }
     return {
       title: data.seo.meta_title || "Bookwindow - Category",
       description:
@@ -70,6 +77,8 @@ export default async function Page({ params }: Props) {
   const { slug } = await params;
 
   const data = await getCategory(slug);
-
+   if (data.success === false) {
+        notFound();
+      }
   return <CategoryPage categoryData={data} />;
 }

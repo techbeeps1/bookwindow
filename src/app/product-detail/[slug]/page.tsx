@@ -2,7 +2,10 @@ import { Metadata } from "next";
 import ProductDetail from "./ProductDetail";
 import config from "@/app/config";
 import { truncateDescription } from "@/helper/helperfun";
+import Link from "next/link";
+import { BiSearch } from "react-icons/bi";
 
+import { notFound } from "next/navigation";
 type Props = {
   params: Promise<{
     slug: string;
@@ -10,6 +13,8 @@ type Props = {
 };
 
 async function getProduct(slug: string) {
+
+  console.log("Fetching product with slug:", slug); // Debugging line
   const res = await fetch(`${config.apiUrl}api/products/${slug}`,
  {   next: {
   revalidate: 600
@@ -18,7 +23,10 @@ async function getProduct(slug: string) {
 );
 
   if (!res.ok) {
-    throw new Error("Failed to fetch product");
+    return {
+      error: `Failed to fetch product with slug: ${slug}, status: ${res.status}`,
+      success: false,
+    };
   }
 
   return res.json();
@@ -30,7 +38,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   try {
     const data = await getProduct(slug);
     const product = data.product;
- 
+     if (data.success === false) {
+    notFound();
+  }
     return {
       title: product.meta_tag_title || product.name || "Bookwindow - Product",
       description: truncateDescription(product.meta_tag_description) ||
@@ -64,6 +74,9 @@ export default async function Page({ params }: Props) {
   const { slug } = await params;
 
   const data = await getProduct(slug);
+    if (data.success === false) {
+    notFound();
+  }
 
   return <ProductDetail data={data} />;
 }
