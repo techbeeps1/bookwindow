@@ -312,7 +312,7 @@ export function Navbar({ menuData }: any) {
                               </Link>
 
                               {/* Mega Menu Dropdown Container - Spans full width of the parent menu row */}
-                              <div className="absolute container  top-[90%] left-[50%] translate-x-[-50%] right-auto w-full opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-300 transform translate-y-1 group-hover:translate-y-0 z-50">
+                              <div className="absolute container  top-[85%] left-[50%] translate-x-[-50%] right-auto w-full opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-300 transform translate-y-1 group-hover:translate-y-0 z-50">
                                 <div className="bg-white border border-neutral-200/80 shadow-[0_25px_55px_rgba(0,0,0,0.15)] p-8 rounded-2xl relative w-full">
                                   {/* Decorative top accent line */}
                                   <div className="bg-gradient-to-r from-neutral-800 to-black h-[3px] rounded-t-2xl absolute top-0 left-0 right-0" />
