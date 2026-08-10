@@ -56,7 +56,7 @@ export function HobbyCategory({
                 </div>
                 {/* Category Title Below Card */}
                 <h3 className="text-center lg:break-keep break-all mt-3 font-semibold text-gray-800 text-sm md:text-[16px] group-hover:text-black transition-colors duration-300">
-                  {item.name} {`${config.apiUrl}storage/app/public/${item.cat_image}`}
+                  {item.name}
                 </h3>
               </Link>
             </motion.div>
