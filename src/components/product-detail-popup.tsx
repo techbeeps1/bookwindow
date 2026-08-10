@@ -149,7 +149,7 @@ export default function ProductDialog({ open, handleOpen, slug }: any) {
                     <button
                       onClick={() => handleAddToCart(productData?.id, 1)}
                       disabled={isLoading}
-                      className={`bg-black h-[50px] flex gap-2 items-center justify-center text-white px-6 py-2 rounded-full transition-all duration-300
+                      className={`bg-black h-[50px] flex gap-2 items-center justify-center text-white px-4 2xl:px-6 py-2 rounded-full transition-all duration-300
                      ${isLoading
                           ? "opacity-70 cursor-not-allowed"
                           : "hover:scale-[1.02] active:scale-95"
@@ -191,7 +191,7 @@ export default function ProductDialog({ open, handleOpen, slug }: any) {
 
                     <button
                       onClick={() => router.push(`/product-detail/${slug}`)}
-                      className="bg-transparent justify-center border hover:bg-black hover:text-white duration-300 border-black flex gap-2 items-center text-black px-6 py-2 rounded-full focus:outline-none"
+                      className="bg-transparent justify-center border hover:bg-black hover:text-white duration-300 border-black flex gap-2 items-center text-black px-4 2xl:px-6 py-2 rounded-full focus:outline-none"
                     >
                       <FaShoppingBag size={18} />
                       View Product
