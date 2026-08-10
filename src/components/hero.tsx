@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 
 
 function Hero({ bannerData }: any) {
-    const router = useRouter();
+  const router = useRouter();
   const [current, setCurrent] = useState(0);
   const [dragOffset, setDragOffset] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
@@ -33,7 +33,7 @@ function Hero({ bannerData }: any) {
   const handlePointerUp = () => {
     if (!isDragging) return;
     setIsDragging(false);
-    
+
     // Threshold for slide transition: 100px
     if (dragOffset < -100) {
       nextSlide();
@@ -45,7 +45,7 @@ function Hero({ bannerData }: any) {
 
 
 
-  const slides = bannerData ;
+  const slides = bannerData;
 
   const nextSlide = () => {
     setCurrent((prev) => (prev === slides.length - 1 ? 0 : prev + 1));
@@ -65,10 +65,10 @@ function Hero({ bannerData }: any) {
 
   return (
     <>
-      <section className="relative w-full overflow-hidden bg-gray-900 group">
-        <div className="relative w-full 2xl:h-[95vh] lg:h-[85vh] sm:h-[75vh] h-[25vh] overflow-hidden">
+      <section className="relative w-full overflow-hidden bg-gray-900 group lg:mt-0 mt-[75px]">
+        <div className="relative w-full 2xl:h-[95vh] lg:h-[70vh] sm:h-[50vh] h-[27vh] overflow-hidden">
           {/* Slider Content Row */}
-          <div 
+          <div
             className={`flex h-full ${isDragging ? "" : "transition-transform duration-700 ease-in-out"}`}
             style={{
               width: `${slides.length * 100}%`,
@@ -83,10 +83,10 @@ function Hero({ bannerData }: any) {
             onTouchMove={(e) => handlePointerMove(e.touches[0].clientX)}
             onTouchEnd={handlePointerUp}
           >
-            {slides.map((slide:any, idx:number) => (
+            {slides.map((slide: any, idx: number) => (
               <div
                 key={slide.id}
-                onClick={()=>{
+                onClick={() => {
                   router.push(slide?.slider_url || '#')
                 }}
                 className="relative h-full cursor-pointer select-none"
@@ -97,7 +97,7 @@ function Hero({ bannerData }: any) {
                   src={`${config.apiUrl}storage/app/public/${slide?.slider_image}`}
                   alt={slide.title}
                   fill
-                  
+
                   priority
                   className="object-cover w-full h-full select-none pointer-events-none"
                   draggable={false}
@@ -141,15 +141,14 @@ function Hero({ bannerData }: any) {
 
           {/* Dots / Indicators */}
           <div className="absolute bottom-4 md:bottom-6 left-1/2 -translate-x-1/2 z-30 flex items-center justify-center gap-3">
-            {slides.map((_:any, idx:any) => (
+            {slides.map((_: any, idx: any) => (
               <button
                 key={idx}
                 onClick={() => setCurrent(idx)}
-                className={`transition-all duration-300 rounded-full ${
-                  current === idx 
-                    ? "md:w-4 md:h-4 w-3 h-3 bg-white shadow-lg" 
-                    : " w-2 h-2 bg-white/50 hover:bg-white/85"
-                }`}
+                className={`transition-all duration-300 rounded-full ${current === idx
+                  ? "md:w-4 md:h-4 w-3 h-3 bg-white shadow-lg"
+                  : " w-2 h-2 bg-white/50 hover:bg-white/85"
+                  }`}
               />
             ))}
           </div>

@@ -26,7 +26,7 @@ function CategoryCard({
           height={500}
           src={`${config.apiUrl}storage/app/public/${cat_image}`}
           alt={cat_title || "Category"}
-          className=" w-full h-[165px] object-contain group-hover:scale-105 transition-transform duration-500 ease-out"
+          className="w-full h-[300px] object-contain group-hover:scale-105 transition-transform duration-500 ease-out"
           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 16vw"
         />
       </div>
