@@ -1,6 +1,8 @@
 "use client";
+import Link from "next/link";
 import { motion } from "framer-motion";
-import CategoryCard from "@/components/category-card";
+import config from "@/app/config";
+import Image from "next/image";
 
 export interface HobbyItem {
   name: string;
@@ -31,7 +33,7 @@ export function HobbyCategory({
         </div>
 
         {/* Grid Layout (2 columns centered) */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 max-w-[650px] mx-auto">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 max-w-[680px] mx-auto">
           {data?.hobby_category?.map((item: any, index: any) => (
             <motion.div
               key={index}
@@ -40,11 +42,23 @@ export function HobbyCategory({
               transition={{ duration: 0.5, delay: index * 0.08, ease: "easeOut" }}
               viewport={{ once: true }}
             >
-              <CategoryCard
-                cat_image={item.cat_image}
-                cat_title={item.name}
-                cat_slug={item.slug}
-              />
+              <Link href={`/category/${item.slug}`} className="group block w-full cursor-pointer">
+                {/* Card Image Box */}
+                <div className="relative w-full px-[20px] py-[25px] rounded-[24px] overflow-hidden bg-gray-50 border border-gray-200 shadow-sm group-hover:shadow-md transition-all duration-300">
+                  <Image
+                    width={400}
+                    height={500}
+                    src={`${config.apiUrl}storage/app/public/${item.cat_image}`}
+                    alt={item.name || "Category"}
+                    className="w-full h-[300px] object-contain group-hover:scale-105 transition-transform duration-500 ease-out"
+                    sizes="(max-width: 640px) 100vw, 50vw"
+                  />
+                </div>
+                {/* Category Title Below Card */}
+                <h3 className="text-center lg:break-keep break-all mt-3 font-semibold text-gray-800 text-sm md:text-[16px] group-hover:text-black transition-colors duration-300">
+                  {item.name} {`${config.apiUrl}storage/app/public/${item.cat_image}`}
+                </h3>
+              </Link>
             </motion.div>
           ))}
         </div>
