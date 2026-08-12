@@ -65,6 +65,7 @@ const mobileSlides =
   mbannerData.length > 0
     ? mbannerData
     : slides;
+    
 
  const nextSlide = () => {
   setCurrent((prev) => {
@@ -222,7 +223,7 @@ useEffect(() => {
             ? slide.mslider_image
             : `${config.apiUrl}storage/app/public/${slide.mslider_image}`
         )
-      : `/image/mobile_banner_${(idx % 2) + 1}.png`;
+      : "";
 
     return (
       <div
@@ -243,7 +244,7 @@ useEffect(() => {
             alt={slide.title || "Mobile Banner"}
             fill
             priority={idx === 0}
-            className="object-contain sm:object-cover w-full h-full select-none pointer-events-none p-2"
+            className="object-cover w-full h-full select-none pointer-events-none"
             draggable={false}
             sizes="100vw"
           />
