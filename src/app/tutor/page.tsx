@@ -98,7 +98,7 @@ export default function Tutor() {
   }, [alertMessage]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-neutral-50 via-neutral-100 to-neutral-200/50 flex items-center justify-center px-4 py-16 md:py-24 relative overflow-hidden">
+    <div className="min-h-screen lg:mt-0 mt-[75px] bg-gradient-to-br from-neutral-50 via-neutral-100 to-neutral-200/50 flex items-center justify-center px-4 py-16 md:py-24 relative overflow-hidden">
 
       {/* Decorative Background Orbs */}
       <div className="absolute top-10 left-10 w-96 h-96 bg-neutral-300/20 rounded-full filter blur-[80px] pointer-events-none animate-pulse"></div>

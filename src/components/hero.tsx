@@ -45,7 +45,12 @@ function Hero({ bannerData }: any) {
 
 
 
-  const slides = bannerData;
+  const defaultSlides = [
+    { id: 1, title: "Bookwindow Bestsellers", slider_image: "/image/banner-img.jpg", mobile_slider_image: "/image/mobile_banner_1.png", slider_url: "#" },
+    { id: 2, title: "Bookwindow Collections", slider_image: "/image/banner-img-2.jpg", mobile_slider_image: "/image/mobile_banner_2.png", slider_url: "#" },
+  ];
+
+  const slides = (bannerData && Array.isArray(bannerData) && bannerData.length > 0) ? bannerData : defaultSlides;
 
   const nextSlide = () => {
     setCurrent((prev) => (prev === slides.length - 1 ? 0 : prev + 1));
@@ -61,12 +66,12 @@ function Hero({ bannerData }: any) {
       nextSlide();
     }, 6000);
     return () => clearInterval(timer);
-  }, [current]);
+  }, [current, slides.length]);
 
   return (
     <>
       <section className="relative w-full overflow-hidden bg-gray-900 group lg:mt-0 mt-[75px]">
-        <div className="relative w-full 2xl:h-[95vh] lg:h-[70vh] sm:h-[50vh] h-[27vh] overflow-hidden">
+        <div className="relative w-full 2xl:h-[95vh] lg:h-[70vh] sm:h-[50vh] h-[520px] overflow-hidden">
           {/* Slider Content Row */}
           <div
             className={`flex h-full ${isDragging ? "" : "transition-transform duration-700 ease-in-out"}`}
@@ -83,28 +88,58 @@ function Hero({ bannerData }: any) {
             onTouchMove={(e) => handlePointerMove(e.touches[0].clientX)}
             onTouchEnd={handlePointerUp}
           >
-            {slides.map((slide: any, idx: number) => (
-              <div
-                key={slide.id}
-                onClick={() => {
-                  router.push(slide?.slider_url || '#')
-                }}
-                className="relative h-full cursor-pointer select-none"
-                style={{ width: `${100 / slides.length}%` }}
-              >
-                {/* Background Image */}
-                <Image
-                  src={`${config.apiUrl}storage/app/public/${slide?.slider_image}`}
-                  alt={slide.title}
-                  fill
+            {slides.map((slide: any, idx: number) => {
+              const desktopSrc = slide?.slider_image
+                ? (slide.slider_image.startsWith("/") || slide.slider_image.startsWith("http")
+                    ? slide.slider_image
+                    : `${config.apiUrl}storage/app/public/${slide.slider_image}`)
+                : "/image/banner-img.jpg";
 
-                  priority
-                  className="object-cover w-full h-full select-none pointer-events-none"
-                  draggable={false}
-                  sizes="100vw"
-                />
-              </div>
-            ))}
+              const mobileSrc = slide?.mobile_slider_image
+                ? (slide.mobile_slider_image.startsWith("/") || slide.mobile_slider_image.startsWith("http")
+                    ? slide.mobile_slider_image
+                    : `${config.apiUrl}storage/app/public/${slide.mobile_slider_image}`)
+                : `/image/mobile_banner_${(idx % 2) + 1}.png`;
+
+              return (
+                <div
+                  key={slide.id || idx}
+                  onClick={() => {
+                    if (!wasDragged.current) {
+                      router.push(slide?.slider_url || '#');
+                    }
+                  }}
+                  className="relative h-full cursor-pointer select-none"
+                  style={{ width: `${100 / slides.length}%` }}
+                >
+                  {/* Desktop Background Image */}
+                  <div className="hidden md:block relative w-full h-full">
+                    <Image
+                      src={desktopSrc}
+                      alt={slide.title || "Banner"}
+                      fill
+                      priority={idx === 0}
+                      className="object-cover w-full h-full select-none pointer-events-none"
+                      draggable={false}
+                      sizes="100vw"
+                    />
+                  </div>
+
+                  {/* Mobile Background Image (Vertical Portrait) */}
+                  <div className="block md:hidden relative w-full h-full">
+                    <Image
+                      src={mobileSrc}
+                      alt={slide.title || "Mobile Banner"}
+                      fill
+                      priority={idx === 0}
+                      className="object-contain sm:object-cover w-full h-full select-none pointer-events-none p-2"
+                      draggable={false}
+                      sizes="100vw"
+                    />
+                  </div>
+                </div>
+              );
+            })}
           </div>
 
           {/* Navigation Arrows */}

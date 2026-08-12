@@ -126,7 +126,7 @@ export default function RequestProduct() {
 
   return (
     <>
-      <div className="min-h-screen bg-neutral-50 flex flex-col items-center justify-center px-4 py-16 md:py-24">
+      <div className="min-h-screen lg:mt-0 mt-[75px]  bg-neutral-50 flex flex-col items-center justify-center px-4 py-16 md:py-24">
         {/* Title */}
         <div className="text-center mb-8">
           <h1 className="text-2xl md:text-3xl font-black text-neutral-900 tracking-tight uppercase">

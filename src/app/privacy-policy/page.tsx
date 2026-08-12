@@ -33,9 +33,9 @@ export default function PrivacyPolicy() {
   return (
     <>
 
-      
+
       {/* Banner Section */}
-      <section className="relative w-full h-[50vh] flex items-center justify-center bg-gray-900 overflow-hidden">
+      <section className="relative w-full h-[50vh] lg:mt-0 mt-[75px] flex items-center justify-center bg-gray-900 overflow-hidden">
         {/* Background Image with Dark Overlay */}
         <div className="absolute inset-0 z-0">
           <Image
@@ -61,7 +61,7 @@ export default function PrivacyPolicy() {
             href="/contact-us"
             className="inline-flex items-center gap-2 px-6 py-3 bg-white text-black text-sm font-semibold rounded-md transition-all duration-300 hover:shadow-lg focus:outline-none uppercase tracking-wider"
           >
-            Contact Us 
+            Contact Us
           </Link>
         </div>
       </section>
@@ -78,8 +78,8 @@ export default function PrivacyPolicy() {
             <span className="sr-only">Loading...</span>
           </div>
         ) : (
-          <div className="bg-white p-6 md:p-10 rounded-2xl border border-gray-100 shadow-sm">           
-            <div 
+          <div className="bg-white p-6 md:p-10 rounded-2xl border border-gray-100 shadow-sm">
+            <div
               className="text-base text-gray-600 space-y-4 leading-relaxed dynamic-content"
               dangerouslySetInnerHTML={{ __html: privacyPolicyData?.content }}
             />

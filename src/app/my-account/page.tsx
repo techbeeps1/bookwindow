@@ -142,7 +142,7 @@ export default function AccountPage() {
 
   return (
     <>
-      <div className="bg-white py-12 min-h-screen">
+      <div className="bg-white py-12 min-h-screen lg:mt-0 mt-[100px]">
         <div className="container mx-auto max-w-screen-xl px-4">
 
           {/* Main Layout Card Grid */}

@@ -4,16 +4,16 @@ import React, { useState, useMemo } from "react";
 import Link from "next/link";
 import Image from "next/image";
 
-import { 
-  FaHeart, 
-  FaTrash, 
-  FaShoppingCart, 
-  FaList, 
-  FaSearch, 
-  FaFilter, 
-  FaArrowRight, 
-  FaCheckCircle, 
-  FaRedo, 
+import {
+  FaHeart,
+  FaTrash,
+  FaShoppingCart,
+  FaList,
+  FaSearch,
+  FaFilter,
+  FaArrowRight,
+  FaCheckCircle,
+  FaRedo,
   FaChevronRight,
   FaShoppingBag,
   FaLock,
@@ -30,7 +30,7 @@ import { ImageBook } from "@/components/ImageBook";
 import ProductDialog from "@/components/product-detail-popup";
 import config from "@/app/config";
 import ProductFilterBar from "@/components/ProductFilterBar";
-import { useViewWishlistQuery,useRemoveWishlistMutation } from "@/lib/api/wishlistApi";
+import { useViewWishlistQuery, useRemoveWishlistMutation } from "@/lib/api/wishlistApi";
 import toast from "react-hot-toast";
 export default function WishlistPage() {
   const sessionId = useSession();
@@ -38,7 +38,7 @@ export default function WishlistPage() {
   const { refetch } = useCart();
   const [addToCart] = useAddToCartMutation();
 
-  const { data: wishlistData, isLoading: isWishlistLoading , isSuccess, refetch: refetchWishlist } = useViewWishlistQuery();
+  const { data: wishlistData, isLoading: isWishlistLoading, isSuccess, refetch: refetchWishlist } = useViewWishlistQuery();
 
 
 
@@ -49,8 +49,8 @@ export default function WishlistPage() {
   const [loadingItemId, setLoadingItemId] = useState<string | null>(null);
   const [movingAllToCart, setMovingAllToCart] = useState(false);
   const [quickViewSlug, setQuickViewSlug] = useState<string | null>(null);
- const [removeWishlist] = useRemoveWishlistMutation();
-  const {  isAuthenticated ,loading } = useAppSelector((state) => state.auth);
+  const [removeWishlist] = useRemoveWishlistMutation();
+  const { isAuthenticated, loading } = useAppSelector((state) => state.auth);
 
   // Remove single item from wishlist
   async function handleRemoveItem(id: string | number) {
@@ -61,13 +61,13 @@ export default function WishlistPage() {
 
   // Clear entire wishlist
   const handleClearAll = () => {
-      wishlistData?.data?.forEach(async (item: any) => {
-        await removeWishlist(item.id).unwrap();
-      });
-      refetchWishlist();
-      setClearAllPopupOpen(false);
-      toast.success("Wishlist cleared");
-    
+    wishlistData?.data?.forEach(async (item: any) => {
+      await removeWishlist(item.id).unwrap();
+    });
+    refetchWishlist();
+    setClearAllPopupOpen(false);
+    toast.success("Wishlist cleared");
+
   };
 
   // Add individual item to Cart
@@ -108,11 +108,11 @@ export default function WishlistPage() {
           session_id: sessionId,
           product_id: item.id,
           quantity: 1,
-        }).catch(() => {});
+        }).catch(() => { });
       }
       await refetch();
       dispatch(openCartDrawer());
-    
+
     } catch (err) {
       console.error(err);
     } finally {
@@ -127,7 +127,7 @@ export default function WishlistPage() {
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
       result = result.filter(
-        (item:any) =>
+        (item: any) =>
           item.name?.toLowerCase().includes(q) ||
           item.production?.toLowerCase().includes(q) ||
           item.categories?.toLowerCase().includes(q)
@@ -136,61 +136,61 @@ export default function WishlistPage() {
 
     switch (sortBy) {
       case "price-low":
-        result.sort((a:any, b:any) => Number(a.offPrice || a.price) - Number(b.offPrice || b.price));
+        result.sort((a: any, b: any) => Number(a.offPrice || a.price) - Number(b.offPrice || b.price));
         break;
       case "price-high":
-        result.sort((a:any, b:any) => Number(b.offPrice || b.price) - Number(a.offPrice || a.price));
+        result.sort((a: any, b: any) => Number(b.offPrice || b.price) - Number(a.offPrice || a.price));
         break;
       case "discount":
-        result.sort((a:any, b:any) => {
+        result.sort((a: any, b: any) => {
           const discA = Number(a.price || 0) - Number(a.offPrice || a.price || 0);
           const discB = Number(b.price || 0) - Number(b.offPrice || b.price || 0);
           return discB - discA;
         });
         break;
       case "name":
-        result.sort((a:any, b:any) => (a.name || "").localeCompare(b.name || ""));
+        result.sort((a: any, b: any) => (a.name || "").localeCompare(b.name || ""));
         break;
       default:
         break;
     }
 
     return result;
-  }, [isSuccess, searchQuery, sortBy,wishlistData]);
+  }, [isSuccess, searchQuery, sortBy, wishlistData]);
 
   const getImageSrc = (item: any) => {
-    if (item.image){
-      return config.apiUrl +"storage/app/public/"+ item.image;
-    }else{
- return config.apiUrl+"storage/app/public/01KXJ7GG8CMSJSZRAVV4KFRF28.png";
-    } 
+    if (item.image) {
+      return config.apiUrl + "storage/app/public/" + item.image;
+    } else {
+      return config.apiUrl + "storage/app/public/01KXJ7GG8CMSJSZRAVV4KFRF28.png";
+    }
 
   };
 
-   if (!isAuthenticated && !loading) {
+  if (!isAuthenticated && !loading) {
     return (
-   <div className="min-h-[calc(100vh-140px)] bg-gray-50 flex items-center justify-center p-4 ">
-  <div className="max-w-md w-full bg-white rounded-2xl shadow-lg p-8 text-center">
-    <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-      <FaLock className="w-8 h-8 text-gray-400" />
-    </div>
-    <h2 className="text-2xl font-semibold text-gray-900 mb-2">Sign in required</h2>
-    <p className="text-gray-500 mb-6">Please sign in to access your wishlist</p>
-    <Link 
-      href="/sign-in" 
-      className="inline-block w-full bg-black text-white font-medium px-6 py-3 rounded-lg hover:bg-gray-800 transition-colors"
-    >
-      Sign In
-    </Link>
-  </div>
-</div>
+      <div className="min-h-[calc(100vh-140px)] bg-gray-50 flex items-center justify-center p-4 ">
+        <div className="max-w-md w-full bg-white rounded-2xl shadow-lg p-8 text-center">
+          <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <FaLock className="w-8 h-8 text-gray-400" />
+          </div>
+          <h2 className="text-2xl font-semibold text-gray-900 mb-2">Sign in required</h2>
+          <p className="text-gray-500 mb-6">Please sign in to access your wishlist</p>
+          <Link
+            href="/sign-in"
+            className="inline-block w-full bg-black text-white font-medium px-6 py-3 rounded-lg hover:bg-gray-800 transition-colors"
+          >
+            Sign In
+          </Link>
+        </div>
+      </div>
     );
- }
+  }
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 via-white to-gray-50 text-gray-800 pb-16">
+    <div className="min-h-screen lg:mt-0 mt-[75px] bg-gradient-to-b from-gray-50 via-white to-gray-50 text-gray-800 pb-16">
       {/* Main Container */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
-        
+
         {/* Breadcrumb Navigation */}
         <nav className="flex items-center mt-[60px] text-xs text-gray-500 font-medium space-x-2 mb-6">
           <Link href="/" className="hover:text-black transition-colors">
@@ -203,10 +203,10 @@ export default function WishlistPage() {
         {/* Page Title */}
         <h1 className="text-2xl sm:text-4xl font-extrabold text-black mb-6 mt-[30px]">
           My Wishlist
-        </h1> 
+        </h1>
 
 
-        {(isSuccess && wishlistData?.data?.length > 0 ) ? (
+        {(isSuccess && wishlistData?.data?.length > 0) ? (
           <div>
             {/* Filter & Action Toolbar */}
             <ProductFilterBar
@@ -270,139 +270,139 @@ export default function WishlistPage() {
             {viewMode === "grid" ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {filteredAndSortedItems.map((item: any) => {
-                 const price = item.mrp;
-                  const offPrice =  item.price;
+                  const price = item.mrp;
+                  const offPrice = item.price;
                   return (
                     <div
                       key={item.id}
                       className="group relative bg-white rounded-2xl border border-gray-200/80 hover:border-gray-300 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between overflow-hidden"
                     >
-                        {/* Remove Button Badge */}
-                        <button
-                          onClick={() => handleRemoveItem(item.id)}
-                          className="absolute top-3 right-3 z-20 p-2 bg-white/90 backdrop-blur-md hover:bg-gray-100 text-gray-400 hover:text-black rounded-full shadow-md transition-all duration-200 border border-gray-100 active:scale-90"
-                          title="Remove from wishlist"
-                        >
-                          <FaTrash className="w-4 h-4" />
-                        </button>
+                      {/* Remove Button Badge */}
+                      <button
+                        onClick={() => handleRemoveItem(item.id)}
+                        className="absolute top-3 right-3 z-20 p-2 bg-white/90 backdrop-blur-md hover:bg-gray-100 text-gray-400 hover:text-black rounded-full shadow-md transition-all duration-200 border border-gray-100 active:scale-90"
+                        title="Remove from wishlist"
+                      >
+                        <FaTrash className="w-4 h-4" />
+                      </button>
 
-                        {/* Top Badge: Sale / Stock */}
-                        <div className="absolute top-3 left-3 z-20 flex flex-col gap-1">
-                          {price !== offPrice && (
-                            <span className="text-xs uppercase bg-black py-[5px] px-5 w-fit text-white rounded-[4px] font-sans">
-                              Sale
-                            </span>
-                          )}
-                          {item.inStock === false && (
-                            <span className="bg-gray-800 text-gray-200 text-[10px] font-medium px-2 py-0.5 rounded-md">
-                              Out of Stock
-                            </span>
-                          )}
-                        </div>
+                      {/* Top Badge: Sale / Stock */}
+                      <div className="absolute top-3 left-3 z-20 flex flex-col gap-1">
+                        {price !== offPrice && (
+                          <span className="text-xs uppercase bg-black py-[5px] px-5 w-fit text-white rounded-[4px] font-sans">
+                            Sale
+                          </span>
+                        )}
+                        {item.inStock === false && (
+                          <span className="bg-gray-800 text-gray-200 text-[10px] font-medium px-2 py-0.5 rounded-md">
+                            Out of Stock
+                          </span>
+                        )}
+                      </div>
 
-                        {/* Image Container */}
-                        <div className="relative pt-4 px-4 bg-gray-50/60 group-hover:bg-gray-50 transition-colors">
+                      {/* Image Container */}
+                      <div className="relative pt-4 px-4 bg-gray-50/60 group-hover:bg-gray-50 transition-colors">
+                        <Link href={`/product-detail/${item.slug || item.id}`}>
+                          <div className="w-full flex justify-center transform group-hover:scale-[1.03] transition-transform duration-300">
+                            <ImageBook src={getImageSrc(item)} alt={item.name || "Book"} size="30px" />
+                          </div>
+                        </Link>
+                      </div>
+
+                      {/* Book Details */}
+                      <div className="p-4 flex flex-col flex-1 justify-between">
+                        <div>
+                          {/* Title */}
                           <Link href={`/product-detail/${item.slug || item.id}`}>
-                            <div className="w-full flex justify-center transform group-hover:scale-[1.03] transition-transform duration-300">
-                              <ImageBook src={getImageSrc(item)} alt={item.name || "Book"} size="30px" />
-                            </div>
+                            <h3 className="font-bold text-gray-900 text-sm line-clamp-2 hover:text-black transition-colors mb-3">
+                              {item.name?.replace(/#COMMA#/g, ",")}
+                            </h3>
                           </Link>
                         </div>
 
-                        {/* Book Details */}
-                        <div className="p-4 flex flex-col flex-1 justify-between">
-                          <div>
-                            {/* Title */}
-                            <Link href={`/product-detail/${item.slug || item.id}`}>
-                              <h3 className="font-bold text-gray-900 text-sm line-clamp-2 hover:text-black transition-colors mb-3">
-                                {item.name?.replace(/#COMMA#/g, ",")}
-                              </h3>
-                            </Link>
+                        {/* Price & Action Buttons matching BookCard */}
+                        <div className="flex justify-between items-center pt-2 border-t border-gray-100">
+                          <div className="flex gap-2 justify-between items-center">
+                            {offPrice && (
+                              <span className="text-sm font-bold">
+                                ₹{offPrice}
+                              </span>
+                            )}
+                            {price && price != 0 && price != offPrice && (
+                              <span className={`${offPrice ? "text-red-500 line-through text-xs font-bold" : "text-xs font-bold mr-2"}`}>
+                                ₹{price}
+                              </span>
+                            )}
                           </div>
 
-                          {/* Price & Action Buttons matching BookCard */}
-                          <div className="flex justify-between items-center pt-2 border-t border-gray-100">
-                            <div className="flex gap-2 justify-between items-center">
-                              {offPrice && (
-                                <span className="text-sm font-bold">
-                                  ₹{offPrice}
-                                </span>
-                              )}
-                              {price && price != 0 && price != offPrice && (
-                                <span className={`${offPrice ? "text-red-500 line-through text-xs font-bold" : "text-xs font-bold mr-2"}`}>
-                                  ₹{price}
-                                </span>
-                              )}
-                            </div>
+                          <div className="flex gap-2 items-center">
+                            {/* Cart Button matching BookCard */}
+                            <button
+                              onClick={() => handleAddToCart(item)}
+                              disabled={loadingItemId === String(item.id) || item.inStock === false}
+                              className="relative p-2 border border-gray-200 text-gray-500 hover:text-white hover:border-black hover:bg-black rounded-full transition-all duration-200 active:scale-95 flex items-center justify-center overflow-hidden"
+                              aria-label="Add to cart"
+                            >
+                              <div className="relative w-[18px] h-[18px] flex items-center justify-center">
+                                {loadingItemId === String(item.id) ? (
+                                  <svg
+                                    className="animate-spin h-[18px] w-[18px]"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <circle
+                                      className="opacity-25"
+                                      cx="12"
+                                      cy="12"
+                                      r="10"
+                                      stroke="currentColor"
+                                      strokeWidth="4"
+                                    />
+                                    <path
+                                      className="opacity-75"
+                                      fill="currentColor"
+                                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                    />
+                                  </svg>
+                                ) : (
+                                  <HiShoppingCart className="w-[18px] h-[18px]" />
+                                )}
+                              </div>
+                            </button>
 
-                            <div className="flex gap-2 items-center">
-                              {/* Cart Button matching BookCard */}
-                              <button
-                                onClick={() => handleAddToCart(item)}
-                                disabled={loadingItemId === String(item.id) || item.inStock === false}
-                                className="relative p-2 border border-gray-200 text-gray-500 hover:text-white hover:border-black hover:bg-black rounded-full transition-all duration-200 active:scale-95 flex items-center justify-center overflow-hidden"
-                                aria-label="Add to cart"
+                            {/* Quick View Eye Button matching BookCard */}
+                            <button
+                              onClick={() => setQuickViewSlug(item.slug || item.id)}
+                              className="p-2 border border-gray-200 text-gray-500 hover:text-white hover:border-black hover:bg-black rounded-full transition-all duration-200 active:scale-95 flex items-center justify-center"
+                              aria-label="Quick view product"
+                            >
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                strokeWidth={1.5}
+                                stroke="currentColor"
+                                className="size-[18px]"
                               >
-                                <div className="relative w-[18px] h-[18px] flex items-center justify-center">
-                                  {loadingItemId === String(item.id) ? (
-                                    <svg
-                                      className="animate-spin h-[18px] w-[18px]"
-                                      xmlns="http://www.w3.org/2000/svg"
-                                      fill="none"
-                                      viewBox="0 0 24 24"
-                                    >
-                                      <circle
-                                        className="opacity-25"
-                                        cx="12"
-                                        cy="12"
-                                        r="10"
-                                        stroke="currentColor"
-                                        strokeWidth="4"
-                                      />
-                                      <path
-                                        className="opacity-75"
-                                        fill="currentColor"
-                                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                                      />
-                                    </svg>
-                                  ) : (
-                                    <HiShoppingCart className="w-[18px] h-[18px]" />
-                                  )}
-                                </div>
-                              </button>
-
-                              {/* Quick View Eye Button matching BookCard */}
-                              <button
-                                onClick={() => setQuickViewSlug(item.slug || item.id)}
-                                className="p-2 border border-gray-200 text-gray-500 hover:text-white hover:border-black hover:bg-black rounded-full transition-all duration-200 active:scale-95 flex items-center justify-center"
-                                aria-label="Quick view product"
-                              >
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  fill="none"
-                                  viewBox="0 0 24 24"
-                                  strokeWidth={1.5}
-                                  stroke="currentColor"
-                                  className="size-[18px]"
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"
-                                  />
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
-                                  />
-                                </svg>
-                              </button>
-                            </div>
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"
+                                />
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
+                                />
+                              </svg>
+                            </button>
                           </div>
                         </div>
                       </div>
-                    );
-                  })}
+                    </div>
+                  );
+                })}
               </div>
             ) : (
               /* LIST VIEW */
@@ -510,7 +510,7 @@ export default function WishlistPage() {
               </div>
             )}
           </div>
-        ) : (isSuccess && wishlistData?.data?.length == 0 ) ? (
+        ) : (isSuccess && wishlistData?.data?.length == 0) ? (
           /* EMPTY WISHLIST STATE */
           <div className="bg-white rounded-3xl border border-gray-200/80 p-8 sm:p-16 text-center my-8 shadow-sm">
             <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center text-black shadow-inner">
@@ -533,9 +533,9 @@ export default function WishlistPage() {
               <FaArrowRight className="w-4 h-4" />
             </Link>
           </div>
-        ):(<div className="bg-white rounded-3xl  p-8 sm:p-16 text-center my-8">
-           
-           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        ) : (<div className="bg-white rounded-3xl  p-8 sm:p-16 text-center my-8">
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {Array.from({ length: 8 }).map((_, i) => (
               <div
                 key={i}
@@ -551,7 +551,7 @@ export default function WishlistPage() {
               </div>
             ))}
           </div>
-          </div>)}
+        </div>)}
 
         {/* Quick View Product Dialog */}
         {quickViewSlug && (
@@ -572,8 +572,8 @@ export default function WishlistPage() {
               <button onClick={() => setClearAllPopupOpen(false)} className="bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400 transition ">No</button>
             </div>
           </div>
-        </div> 
-}
+        </div>
+        }
 
       </div>
     </div>
