@@ -42,10 +42,10 @@ export default function Blogs() {
 
   return (
     <>
-    
+
 
       {/* Banner Section */}
-      <section className="relative w-full h-[40vh] flex items-center justify-center bg-gray-900 overflow-hidden">
+      <section className="relative w-full h-[40vh] lg:mt-0 mt-[75px] flex items-center justify-center bg-gray-900 overflow-hidden">
         {/* Background Image with Dark Overlay */}
         <div className="absolute inset-0 z-0">
           <Image
@@ -73,61 +73,61 @@ export default function Blogs() {
       <section className="container mx-auto px-4 mb-16 mt-16 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {!blogData?.length
           ? [1, 2, 3, 4].map((_i) => (
-              <div
-                key={_i}
-                role="status"
-                className="bg-white p-5 rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.05)] border border-gray-100/50 animate-pulse flex flex-col justify-between h-[360px]"
-              >
-                <div>
-                  <div className="relative w-full aspect-[4/3] bg-gray-200 rounded-xl mb-4"></div>
-                  <div className="h-5 bg-gray-200 rounded w-5/6 mb-2.5"></div>
-                  <div className="h-5 bg-gray-200 rounded w-2/3 mb-4"></div>
-                </div>
-                <div className="h-4 bg-gray-200 rounded w-1/4 mt-auto"></div>
-                <span className="sr-only">Loading...</span>
+            <div
+              key={_i}
+              role="status"
+              className="bg-white p-5 rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.05)] border border-gray-100/50 animate-pulse flex flex-col justify-between h-[360px]"
+            >
+              <div>
+                <div className="relative w-full aspect-[4/3] bg-gray-200 rounded-xl mb-4"></div>
+                <div className="h-5 bg-gray-200 rounded w-5/6 mb-2.5"></div>
+                <div className="h-5 bg-gray-200 rounded w-2/3 mb-4"></div>
               </div>
-            ))
+              <div className="h-4 bg-gray-200 rounded w-1/4 mt-auto"></div>
+              <span className="sr-only">Loading...</span>
+            </div>
+          ))
           : blogData?.map((blog: any) => (
-              <div
-                key={blog?.id}
-                className="group bg-white p-5 rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.05)] hover:shadow-[0_10px_30px_rgba(0,0,0,0.08)] border border-gray-100/50 flex flex-col justify-between h-full transition-all duration-300"
-              >
-                <div>
-                  <a
-                    href={`blogs/${blog?.slug}`}
-                    className="block relative w-full aspect-[4/3] overflow-hidden rounded-xl mb-4 bg-slate-50"
-                  >
-                    <Image
-                      src={`${config.apiUrl}storage/app/public/${blog?.image}`}
-                      alt={blog?.title}
-                      fill
-                      className="rounded-xl transition-transform duration-500 ease-out group-hover:scale-105"
-                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                    />
-                  </a>
-                  <Typography
-                    as="a"
-                    href={`blogs/${blog?.slug}`}
-                    className="mb-4 text-base font-bold text-slate-800 hover:text-black transition-colors duration-200 line-clamp-2 leading-snug block"
-                    {...({} as React.ComponentProps<typeof Typography>)}
-                  >
-                    {blog?.title}
-                  </Typography>
-                </div>
+            <div
+              key={blog?.id}
+              className="group bg-white p-5 rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.05)] hover:shadow-[0_10px_30px_rgba(0,0,0,0.08)] border border-gray-100/50 flex flex-col justify-between h-full transition-all duration-300"
+            >
+              <div>
                 <a
                   href={`blogs/${blog?.slug}`}
-                  className="inline-flex items-center text-sm font-semibold text-slate-500 hover:text-black transition-colors duration-200 mt-auto"
+                  className="block relative w-full aspect-[4/3] overflow-hidden rounded-xl mb-4 bg-slate-50"
                 >
-                  Read More
-                  <span className="ml-1.5 transform transition-transform group-hover:translate-x-1 duration-200">
-                    &rarr;
-                  </span>
+                  <Image
+                    src={`${config.apiUrl}storage/app/public/${blog?.image}`}
+                    alt={blog?.title}
+                    fill
+                    className="rounded-xl transition-transform duration-500 ease-out group-hover:scale-105"
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                  />
                 </a>
+                <Typography
+                  as="a"
+                  href={`blogs/${blog?.slug}`}
+                  className="mb-4 text-base font-bold text-slate-800 hover:text-black transition-colors duration-200 line-clamp-2 leading-snug block"
+                  {...({} as React.ComponentProps<typeof Typography>)}
+                >
+                  {blog?.title}
+                </Typography>
               </div>
-            ))}
+              <a
+                href={`blogs/${blog?.slug}`}
+                className="inline-flex items-center text-sm font-semibold text-slate-500 hover:text-black transition-colors duration-200 mt-auto"
+              >
+                Read More
+                <span className="ml-1.5 transform transition-transform group-hover:translate-x-1 duration-200">
+                  &rarr;
+                </span>
+              </a>
+            </div>
+          ))}
       </section>
 
-    
+
     </>
   );
 }

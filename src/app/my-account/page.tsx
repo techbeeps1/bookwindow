@@ -7,7 +7,6 @@ import { useRouter } from "next/navigation";
 import { useAppSelector } from "@/hooks/useStore";
 import { logout } from "@/lib/slices/authSlice";
 import { useDispatch } from "react-redux";
-import { IconBase } from "react-icons";
 import toast from "react-hot-toast";
 import { LuLayoutGrid } from "react-icons/lu";
 import { TbClipboardListFilled } from "react-icons/tb";
@@ -143,7 +142,7 @@ export default function AccountPage() {
 
   return (
     <>
-      <div className="bg-white py-12 min-h-screen">
+      <div className="bg-white py-12 min-h-screen lg:mt-0 mt-[100px]">
         <div className="container mx-auto max-w-screen-xl px-4">
 
           {/* Main Layout Card Grid */}
@@ -1369,7 +1368,7 @@ function AccountDetailsTab({ customer, isEdited }: any) {
             <div className="text-sm space-y-3 font-semibold text-neutral-600 leading-relaxed">
               <p className="flex items-center gap-2 text-neutral-900 font-bold text-sm pb-2 border-b border-neutral-100">
                 <span className="w-8 h-8 rounded-full bg-neutral-100 flex items-center justify-center font-bold text-xs text-black">
-                  <IconBase name="user" className="w-4 h-4" />
+                  <FaUser className="w-4 h-4 text-neutral-700" />
                 </span>
                 <span>{customer?.first_name} {customer?.last_name}</span>
               </p>

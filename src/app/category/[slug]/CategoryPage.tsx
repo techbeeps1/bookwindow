@@ -111,7 +111,7 @@ export default function CategoryPage({ categoryData }: { categoryData: any }) {
 
   return (
     <>
-      <section className="container mx-auto mb-10 mt-10 flex flex-col md:flex-row px-3 sm:px-5 lg:px-8 gap-4 lg:gap-6">
+      <section className="container lg:mt-0 mt-[120px] mx-auto mb-10 mt-10 flex flex-col md:flex-row px-3 sm:px-5 lg:px-8 gap-4 lg:gap-6">
         <CategoryPublicationSidebar
           onCategorySelect={handleCategorySelect}
           onPublicationSelect={handlePublicationSelect}

@@ -117,7 +117,7 @@ export default function ContactSection() {
 
 
       {/* Banner Section */}
-      <section className="relative w-full h-[50vh] flex items-center justify-center bg-gray-900 overflow-hidden">
+      <section className="relative w-full h-[50vh] lg:mt-0 mt-[75px] flex items-center justify-center bg-gray-900 overflow-hidden">
         {/* Background Image with Dark Overlay */}
         <div className="absolute inset-0 z-0">
           <Image

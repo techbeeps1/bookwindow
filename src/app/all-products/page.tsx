@@ -112,7 +112,7 @@ export default function Category() {
 
   return (
     <>
-      <section className="container mx-auto mb-10 mt-10 flex flex-col md:flex-row px-3 sm:px-5 lg:px-8 gap-4 lg:gap-6">
+      <section className="container mx-auto mb-10 lg:mt-0 mt-[120px] flex flex-col md:flex-row px-3 sm:px-5 lg:px-8 gap-4 lg:gap-6">
         <AllProductSidebar
           onCategorySelect={handleCategorySelect}
           onPublicationSelect={handlePublicationSelect}
@@ -167,7 +167,7 @@ export default function Category() {
                   slug={product.slug}
                   id={product.id}
                   quantity={product.quantity}
-                  onItemsCountUpdate={() => {}}
+                  onItemsCountUpdate={() => { }}
                   viewMode={viewMode}
                 />
               ))}
@@ -184,11 +184,10 @@ export default function Category() {
                   window.scrollTo({ top: 0, behavior: "smooth" });
                 }}
                 disabled={currentPage === 1}
-                className={`flex items-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-full border transition-all duration-200 active:scale-95 ${
-                  currentPage === 1
-                    ? "bg-[#f5f5f5] text-neutral-400 border-transparent cursor-not-allowed opacity-60"
-                    : "bg-white text-black border-neutral-300 hover:bg-neutral-50 hover:border-neutral-400 hover:shadow-sm"
-                }`}
+                className={`flex items-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-full border transition-all duration-200 active:scale-95 ${currentPage === 1
+                  ? "bg-[#f5f5f5] text-neutral-400 border-transparent cursor-not-allowed opacity-60"
+                  : "bg-white text-black border-neutral-300 hover:bg-neutral-50 hover:border-neutral-400 hover:shadow-sm"
+                  }`}
               >
                 <MdKeyboardArrowLeft className="w-6 h-6" />
 
@@ -209,11 +208,10 @@ export default function Category() {
                   window.scrollTo({ top: 0, behavior: "smooth" });
                 }}
                 disabled={currentPage === totalPages}
-                className={`flex items-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-full border transition-all duration-200 active:scale-95 ${
-                  currentPage === totalPages
-                    ? "bg-[#f5f5f5] text-neutral-400 border-transparent cursor-not-allowed opacity-60"
-                    : "bg-white text-black border-neutral-300 hover:bg-neutral-50 hover:border-neutral-400 hover:shadow-sm"
-                }`}
+                className={`flex items-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-full border transition-all duration-200 active:scale-95 ${currentPage === totalPages
+                  ? "bg-[#f5f5f5] text-neutral-400 border-transparent cursor-not-allowed opacity-60"
+                  : "bg-white text-black border-neutral-300 hover:bg-neutral-50 hover:border-neutral-400 hover:shadow-sm"
+                  }`}
               >
                 <span>Next</span>
                 <MdKeyboardArrowRight className="w-6 h-6" />

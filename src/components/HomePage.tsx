@@ -35,7 +35,8 @@ export default function HomePage({ homePageData }: any) {
         viewport={{ once: true }}
       >
         <Hero
-          bannerData={homePageData?.sldier_section}
+          bannerData={homePageData?.slider_section}
+          mbannerData={homePageData?.mobile_slider_section}
         />
       </motion.div>
 

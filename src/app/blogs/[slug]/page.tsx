@@ -8,10 +8,10 @@ import { use } from "react";
 import Link from "next/link";
 import Image from "next/image";
 
-export default function BlogDetail({ params }:  {
+export default function BlogDetail({ params }: {
   params: Promise<{ slug: string }>;
 }) {
-   const { slug } = use(params);
+  const { slug } = use(params);
   const [blogData, setBlogData] = React.useState([] as any);
   const [loading, setLoading] = React.useState(true);
 
@@ -46,8 +46,8 @@ export default function BlogDetail({ params }:  {
   return (
     <>
 
-      
-      <div className="min-h-screen bg-slate-50/50 pb-16">
+
+      <div className="min-h-screen lg:mt-0 mt-[100px] bg-slate-50/50 pb-16">
         {/* Breadcrumb section */}
         <div className="container mx-auto px-4 pt-8 max-w-4xl">
           <Link
