@@ -1,6 +1,7 @@
 import "./globals.css";
 import type { Metadata } from "next";
 import { Roboto } from "next/font/google";
+import Script from "next/script";
 import { FixedPlugin } from "@/components";
 //import MainWraper from "@/components/MainWraper";
 import ReduxProvider from "@/lib/provider";
@@ -44,17 +45,35 @@ export default async function RootLayout({
   const menuData = await getMenu();
   return (
     <html lang="en">
-      <head></head>
+      <head>
+        {/* Google Analytics */}
+        <Script
+          strategy="afterInteractive"
+          src="https://www.googletagmanager.com/gtag/js?id=G-Q8BCCV1SLL"
+        />
+        <Script
+          id="google-analytics"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-Q8BCCV1SLL');
+            `,
+          }}
+        />
+      </head>
       <body className={roboto.className}>
         <ReduxProvider>
           <AppInitializer />
           <Navbar menuData={menuData.header} />
 
           {children}
-           <CartDrawer/>
-           <FixedPlugin />
+          <CartDrawer />
+          <FixedPlugin />
           <Footer menuData={menuData.footer} />
-          <Toaster position="top-right"   reverseOrder={false}/>
+          <Toaster position="top-right" reverseOrder={false} />
         </ReduxProvider>
       </body>
     </html>
