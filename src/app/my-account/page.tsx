@@ -874,10 +874,7 @@ function AddressesTab({ customer, isEdited }: any) {
       toast.error("Address Line 1 is required.");
       return;
     }
-    if (!customer?.email) {
-      toast.error("Customer email is not available.");
-      return;
-    }
+
     if (zipcode && !/^\d{6}$/.test(zipcode)) {
       toast.error("Please enter a valid 6-digit Indian postal code.");
       return;
