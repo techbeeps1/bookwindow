@@ -96,8 +96,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // Categories
   for (const item of data.categories || []) {
+    const cleanCategoryUrl = item.url.replace(/^category\//, "").replace(/^\/+/, "");
     sitemap.push({
-      url: `${BASE_URL}/category/${item.url}`,
+      url: `${BASE_URL}/category/${cleanCategoryUrl}`,
       lastModified: new Date(item.updated_at),
       priority: getPriority(item.url, "category"),
     });
@@ -105,8 +106,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // Products
   for (const item of data.products || []) {
+    const cleanProductUrl = item.url
+      .replace(/^product\//, "")
+      .replace(/^product-detail\//, "")
+      .replace(/^\/+/, "");
     sitemap.push({
-      url: `${BASE_URL}/product/${item.url}`,
+      url: `${BASE_URL}/product/${cleanProductUrl}`,
       lastModified: new Date(item.updated_at),
       priority: getPriority(item.url, "product"),
     });

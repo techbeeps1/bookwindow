@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import ProductDetail from "./ProductDetail";
 import config from "@/app/config";
 import { truncateDescription } from "@/helper/helperfun";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 
 type Props = {
   params: Promise<{
@@ -11,7 +11,8 @@ type Props = {
 };
 
 async function getProduct(slug: string) {
-  const res = await fetch(`${config.apiUrl}api/products/${slug}`, {
+  const encodedSlug = encodeURIComponent(slug);
+  const res = await fetch(`${config.apiUrl}api/products/${encodedSlug}`, {
     next: {
       revalidate: 600,
     },
@@ -97,6 +98,14 @@ export default async function Page({ params }: Props) {
   const data = await getProduct(slug);
   if (data.success === false || !data?.product) {
     notFound();
+  }
+
+  if (
+    data.product.slug &&
+    data.product.slug !== slug &&
+    decodeURIComponent(data.product.slug) !== decodeURIComponent(slug)
+  ) {
+    permanentRedirect(`/product/${data.product.slug}`);
   }
 
   return <ProductDetail data={data} />;
