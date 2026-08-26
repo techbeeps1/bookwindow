@@ -39,7 +39,7 @@ export default function ShoppingCart() {
   const sessionId = useSession();
   const initialStep = "cart";
   const [cartFetched, setCartFetched] = useState(false);
- const [updatingItemId, setUpdatingItemId] = useState<string | null>(null);
+  const [updatingItemId, setUpdatingItemId] = useState<string | null>(null);
   const [cartItems, setCartItems] = useState([] as CartItem[] | any[]);
   const [items_count, setItemsCount] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -67,10 +67,10 @@ export default function ShoppingCart() {
 
   const [coupon_code, setCouponCode] = useState("");
   const [couponData, setCouponData] = useState({} as any);
- 
+
   const [loginUpdated, setLoginUpdated] = useState(0);
-  
-  
+
+
   const { data } = useCart();
   const [updateCart] = useUpdateCartMutation();
   const [removeCart] = useRemoveCartMutation();
@@ -88,7 +88,7 @@ export default function ShoppingCart() {
         console.error("Error checking user session:", error);
         router.push("/login");
       });
-  }, [sessionId,loginUpdated]);
+  }, [sessionId, loginUpdated]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -147,20 +147,20 @@ export default function ShoppingCart() {
 
   useEffect(() => {
     const viewCart = async () => {
-    
+
       try {
         setCartItems(data?.items || []);
         setItemsCount(data?.items_count || 0);
         setCartFetched(true);
-        
+
       } catch (error) {
         console.error("Error loading cart:", error);
         setCartItems([]);
         setItemsCount(0);
         setCartFetched(true);
-      } 
-        setLoading(false);
-        setUpdatingItemId(null);
+      }
+      setLoading(false);
+      setUpdatingItemId(null);
     };
     if (sessionId) {
       viewCart();
@@ -355,9 +355,9 @@ export default function ShoppingCart() {
           discount_amount:
             isCouponApplied && couponData && couponSuccess
               ? cartItems?.reduce(
-                  (acc, item) => acc + item.product_price * item.quantity,
-                  0,
-                ) - calculateTotal()
+                (acc, item) => acc + item.product_price * item.quantity,
+                0,
+              ) - calculateTotal()
               : 0,
         }),
       });
@@ -373,7 +373,7 @@ export default function ShoppingCart() {
         setTimeout(() => {
           // setCartItems([]);
           setItemsCount(0);
-         
+
         }, 2000);
       }
       if (response.ok && result?.razorpay_order_id) {
@@ -500,13 +500,12 @@ export default function ShoppingCart() {
                     <div
                       key={step}
                       onClick={() => goToStep(step)}
-                      className={`pb-2 px-4 transition-all duration-300 border-b-2 cursor-pointer ${
-                        isCurrent
+                      className={`pb-2 px-4 transition-all duration-300 border-b-2 cursor-pointer ${isCurrent
                           ? "border-black text-black scale-105"
                           : isDone
                             ? "border-green-600 text-green-700"
                             : "border-transparent text-neutral-300 hover:text-neutral-500"
-                      }`}
+                        }`}
                     >
                       <span className="mr-1">{idx + 1}.</span> {step}
                     </div>
@@ -558,7 +557,7 @@ export default function ShoppingCart() {
                               </div>
                               <div className="flex flex-col">
                                 <Link
-                                  href={`/product-detail/${item.product_slug}`}
+                                  href={`/product/${item.product_slug}`}
                                   className="text-sm sm:text-base font-bold text-neutral-800 hover:text-black line-clamp-2 transition-colors"
                                 >
                                   {item.product_name}
@@ -621,11 +620,11 @@ export default function ShoppingCart() {
                                       return (
                                         couponData.type === "fixed"
                                           ? itemTotal -
-                                            parseFloat(couponData.value)
+                                          parseFloat(couponData.value)
                                           : itemTotal -
-                                            (itemTotal *
-                                              parseFloat(couponData.value)) /
-                                              100
+                                          (itemTotal *
+                                            parseFloat(couponData.value)) /
+                                          100
                                       ).toFixed(2);
                                     }
                                   }
@@ -638,7 +637,7 @@ export default function ShoppingCart() {
                                 onClick={() => removeItem(item.product_id)}
                                 className="text-red-500 hover:text-red-700 transition-colors p-1 cursor-pointer"
                                 title="Remove Item"
-                              >                               
+                              >
                                 <RiDeleteBinFill className="w-6 h-6" />
                               </button>
                             </div>
@@ -677,47 +676,47 @@ export default function ShoppingCart() {
                         </button>
                       </div>
 
- 
+
                     </div>
 
                     <div className="mt-2">
                       {couponSuccess && isCouponApplied && couponData
                         ? (() => {
-                            const couponCategories = couponData.category_id
-                              ? JSON.parse(couponData.category_id)
-                              : null;
+                          const couponCategories = couponData.category_id
+                            ? JSON.parse(couponData.category_id)
+                            : null;
 
-                            const isCategoryMatch =
-                              !couponCategories ||
-                              cartItems?.some((item) =>
-                                couponCategories.includes(
-                                  String(item.category_id),
-                                ),
-                              );
-                            return (
-                              isCategoryMatch && (
-                                <div className="inline-flex items-center gap-1 bg-green-50 text-green-800 px-3 py-1 rounded-lg text-xs font-bold border border-green-150 shadow-sm mt-1">
-                                  <span>Code: {couponData?.code}</span>
-                                  <button
-                                    type="button"
-                                    onClick={() => {
-                                      setIsCoupnApplied(false);
-                                      setCouponError("");
-                                      setCouponSuccess("");
-                                    }}
-                                    className="p-0.5 hover:bg-green-100 rounded-full transition-colors text-green-600 hover:text-green-900 cursor-pointer"
-                                  >
-                                    <IoClose className="w-4 h-4" />
-                                  </button>
-                                </div>
-                              )
+                          const isCategoryMatch =
+                            !couponCategories ||
+                            cartItems?.some((item) =>
+                              couponCategories.includes(
+                                String(item.category_id),
+                              ),
                             );
-                          })()
+                          return (
+                            isCategoryMatch && (
+                              <div className="inline-flex items-center gap-1 bg-green-50 text-green-800 px-3 py-1 rounded-lg text-xs font-bold border border-green-150 shadow-sm mt-1">
+                                <span>Code: {couponData?.code}</span>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setIsCoupnApplied(false);
+                                    setCouponError("");
+                                    setCouponSuccess("");
+                                  }}
+                                  className="p-0.5 hover:bg-green-100 rounded-full transition-colors text-green-600 hover:text-green-900 cursor-pointer"
+                                >
+                                  <IoClose className="w-4 h-4" />
+                                </button>
+                              </div>
+                            )
+                          );
+                        })()
                         : couponError && (
-                            <p className="text-red-700 text-xs font-bold pl-1 mt-1">
-                              {couponError}
-                            </p>
-                          )}
+                          <p className="text-red-700 text-xs font-bold pl-1 mt-1">
+                            {couponError}
+                          </p>
+                        )}
                     </div>
                   </div>
 
@@ -747,10 +746,10 @@ export default function ShoppingCart() {
                             - ₹
                             {isCouponApplied && couponData && couponSuccess
                               ? cartItems?.reduce(
-                                  (acc, item) =>
-                                    acc + item.product_price * item.quantity,
-                                  0,
-                                ) - calculateTotal()
+                                (acc, item) =>
+                                  acc + item.product_price * item.quantity,
+                                0,
+                              ) - calculateTotal()
                               : 0}
                           </span>
                         </div>
@@ -867,7 +866,7 @@ export default function ShoppingCart() {
                               </div>
                               <div className="flex flex-col">
                                 <Link
-                                  href={`/product-detail/${item.product_slug}`}
+                                  href={`/product/${item.product_slug}`}
                                   className="text-sm sm:text-base font-bold text-neutral-800 hover:text-black line-clamp-2 transition-colors"
                                 >
                                   {item.product_name}
@@ -928,11 +927,11 @@ export default function ShoppingCart() {
                                       return (
                                         couponData.type === "fixed"
                                           ? itemTotal -
-                                            parseFloat(couponData.value)
+                                          parseFloat(couponData.value)
                                           : itemTotal -
-                                            (itemTotal *
-                                              parseFloat(couponData.value)) /
-                                              100
+                                          (itemTotal *
+                                            parseFloat(couponData.value)) /
+                                          100
                                       ).toFixed(2);
                                     }
                                   }
@@ -962,11 +961,10 @@ export default function ShoppingCart() {
                           {/* Standard Delivery Option */}
                           <div
                             onClick={() => setDeliveryType("standard")}
-                            className={`flex flex-col p-4 rounded-2xl border-2 cursor-pointer transition-all ${
-                              deliveryType === "standard"
+                            className={`flex flex-col p-4 rounded-2xl border-2 cursor-pointer transition-all ${deliveryType === "standard"
                                 ? "border-black bg-white"
                                 : "border-neutral-200 bg-white hover:border-neutral-300"
-                            }`}
+                              }`}
                           >
                             <span className="text-xs font-bold uppercase tracking-wider text-neutral-850">
                               Standard
@@ -1010,11 +1008,10 @@ export default function ShoppingCart() {
                           {/* Cash On Delivery Option */}
                           <div
                             onClick={() => setPaymentMethod("cod")}
-                            className={`flex flex-col justify-between p-4 rounded-2xl border-2 cursor-pointer transition-all ${
-                              payment_method === "cod"
+                            className={`flex flex-col justify-between p-4 rounded-2xl border-2 cursor-pointer transition-all ${payment_method === "cod"
                                 ? "border-black bg-white"
                                 : "border-neutral-200 bg-white hover:border-neutral-300"
-                            }`}
+                              }`}
                           >
                             <span className="text-xs font-bold uppercase tracking-wider text-neutral-855">
                               COD
@@ -1027,11 +1024,10 @@ export default function ShoppingCart() {
                           {/* Online Payment Option */}
                           <div
                             onClick={() => setPaymentMethod("razorpay")}
-                            className={`flex flex-col justify-between p-4 rounded-2xl border-2 cursor-pointer transition-all ${
-                              payment_method === "razorpay"
+                            className={`flex flex-col justify-between p-4 rounded-2xl border-2 cursor-pointer transition-all ${payment_method === "razorpay"
                                 ? "border-black bg-white"
                                 : "border-neutral-200 bg-white hover:border-neutral-300"
-                            }`}
+                              }`}
                           >
                             <span className="text-xs font-bold uppercase tracking-wider text-neutral-850">
                               Online
@@ -1058,10 +1054,10 @@ export default function ShoppingCart() {
                             - ₹
                             {isCouponApplied && couponData && couponSuccess
                               ? cartItems?.reduce(
-                                  (acc, item) =>
-                                    acc + item.product_price * item.quantity,
-                                  0,
-                                ) - calculateTotal()
+                                (acc, item) =>
+                                  acc + item.product_price * item.quantity,
+                                0,
+                              ) - calculateTotal()
                               : 0}
                           </span>
                         </div>

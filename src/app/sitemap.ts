@@ -15,7 +15,7 @@ interface SitemapResponse {
 }
 
 async function getSitemapData(): Promise<SitemapResponse> {
-   const response = await fetch(`${config.apiUrl}api/sitemap-data/`);
+  const response = await fetch(`${config.apiUrl}api/sitemap-data/`);
 
   if (!response.ok) {
     throw new Error(`Sitemap API failed: ${response.status}`);
@@ -77,27 +77,27 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Pages
   for (const item of data.pages || []) {
 
-      if (item.url === "" || item.url === "home") {
-    sitemap.push({
-      url: `${BASE_URL}/`,
-      lastModified: new Date(item.updated_at),
-      priority: getPriority(item.url, "page"),
-    });
-      }else {
-    sitemap.push({
-      url: `${BASE_URL}/${item.url}`,
-      lastModified: new Date(item.updated_at),
-      priority: getPriority(item.url, "page"),
-    });
+    if (item.url === "" || item.url === "home") {
+      sitemap.push({
+        url: `${BASE_URL}/`,
+        lastModified: new Date(item.updated_at),
+        priority: getPriority(item.url, "page"),
+      });
+    } else {
+      sitemap.push({
+        url: `${BASE_URL}/${item.url}`,
+        lastModified: new Date(item.updated_at),
+        priority: getPriority(item.url, "page"),
+      });
 
-      }
+    }
 
   }
 
   // Categories
   for (const item of data.categories || []) {
     sitemap.push({
-      url: `${BASE_URL}/${item.url}`,
+      url: `${BASE_URL}/category/${item.url}`,
       lastModified: new Date(item.updated_at),
       priority: getPriority(item.url, "category"),
     });
@@ -106,7 +106,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Products
   for (const item of data.products || []) {
     sitemap.push({
-      url: `${BASE_URL}/${item.url}`,
+      url: `${BASE_URL}/product/${item.url}`,
       lastModified: new Date(item.updated_at),
       priority: getPriority(item.url, "product"),
     });

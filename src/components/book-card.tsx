@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from "react";
 import { useAppDispatch } from "@/hooks/useStore";
-import ProductDialog from "./product-detail-popup";
+import ProductDialog from "./product-popup";
 import Link from "next/link";
 import { useAddToCartMutation } from "@/lib/api/cartApi";
 import { useSession } from "@/hooks/useSession";
@@ -122,7 +122,7 @@ export function BookCard({
       >
         {/* Book Cover Image */}
         <div className="w-28 xs:w-32 sm:w-36 flex-shrink-0 rounded-xl">
-          <Link href={`/product-detail/${slug}`}>
+          <Link href={`/product/${slug}`}>
             <ImageBook src={img} alt={title} size={viewMode === "list" ? "10px" : "30px"} />
           </Link>
         </div>
@@ -137,7 +137,7 @@ export function BookCard({
             )}
           </div>
 
-          <Link href={`/product-detail/${slug}`}>
+          <Link href={`/product/${slug}`}>
             <h3 className="font-bold text-xs sm:text-base text-gray-900 hover:text-black transition-colors line-clamp-2 leading-tight">
               {formattedTitle}
             </h3>
@@ -318,7 +318,7 @@ export function BookCard({
 
       {/* Book Cover Image Container */}
       <div className="relative pt-4 px-4 bg-gray-50/60 group-hover:bg-gray-50 transition-colors">
-        <Link href={`/product-detail/${slug}`}>
+        <Link href={`/product/${slug}`}>
           <div className="w-full flex justify-center transform transition-transform duration-300">
             <ImageBook src={img} alt={title} size="30px" />
           </div>
@@ -328,7 +328,7 @@ export function BookCard({
       {/* Details & Bottom Bar */}
       <div className="p-4 flex flex-col flex-1 justify-between">
         <div>
-          <Link href={`/product-detail/${slug}`}>
+          <Link href={`/product/${slug}`}>
             <h3 className="font-bold text-gray-900 text-sm line-clamp-2 hover:text-black transition-colors mb-3">
               {limitedTitle}
             </h3>

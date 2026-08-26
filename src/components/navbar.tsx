@@ -199,7 +199,7 @@ export function Navbar({ menuData }: any) {
                             {filteredProducts.map((product: any) => (
                               <Link
                                 key={product?.id}
-                                href={`/product-detail/${product?.slug}`}
+                                href={`/product/${product?.slug}`}
                                 onClick={() => setSearchTerm("")}
                                 className="flex gap-4 items-center px-4 py-3 hover:bg-neutral-100/70 rounded-xl transition-all duration-200 border-b border-neutral-100 last:border-b-0 text-left"
                               >
@@ -551,7 +551,7 @@ export function Navbar({ menuData }: any) {
                 {filteredProducts.map((product: any) => (
                   <Link
                     key={product?.id}
-                    href={`/product-detail/${product?.slug}`}
+                    href={`/product/${product?.slug}`}
                     onClick={() => setSearchTerm("")}
                     className="flex gap-4 items-center p-3 hover:bg-neutral-50 rounded-2xl transition-all border border-neutral-100 hover:border-neutral-200"
                   >

@@ -1,39 +1,83 @@
-"use client";
-
-import React from "react";
 import Image from "next/image";
-import axios from "axios";
 import config from "../config";
+import { Metadata } from "next";
+import { truncateDescription } from "@/helper/helperfun";
 import Link from "next/link";
 
-export default function PrivacyPolicy() {
-  const [privacyPolicyData, setPrivacyPolicyData] = React.useState<any>(null);
+async function getPrivacyPolicyData() {
+  try {
+    const res = await fetch(`${config.apiUrl}api/cms-pages/privacy-policy`, {
+      next: {
+        revalidate: 600,
+      },
+    });
+    if (!res.ok) {
+      return null;
+    }
+    return res.json();
+  } catch {
+    return null;
+  }
+}
 
-  React.useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
+export async function generateMetadata(): Promise<Metadata> {
+  const data = await getPrivacyPolicyData();
 
-  React.useEffect(() => {
-    const fetchPrivacyPolicy = async () => {
-      try {
-        const response = await axios({
-          method: "get",
-          url: `${config.apiUrl}api/cms-pages/privacy-policy`,
-          responseType: "json",
-        });
-        setPrivacyPolicyData(response.data);
-      } catch (error) {
-        console.log("error", error);
-      }
+  if (!data) {
+    return {
+      title: "Privacy Policy | Bookwindow",
+      description: "Privacy Policy and user data protection terms of Bookwindow.",
     };
+  }
 
-    fetchPrivacyPolicy();
-  }, []);
+  const title =
+    data.meta_title?.trim() ||
+    `${data.title || "Privacy Policy"} | Bookwindow`;
+
+  const description =
+    data.meta_description?.trim() ||
+    truncateDescription(data.short_description || data.content?.replace(/<[^>]*>?/gm, "")) ||
+    "Your privacy is highly important to us. Understand how we collect, use, manage, and secure your personal information on Bookwindow.";
+
+  const keywords = data.meta_keywords
+    ? data.meta_keywords.split(",").map((item: string) => item.trim())
+    : undefined;
+
+  const imageUrl = data.banner_images
+    ? `${config.apiUrl}storage/app/public/${data.banner_images}`
+    : "/image/privacy.jpg";
+
+  return {
+    title,
+    description,
+    keywords,
+    alternates: {
+      canonical: "/privacy-policy",
+    },
+    robots: {
+      index: true,
+      follow: true,
+    },
+    openGraph: {
+      title,
+      description,
+      url: "https://bookwindow.in/privacy-policy",
+      images: [imageUrl],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [imageUrl],
+    },
+  };
+}
+
+export default async function PrivacyPolicy() {
+  const privacyPolicyData = await getPrivacyPolicyData();
 
   return (
     <>
-
-
       {/* Banner Section */}
       <section className="relative w-full h-[50vh] lg:mt-0 mt-[75px] flex items-center justify-center bg-gray-900 overflow-hidden">
         {/* Background Image with Dark Overlay */}
@@ -52,10 +96,11 @@ export default function PrivacyPolicy() {
         {/* Banner Content */}
         <div className="relative z-10 text-center max-w-4xl px-6 flex flex-col items-center">
           <h1 className="text-4xl md:text-6xl font-bold text-white mb-5 uppercase">
-            Privacy Policy
+            {privacyPolicyData?.title || "Privacy Policy"}
           </h1>
           <p className="text-gray-300 text-sm md:text-base lg:text-lg max-w-3xl leading-relaxed mb-8 font-light">
-            Your privacy is highly important to us. Understand how we collect, use, manage, and secure your personal information on Bookwindow.
+            {privacyPolicyData?.short_description ||
+              "Your privacy is highly important to us. Understand how we collect, use, manage, and secure your personal information on Bookwindow."}
           </p>
           <Link
             href="/contact-us"
@@ -68,26 +113,15 @@ export default function PrivacyPolicy() {
 
       {/* CMS Content Section */}
       <section className="container mx-auto px-4 max-w-5xl my-16 md:my-24">
-        {!privacyPolicyData?.title ? (
-          <div role="status" className="animate-pulse space-y-4 min-h-[300px]">
-            <div className="h-6 bg-gray-200 rounded-full w-48 mb-6"></div>
-            <div className="h-4 bg-gray-150 rounded-full w-full"></div>
-            <div className="h-4 bg-gray-150 rounded-full w-[92%]"></div>
-            <div className="h-4 bg-gray-150 rounded-full w-[95%]"></div>
-            <div className="h-4 bg-gray-150 rounded-full w-[85%]"></div>
-            <span className="sr-only">Loading...</span>
-          </div>
-        ) : (
-          <div className="bg-white p-6 md:p-10 rounded-2xl border border-gray-100 shadow-sm">
-            <div
-              className="text-base text-gray-600 space-y-4 leading-relaxed dynamic-content"
-              dangerouslySetInnerHTML={{ __html: privacyPolicyData?.content }}
-            />
-          </div>
-        )}
+        <div className="bg-white p-6 md:p-10 rounded-2xl border border-gray-100 shadow-sm">
+          <div
+            className="text-base text-gray-600 space-y-4 leading-relaxed dynamic-content"
+            dangerouslySetInnerHTML={{
+              __html: privacyPolicyData?.content || "<p>Privacy Policy content.</p>",
+            }}
+          />
+        </div>
       </section>
-
-
     </>
   );
 }

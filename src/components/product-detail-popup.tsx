@@ -190,7 +190,7 @@ export default function ProductDialog({ open, handleOpen, slug }: any) {
                     </button>
 
                     <button
-                      onClick={() => router.push(`/product-detail/${slug}`)}
+                      onClick={() => router.push(`/product/${slug}`)}
                       className="bg-transparent justify-center border hover:bg-black hover:text-white duration-300 border-black flex gap-2 items-center text-black px-4 2xl:px-6 py-2 rounded-full focus:outline-none"
                     >
                       <FaShoppingBag size={18} />
