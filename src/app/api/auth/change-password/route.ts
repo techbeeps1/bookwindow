@@ -4,16 +4,18 @@ import config from "@/app/config";
 
 export async function POST(req: NextRequest) {
   const body = await req.json();
-  const token = req.cookies.get("MMMAT")?.value;
+  const token = req.cookies.get("BWAT")?.value;
   if (!token) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
-  const res = await fetch(`${config.apiUrl}/change-password` ,{
+  const res = await fetch(`${config.apiUrl}/change-password`, {
     method: "POST",
     body: JSON.stringify(body),
-    headers:{ "Content-Type": "application/json" ,
-     "Authorization": `Bearer ${token}`}
-    
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`
+    }
+
   });
   const data = await res.json();
   const response = NextResponse.json(data);

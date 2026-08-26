@@ -1,4 +1,3 @@
-
 import config from "@/app/config";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -26,6 +25,7 @@ export async function PUT(
   return handle(request, context);
 }
 
+// ---------- PATCH ----------
 export async function PATCH(
   request: NextRequest,
   context: { params: Promise<{ path?: string[] }> }
@@ -41,19 +41,16 @@ export async function DELETE(
   return handle(request, context);
 }
 
-
-
-// ---------- COMMON ----------
+// ---------- COMMON HANDLER ----------
 async function handle(
   request: NextRequest,
   context: { params: Promise<{ path?: string[] }> }
 ) {
   try {
+    const params = await context.params;
+    const path = params?.path;
+    const search = request.nextUrl.search || "";
 
-    const { path } = await context.params;
-    const search = request.nextUrl.search; // ?id=5&name=test
-
-  
     if (!path || path.length === 0) {
       return NextResponse.json(
         { error: "Invalid API path" },
@@ -63,7 +60,10 @@ async function handle(
 
     const apiPath = path.join("/");
 
-    const token = request.cookies.get("BWAT")?.value;
+    // 1. Token read from Cookie OR Authorization header
+    const token =
+      request.cookies.get("BWAT")?.value ||
+      request.headers.get("authorization")?.replace(/^Bearer\s+/i, "");
 
     if (!token) {
       return NextResponse.json(
@@ -72,48 +72,66 @@ async function handle(
       );
     }
 
-    const headers = new Headers(request.headers);
-    headers.delete("host");
-    headers.delete("content-length");
-    headers.set("Authorization", `Bearer ${token}`);
-    const url = `${config.apiUrl}api/my-account/${apiPath}${search}`;
+    // 2. Clean outgoing headers (Avoid forwarding Cloudflare/Hop-by-hop headers)
+    const outgoingHeaders: Record<string, string> = {
+      Accept: "application/json",
+      Authorization: `Bearer ${token}`,
+    };
 
-    interface NodeRequestInit extends RequestInit {
-      duplex?: "half";
+    const contentType = request.headers.get("content-type");
+    if (contentType) {
+      outgoingHeaders["Content-Type"] = contentType;
     }
-  const bodydata = request.method !== "GET" && request.method !== "HEAD" ? request.body : undefined;
-    
+
+    // 3. Body formatting (Only for non-GET/HEAD methods)
+    let body: any = undefined;
+    if (request.method !== "GET" && request.method !== "HEAD") {
+      try {
+        if (contentType?.includes("application/json")) {
+          const jsonBody = await request.json();
+          body = JSON.stringify(jsonBody);
+        } else if (
+          contentType?.includes("multipart/form-data") ||
+          contentType?.includes("application/x-www-form-urlencoded")
+        ) {
+          body = await request.arrayBuffer();
+        } else {
+          body = await request.text();
+        }
+      } catch {
+        body = undefined;
+      }
+    }
+
+    const cleanApiUrl = config.apiUrl.replace(/\/+$/, "");
+    const url = `${cleanApiUrl}/api/my-account/${apiPath}${search}`;
+
     const apiRes = await fetch(url, {
-    
       method: request.method,
-      headers,
-      body: bodydata,
-      duplex: "half",
-    } as NodeRequestInit);
+      headers: outgoingHeaders,
+      body,
+    });
 
+    const responseText = await apiRes.text();
 
-    if (apiRes.status === 401) {
- 
+    let data: any;
+    try {
+      data = JSON.parse(responseText);
+    } catch {
       return NextResponse.json(
-        { error: "Unauthorized Access" },
-        { status: 401 }
+        { error: responseText || "Backend returned non-JSON response" },
+        { status: apiRes.status || 500 }
       );
     }
 
-  
-    const data = await apiRes.json();
- 
     return NextResponse.json(data, {
       status: apiRes.status,
     });
-
-  } catch (err) {
+  } catch (err: any) {
     console.error("Proxy Error:", err);
     return NextResponse.json(
-      { error: "Proxy failed" },
+      { error: err?.message || "Proxy failed" },
       { status: 500 }
     );
   }
 }
-
-
