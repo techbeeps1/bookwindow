@@ -125,6 +125,16 @@ const nextConfig = {
         destination: "/return-policy",
         permanent: true,
       },
+      {
+        source: "/news.php",
+        destination: "/blogs",
+        permanent: true,
+      },
+      {
+        source: "/current-affairs/Bhil-Tribal-Group",
+        destination: "/current-affairs",
+        permanent: true,
+      },
     ];
   },
 };

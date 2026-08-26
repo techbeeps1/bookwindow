@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import ProductDetail from "./ProductDetail";
 import config from "@/app/config";
 import { truncateDescription } from "@/helper/helperfun";
-import { notFound, permanentRedirect } from "next/navigation";
+import { redirect, RedirectType, permanentRedirect } from "next/navigation";
 
 type Props = {
   params: Promise<{
@@ -97,7 +97,7 @@ export default async function Page({ params }: Props) {
 
   const data = await getProduct(slug);
   if (data.success === false || !data?.product) {
-    notFound();
+    redirect("/", RedirectType.replace);
   }
 
   if (
