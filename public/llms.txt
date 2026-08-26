@@ -1,0 +1,30 @@
+# Bookwindow
+
+> Bookwindow (https://bookwindow.in) is India's leading online bookstore specializing in competitive exam preparation books, educational textbooks, mock test series, magazines, and publisher collections.
+
+## Core Offerings & Specialties
+
+- **Competitive Exam Books**: Comprehensive preparation materials for UPSC (Civil Services & Engineering Services), SSC (CGL, CHSL, MTS, GD, JE), Railway (RRB NTPC, ALP, Group D), State Public Service Commissions (RPSC, RAS), Defence Exams (NDA, CDS, Army, Navy, Air Force, CAPF), Teaching Exams (CTET, REET), Medical Entrance (NEET, AIIMS), and Engineering (JEE Main & Advanced).
+- **School & Academic Books**: CBSE, NCERT, and State Board curriculum textbooks, reference guides, and sample papers for Classes 1 to 12.
+- **Publisher Directory**: Authentic books sourced directly from top Indian publishing houses including Utkarsh Publications, Arihant, Disha, Kiran, and more.
+- **Current Affairs & Exam News**: Bi-lingual (Hindi & English) monthly compilations, magazines, and exam notifications.
+- **Mock Tests & Solved Papers**: Model question papers, previous years' solved question banks, and chapter-wise practice workbooks.
+- **Book Sourcing & Requests**: Dedicated on-demand book finding and request service for rare, specialized, or out-of-stock educational resources.
+
+## Key Links & Page Directory
+
+- [Home](https://bookwindow.in/): Official homepage with popular categories, latest book deals, and featured exams.
+- [All Products Catalog](https://bookwindow.in/all-products): Full book catalog with filters by category, publisher, and price.
+- [Publications Directory](https://bookwindow.in/publications): Index of all featured book publishers and publication-wise store pages.
+- [Current Affairs](https://bookwindow.in/current-affairs): Regularly updated current affairs modules in Hindi and English.
+- [Blogs](https://bookwindow.in/blogs): Preparation strategies, exam guides, syllabus breakdowns, and book reviews.
+- [Request a Product](https://bookwindow.in/request-product): On-demand product request form for unavailable or custom books.
+- [Tutor Platform](https://bookwindow.in/tutor): Mentorship and tutor discovery network.
+- [About Us](https://bookwindow.in/about-us): Company overview and mission.
+- [Contact Us](https://bookwindow.in/contact-us): Customer support and helpdesk information.
+
+## Customer Policies & Support
+
+- [Privacy Policy](https://bookwindow.in/privacy-policy): Privacy terms and data protection policies.
+- [Return & Refund Policy](https://bookwindow.in/return-policy): Product return, cancellation, and refund guidelines.
+- [Terms and Conditions](https://bookwindow.in/terms): User agreement and service conditions.

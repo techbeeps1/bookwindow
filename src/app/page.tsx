@@ -43,7 +43,7 @@ export async function generateMetadata(): Promise<Metadata> {
         title: seo.meta_title || "Bookwindow",
         description:
           seo.meta_description || "Buy books online at Bookwindow.",
-        url: "https://yourdomain.com",
+        url: "https://bookwindow.in",
         type: "website",
         images: [
           seo.meta_image

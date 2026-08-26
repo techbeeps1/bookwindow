@@ -6,8 +6,16 @@ import CategoryPublicationSidebar from "@/components/category-publication-sideba
 import ProductFilterBar from "@/components/ProductFilterBar";
 import { FiSearch, FiFilter, FiGrid, FiList } from "react-icons/fi";
 import { MdKeyboardArrowLeft, MdKeyboardArrowRight } from "react-icons/md";
+import { FaChevronRight } from "react-icons/fa";
+import Link from "next/link";
 
-export default function CategoryPage({ categoryData }: { categoryData: any }) {
+export default function CategoryPage({
+  categoryData,
+  slug,
+}: {
+  categoryData: any;
+  slug?: string;
+}) {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 12;
 
@@ -19,8 +27,43 @@ export default function CategoryPage({ categoryData }: { categoryData: any }) {
   const [sortBy, setSortBy] = useState<string>("default");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
+  const categoryTitle = useMemo(() => {
+    // 1. Direct field on categoryData
+    if (categoryData?.name && typeof categoryData.name === "string") return categoryData.name;
+    if (categoryData?.title && typeof categoryData.title === "string") return categoryData.title;
+    if (categoryData?.category_name && typeof categoryData.category_name === "string") return categoryData.category_name;
 
+    // 2. From SEO meta_title
+    if (categoryData?.seo?.meta_title && typeof categoryData.seo.meta_title === "string" && categoryData.seo.meta_title.trim()) {
+      const cleanTitle = categoryData.seo.meta_title
+        .replace(/\s*[-|–]\s*Bookwindow.*$/i, "")
+        .replace(/^Bookwindow\s*[-|–]\s*/i, "")
+        .trim();
+      if (cleanTitle && cleanTitle.toLowerCase() !== "category" && cleanTitle.toLowerCase() !== "bookwindow") {
+        return cleanTitle;
+      }
+    }
 
+    // 3. From slug (e.g. "defence-exam-books" -> "Defence Exam Books")
+    if (slug) {
+      return slug
+        .split("-")
+        .map((word) => {
+          const upper = word.toUpperCase();
+          if (
+            ["CBSE", "RBSE", "NCERT", "UPSC", "SSC", "RRB", "NEET", "JEE", "IIT", "RAS", "RPSC", "CTET", "REET", "GK", "GS", "PDF"].includes(
+              upper
+            )
+          ) {
+            return upper;
+          }
+          return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+        })
+        .join(" ");
+    }
+
+    return "Category";
+  }, [categoryData, slug]);
 
   const products = useMemo(
     () => categoryData?.products ?? [],
@@ -39,7 +82,6 @@ export default function CategoryPage({ categoryData }: { categoryData: any }) {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
-
 
   const filteredProducts = useMemo(() => {
     let filtered = products.filter((product: any) => {
@@ -66,7 +108,6 @@ export default function CategoryPage({ categoryData }: { categoryData: any }) {
     } else if (sortBy === "name") {
       filtered.sort((a: any, b: any) => (a.name || "").localeCompare(b.name || ""));
     }
-
 
     return filtered;
   }, [products, selectedCategoryIds, selectedPublicationIds, searchQuery, sortBy]);
@@ -111,7 +152,38 @@ export default function CategoryPage({ categoryData }: { categoryData: any }) {
 
   return (
     <>
-      <section className="container lg:mt-0 mt-[120px] mx-auto mb-10 mt-10 flex flex-col md:flex-row px-3 sm:px-5 lg:px-8 gap-4 lg:gap-6">
+      {/* Category Header & Breadcrumb */}
+      <div className="container mx-auto px-3 sm:px-5 lg:px-8 pt-6 lg:pt-8 lg:mt-0 mt-[90px]">
+
+        {/* Category Title & Count */}
+        <div className="pb-4 mb-6 border-b border-neutral-200/80 flex flex-col sm:flex-row sm:items-end justify-between gap-2">
+          <div>
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-neutral-900 tracking-tight">
+              {categoryTitle}
+            </h1>
+            <p className="text-xs sm:text-sm text-neutral-500 font-medium mt-1">
+              Showing {filteredProducts.length} {filteredProducts.length === 1 ? "book" : "books"} available
+            </p>
+          </div>
+        </div>
+        {/* Breadcrumbs */}
+        <nav className="flex items-center gap-2 text-xs sm:text-sm text-neutral-500 mb-3">
+          <Link href="/" className="hover:text-black transition-colors font-medium">
+            Home
+          </Link>
+          <FaChevronRight className="w-2.5 h-2.5 text-neutral-400" />
+          <Link href="/all-products" className="hover:text-black transition-colors font-medium">
+            Categories
+          </Link>
+          <FaChevronRight className="w-2.5 h-2.5 text-neutral-400" />
+          <span className="text-neutral-900 font-semibold truncate max-w-[200px] sm:max-w-none">
+            {categoryTitle}
+          </span>
+        </nav>
+
+      </div>
+
+      <section className="container mx-auto mb-12 flex flex-col md:flex-row px-3 sm:px-5 lg:px-8 gap-4 lg:gap-6">
         <CategoryPublicationSidebar
           onCategorySelect={handleCategorySelect}
           onPublicationSelect={handlePublicationSelect}
@@ -122,7 +194,6 @@ export default function CategoryPage({ categoryData }: { categoryData: any }) {
           publications={publicationData}
           category_id={childCategory[0]?.parent_id}
           isFetched={false}
-
         />
 
         <div className="flex-1 w-full min-w-0">
@@ -172,7 +243,7 @@ export default function CategoryPage({ categoryData }: { categoryData: any }) {
                     quantity={product.quantity}
                     onItemsCountUpdate={() => { }}
                     subcategoryName={subcategory?.name}
-                    mainCategoryName={"slug"}
+                    mainCategoryName={categoryTitle}
                     viewMode={viewMode}
                   />
                 );

@@ -14,7 +14,7 @@ type Props = {
 async function getPublication(slug: string) {
   const res = await fetch(`${config.apiUrl}api/publication/${slug}`, {
     next: {
-      revalidate: 0,
+      revalidate: 600,
     },
   });
 

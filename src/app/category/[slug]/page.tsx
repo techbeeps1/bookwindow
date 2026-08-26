@@ -80,5 +80,5 @@ export default async function Page({ params }: Props) {
    if (data.success === false) {
         notFound();
       }
-  return <CategoryPage categoryData={data} />;
+  return <CategoryPage categoryData={data} slug={slug} />;
 }

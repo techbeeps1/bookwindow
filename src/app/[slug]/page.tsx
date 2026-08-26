@@ -16,7 +16,9 @@ async function getPageData(slug: string) {
   const res = await fetch(
     `${config.apiUrl}api/cms-pages/${slug}`,
     {
-      cache: "no-store", // SSR
+      next: {
+        revalidate: 600,
+      },
     }
   );
   if (!res.ok) {
