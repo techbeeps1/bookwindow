@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from "react";
 import { useAppDispatch } from "@/hooks/useStore";
-import ProductDialog from "./product-popup";
+import ProductDialog from "./product-detail-popup";
 import Link from "next/link";
 import { useAddToCartMutation } from "@/lib/api/cartApi";
 import { useSession } from "@/hooks/useSession";

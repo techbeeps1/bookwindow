@@ -27,7 +27,7 @@ import { useCart } from "@/hooks/useCart";
 import { useAppDispatch, useAppSelector } from "@/hooks/useStore";
 import { openCartDrawer } from "@/lib/slices/uiSlice";
 import { ImageBook } from "@/components/ImageBook";
-import ProductDialog from "@/components/product-popup";
+import ProductDialog from "@/components/product-detail-popup";
 import config from "@/app/config";
 import ProductFilterBar from "@/components/ProductFilterBar";
 import { useViewWishlistQuery, useRemoveWishlistMutation } from "@/lib/api/wishlistApi";
