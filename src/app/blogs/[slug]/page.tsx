@@ -83,6 +83,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
+import JsonLd from "@/components/seo/JsonLd";
+import { generateArticleSchema, generateBreadcrumbSchema } from "@/helper/schemaHelper";
+
 export default async function BlogDetailPage({ params }: Props) {
   const { slug } = await params;
   const blog = await getBlog(slug);
@@ -91,5 +94,18 @@ export default async function BlogDetailPage({ params }: Props) {
     notFound();
   }
 
-  return <BlogDetailClient blogData={blog} />;
+  const articleSchema = generateArticleSchema(blog, "BlogPosting", slug);
+  const breadcrumbSchema = generateBreadcrumbSchema([
+    { name: "Home", url: "/" },
+    { name: "Blogs", url: "/blogs" },
+    { name: blog.title || "Blog Post", url: `/blogs/${slug}` },
+  ]);
+
+  return (
+    <>
+      <JsonLd schema={[articleSchema, breadcrumbSchema]} />
+      <BlogDetailClient blogData={blog} />
+    </>
+  );
 }
+

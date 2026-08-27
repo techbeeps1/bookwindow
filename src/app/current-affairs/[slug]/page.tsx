@@ -93,6 +93,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
+import JsonLd from "@/components/seo/JsonLd";
+import { generateArticleSchema, generateBreadcrumbSchema } from "@/helper/schemaHelper";
+
 export default async function CurrentAffairsDetailPage({ params }: Props) {
   const { slug } = await params;
   const [newsData, newsList] = await Promise.all([
@@ -104,10 +107,21 @@ export default async function CurrentAffairsDetailPage({ params }: Props) {
     notFound();
   }
 
+  const articleSchema = generateArticleSchema(newsData, "NewsArticle", slug);
+  const breadcrumbSchema = generateBreadcrumbSchema([
+    { name: "Home", url: "/" },
+    { name: "Current Affairs", url: "/current-affairs" },
+    { name: newsData.title || "News Update", url: `/current-affairs/${slug}` },
+  ]);
+
   return (
-    <CurrentAffairsDetailClient
-      currentAffairsData={newsData}
-      currentAffairsList={newsList}
-    />
+    <>
+      <JsonLd schema={[articleSchema, breadcrumbSchema]} />
+      <CurrentAffairsDetailClient
+        currentAffairsData={newsData}
+        currentAffairsList={newsList}
+      />
+    </>
   );
 }
+

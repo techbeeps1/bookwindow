@@ -73,8 +73,19 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
+import JsonLd from "@/components/seo/JsonLd";
+import { generateBreadcrumbSchema, generateWebPageSchema } from "@/helper/schemaHelper";
+
 export default async function Terms() {
   const termsData = await getTermsData();
+
+  const title = termsData?.title || "Terms and Conditions";
+  const desc = termsData?.short_description || "Terms and conditions for using Bookwindow website and services.";
+  const webPageSchema = generateWebPageSchema(title, desc, "/terms");
+  const breadcrumbSchema = generateBreadcrumbSchema([
+    { name: "Home", url: "/" },
+    { name: title, url: "/terms" },
+  ]);
 
   let formattedContent = termsData?.content || "<p>Terms and conditions content.</p>";
   if (termsData?.content) {
@@ -91,8 +102,10 @@ export default async function Terms() {
 
   return (
     <>
+      <JsonLd schema={[webPageSchema, breadcrumbSchema]} />
       {/* Banner Section */}
       <section className="relative w-full h-[50vh] lg:mt-0 mt-[75px] flex items-center justify-center bg-gray-900 overflow-hidden">
+
         {/* Background Image with Dark Overlay */}
         <div className="absolute inset-0 z-0">
           <Image

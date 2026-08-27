@@ -15,10 +15,24 @@ export const metadata: Metadata = {
   },
 };
 
+import JsonLd from "@/components/seo/JsonLd";
+import { generateBreadcrumbSchema } from "@/helper/schemaHelper";
+
 export default function CurrentAffairsLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return <>{children}</>;
+  const breadcrumbSchema = generateBreadcrumbSchema([
+    { name: "Home", url: "/" },
+    { name: "Current Affairs", url: "/current-affairs" },
+  ]);
+
+  return (
+    <>
+      <JsonLd schema={breadcrumbSchema} />
+      {children}
+    </>
+  );
 }
+
