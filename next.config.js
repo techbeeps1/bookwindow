@@ -135,6 +135,11 @@ const nextConfig = {
         destination: "/current-affairs",
         permanent: true,
       },
+      {
+        source: "/category/3",
+        destination: "/all-products",
+        permanent: true,
+      },
     ];
   },
 };
