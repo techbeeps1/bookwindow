@@ -127,33 +127,43 @@ export default function Checkout({
     setEmail(value);
     setUserFound(null);
     setErrorMessage("");
-    setIsBuffering(true);
 
     if (debounceTimeout) {
       clearTimeout(debounceTimeout);
     }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!value || !emailRegex.test(value.trim())) {
+      setIsBuffering(false);
+      return;
+    }
+
+    setIsBuffering(true);
     const timeout = setTimeout(() => {
-      checkUser(value);
+      checkUser(value.trim());
     }, 500);
 
     setDebounceTimeout(timeout);
   };
 
   const checkUser = async (emailToCheck: string) => {
+    if (!emailToCheck) {
+      setIsBuffering(false);
+      return;
+    }
     try {
       const response = await axios.post(`${config.apiUrl}api/v1/checkuser`, {
         email: emailToCheck,
       });
 
-      if (response.data.success) {
+      if (response?.data?.success) {
         setUserFound(true);
         setErrorMessage("");
-      } else if (response.data.error) {
+      } else {
         setUserFound(false);
         setErrorMessage("This email is not registered with us.");
       }
-    } catch (error) {
-      console.error("API error:", error);
+    } catch {
       setUserFound(false);
       setErrorMessage("This email is not registered with us.");
     } finally {

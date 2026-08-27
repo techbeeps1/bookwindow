@@ -482,6 +482,24 @@ function OrdersTab({ userOrders }: any) {
                     const isSuccess = ["delivered", "completed", "paid", "success"].some((s) => statusLower?.includes(s));
                     const isCancelled = ["cancelled", "failed", "refunded"].some((s) => statusLower?.includes(s));
 
+                    const isCodOrder =
+                      order?.order_details?.payment_method?.toLowerCase() === "cod" ||
+                      Number(order?.order_details?.delivery_amount) > 0 ||
+                      Number(order?.order_details?.cod_amount) > 0 ||
+                      Number(order?.order_details?.cod_charges) > 0;
+                    const codFee =
+                      Number(order?.order_details?.delivery_amount) ||
+                      Number(order?.order_details?.cod_amount) ||
+                      Number(order?.order_details?.cod_charges) ||
+                      (isCodOrder ? 49 : 0);
+                    const subtotalVal = Number(order?.order_details?.subtotal) || 0;
+                    const discountVal = Number(order?.order_details?.discount_amount) || 0;
+                    const shippingVal = Number(order?.order_details?.shipping_amount) || 49;
+                    const calculatedRowTotal =
+                      subtotalVal > 0
+                        ? (subtotalVal - discountVal + shippingVal + (isCodOrder ? codFee : 0)).toFixed(2)
+                        : order?.order_details?.total_amount;
+
                     return (
                       <tr key={order?.id} className={`hover:bg-neutral-50/40 transition-colors ${selectedRows[order.id] ? "bg-neutral-50/20" : ""}`}>
                         <td className="p-4 text-center">
@@ -514,7 +532,7 @@ function OrdersTab({ userOrders }: any) {
                           </span>
                         </td>
                         <td className="p-4 text-sm text-neutral-900 font-bold">
-                          ₹{order?.order_details?.total_amount}{" "}
+                          ₹{calculatedRowTotal}{" "}
                           <span className="text-neutral-400 font-semibold text-xs ml-1">
                             ({order?.items.length} {order?.items.length === 1 ? "item" : "items"})
                           </span>
@@ -695,10 +713,46 @@ function OrdersTab({ userOrders }: any) {
                     : `₹${selectedOrder?.order_details?.shipping_amount}`}
                 </span>
               </div>
-              <div className="flex justify-between pt-3.5 font-bold text-sm text-neutral-955">
-                <span className="text-neutral-900 font-extrabold uppercase tracking-wider text-xs flex items-center">Total Amount</span>
-                <span className="text-xl font-extrabold text-neutral-955">₹{selectedOrder?.order_details?.total_amount}</span>
-              </div>
+              {(selectedOrder?.order_details?.payment_method?.toLowerCase() === "cod" ||
+                Number(selectedOrder?.order_details?.delivery_amount) > 0 ||
+                Number(selectedOrder?.order_details?.cod_amount) > 0 ||
+                Number(selectedOrder?.order_details?.cod_charges) > 0) && (
+                <div className="flex justify-between py-3.5">
+                  <span className="text-neutral-455 font-bold uppercase tracking-wider text-xs">COD Charges</span>
+                  <span className="text-neutral-955 font-bold">
+                    ₹{selectedOrder?.order_details?.delivery_amount ||
+                      selectedOrder?.order_details?.cod_amount ||
+                      selectedOrder?.order_details?.cod_charges ||
+                      49}
+                  </span>
+                </div>
+              )}
+              {(() => {
+                const isSelectedCod =
+                  selectedOrder?.order_details?.payment_method?.toLowerCase() === "cod" ||
+                  Number(selectedOrder?.order_details?.delivery_amount) > 0 ||
+                  Number(selectedOrder?.order_details?.cod_amount) > 0 ||
+                  Number(selectedOrder?.order_details?.cod_charges) > 0;
+                const selectedCodFee =
+                  Number(selectedOrder?.order_details?.delivery_amount) ||
+                  Number(selectedOrder?.order_details?.cod_amount) ||
+                  Number(selectedOrder?.order_details?.cod_charges) ||
+                  (isSelectedCod ? 49 : 0);
+                const selectedSubtotal = Number(selectedOrder?.order_details?.subtotal) || 0;
+                const selectedDiscount = Number(selectedOrder?.order_details?.discount_amount) || 0;
+                const selectedShipping = Number(selectedOrder?.order_details?.shipping_amount) || 49;
+                const selectedTotal =
+                  selectedSubtotal > 0
+                    ? (selectedSubtotal - selectedDiscount + selectedShipping + (isSelectedCod ? selectedCodFee : 0)).toFixed(2)
+                    : selectedOrder?.order_details?.total_amount;
+
+                return (
+                  <div className="flex justify-between pt-3.5 font-bold text-sm text-neutral-955">
+                    <span className="text-neutral-900 font-extrabold uppercase tracking-wider text-xs flex items-center">Total Amount</span>
+                    <span className="text-xl font-extrabold text-neutral-955">₹{selectedTotal}</span>
+                  </div>
+                );
+              })()}
             </div>
           </div>
 

@@ -441,10 +441,23 @@ export default function ShoppingCart() {
       const result = await response.json();
       // Reset the order process state after the request completes
 
-      if (result?.order_number && !result?.razorpay_order_id) {
-        setOrderNumber(result?.order_number);
+      if (!response.ok && !result?.razorpay_order_id && !result?.order_number) {
+        setIsOrderProcess(false);
+        const msg = result?.message || result?.error || "Order placement failed. Please try again.";
+        alert(msg);
+        return;
+      }
+
+      const orderNum =
+        result?.order_number ||
+        result?.order?.order_number ||
+        result?.data?.order_number ||
+        result?.data?.order?.order_number;
+
+      if (orderNum && !result?.razorpay_order_id) {
+        setOrderNumber(orderNum);
         refetch();
-        router.push(`/view-orders?order_number=${result?.order_number}`);
+        router.push(`/view-orders?order_number=${orderNum}`);
         return;
       }
       if (response.ok && result?.razorpay_order_id) {
@@ -485,9 +498,14 @@ export default function ShoppingCart() {
             console.log("RAzorpay data", verifyData);
             if (verifyRes.ok) {
               refetch();
-              setOrderNumber(result?.order?.order_number);
+              const finalOrderNumber =
+                verifyData?.order?.order_number ||
+                verifyData?.order_number ||
+                result?.order?.order_number ||
+                result?.order_number;
+              setOrderNumber(finalOrderNumber);
               router.push(
-                `/view-orders?order_number=${result?.order?.order_number}`,
+                `/view-orders?order_number=${finalOrderNumber}`,
               );
             } else {
               setIsOrderProcess(false);
