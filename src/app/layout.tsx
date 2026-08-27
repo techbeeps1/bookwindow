@@ -24,6 +24,9 @@ async function getMenu() {
   return response.json();
 }
 
+import JsonLd from "@/components/seo/JsonLd";
+import { generateOrganizationSchema, generateWebSiteSchema } from "@/helper/schemaHelper";
+
 const roboto = Roboto({
   subsets: ["latin"],
   weight: ["300", "400", "500", "700", "900"],
@@ -43,9 +46,15 @@ export default async function RootLayout({
   children: React.ReactNode;
 }) {
   const menuData = await getMenu();
+  const orgSchema = generateOrganizationSchema();
+  const webSiteSchema = generateWebSiteSchema();
+
   return (
     <html lang="en">
       <head>
+        {/* Schema.org Global Structured Data */}
+        <JsonLd schema={[orgSchema, webSiteSchema]} />
+
         {/* Google Analytics */}
         <Script
           strategy="afterInteractive"

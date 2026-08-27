@@ -92,6 +92,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 }
 
+import JsonLd from "@/components/seo/JsonLd";
+import { generateProductSchema, generateBreadcrumbSchema } from "@/helper/schemaHelper";
+
 export default async function Page({ params }: Props) {
   const { slug } = await params;
 
@@ -108,5 +111,33 @@ export default async function Page({ params }: Props) {
     permanentRedirect(`/product/${data.product.slug}`);
   }
 
-  return <ProductDetail data={data} />;
+  const product = data.product;
+  const productSchema = generateProductSchema(product, slug);
+
+  const breadcrumbs = [
+    { name: "Home", url: "/" },
+    { name: "Books", url: "/all-products" },
+  ];
+
+  if (product.production?.name) {
+    breadcrumbs.push({
+      name: product.production.name,
+      url: `/publication/${product.production.slug}`,
+    });
+  }
+
+  breadcrumbs.push({
+    name: product.name || "Book Details",
+    url: `/product/${product.slug || slug}`,
+  });
+
+  const breadcrumbSchema = generateBreadcrumbSchema(breadcrumbs);
+
+  return (
+    <>
+      <JsonLd schema={[productSchema, breadcrumbSchema]} />
+      <ProductDetail data={data} />
+    </>
+  );
 }
+

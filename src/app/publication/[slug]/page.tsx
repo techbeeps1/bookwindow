@@ -99,6 +99,9 @@ export async function generateMetadata({
   }
 }
 
+import JsonLd from "@/components/seo/JsonLd";
+import { generatePublicationGraphSchema } from "@/helper/schemaHelper";
+
 export default async function Page({ params }: Props) {
   const { slug } = await params;
 
@@ -107,5 +110,29 @@ export default async function Page({ params }: Props) {
     notFound();
   }
 
-  return <PublisherPage categoryData={data} />;
+  const publisherName =
+    data.publication?.name ||
+    slug
+      .split("-")
+      .map((w: string) => w.charAt(0).toUpperCase() + w.slice(1))
+      .join(" ");
+
+  const publisherDescription =
+    data?.seo?.meta_description?.trim() ||
+    `Buy authentic books from ${publisherName} online at best prices on Bookwindow.`;
+
+  const publicationGraphSchema = generatePublicationGraphSchema({
+    publisherName,
+    publisherUrl: `/publication/${slug}`,
+    publisherDescription,
+    products: data?.products || [],
+  });
+
+  return (
+    <>
+      <JsonLd schema={publicationGraphSchema} />
+      <PublisherPage categoryData={data} />
+    </>
+  );
 }
+

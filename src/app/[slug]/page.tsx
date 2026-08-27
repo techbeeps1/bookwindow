@@ -69,6 +69,9 @@ export async function generateMetadata({
   };
 }
 
+import JsonLd from "@/components/seo/JsonLd";
+import { generateBreadcrumbSchema, generateWebPageSchema } from "@/helper/schemaHelper";
+
 export default async function AboutUs({ params }: PageProps) {
   const { slug } = await params;
   const PageData = await getPageData(slug);
@@ -76,11 +79,20 @@ export default async function AboutUs({ params }: PageProps) {
     notFound();
   }
 
+  const title = PageData?.title || slug;
+  const desc = PageData?.short_description || PageData?.meta_description || "Bookwindow information page.";
+  const webPageSchema = generateWebPageSchema(title, desc, `/${slug}`);
+  const breadcrumbSchema = generateBreadcrumbSchema([
+    { name: "Home", url: "/" },
+    { name: title, url: `/${slug}` },
+  ]);
 
   return (
     <>
+      <JsonLd schema={[webPageSchema, breadcrumbSchema]} />
       {/* Banner Section */}
       <section className="relative w-full h-[50vh] flex items-center justify-center bg-gray-900 overflow-hidden">
+
         <div className="absolute inset-0 z-0">
           <Image
             src={`${config.apiUrl}storage/app/public/${PageData?.banner_images}`}

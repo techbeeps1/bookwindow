@@ -15,10 +15,25 @@ export const metadata: Metadata = {
   },
 };
 
+import JsonLd from "@/components/seo/JsonLd";
+import { generateContactPageSchema, generateBreadcrumbSchema } from "@/helper/schemaHelper";
+
 export default function ContactUsLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return <>{children}</>;
+  const contactSchema = generateContactPageSchema();
+  const breadcrumbSchema = generateBreadcrumbSchema([
+    { name: "Home", url: "/" },
+    { name: "Contact Us", url: "/contact-us" },
+  ]);
+
+  return (
+    <>
+      <JsonLd schema={[contactSchema, breadcrumbSchema]} />
+      {children}
+    </>
+  );
 }
+
