@@ -313,23 +313,102 @@ export default function ShoppingCart() {
     }
   };
 
-  const couponValidation = (
-    max_cart_amount: number,
-    min_cart_amount: number,
-    totalAmount: number,
-  ) => {
-    if (
-      (totalAmount <= max_cart_amount && totalAmount >= min_cart_amount) ||
-      (min_cart_amount === null && max_cart_amount === null) ||
-      (totalAmount > min_cart_amount && max_cart_amount === null) ||
-      (totalAmount < max_cart_amount && min_cart_amount === null)
-    ) {
-      setCouponSuccess("coupon is valid");
-    } else if (totalAmount > max_cart_amount && max_cart_amount !== null) {
-      setCouponError(`Maximum cart amount should be ${max_cart_amount}`);
-    } else if (totalAmount < min_cart_amount && min_cart_amount !== null) {
-      setCouponError(`Minimum cart amount should be ${min_cart_amount}`);
+  // Auto-validate applied coupon whenever cart items or subtotal change
+  useEffect(() => {
+    if (isCouponApplied && couponData && Object.keys(couponData).length > 0) {
+      const currentSubtotal =
+        cartItems?.reduce(
+          (acc, item) => acc + item.product_price * item.quantity,
+          0
+        ) || 0;
+
+      const minAmount =
+        couponData.min_cart_amount !== null &&
+        couponData.min_cart_amount !== undefined &&
+        couponData.min_cart_amount !== ""
+          ? parseFloat(couponData.min_cart_amount)
+          : null;
+      const maxAmount =
+        couponData.max_cart_amount !== null &&
+        couponData.max_cart_amount !== undefined &&
+        couponData.max_cart_amount !== ""
+          ? parseFloat(couponData.max_cart_amount)
+          : null;
+
+      if (minAmount !== null && currentSubtotal < minAmount) {
+        setIsCoupnApplied(false);
+        setCouponSuccess("");
+        setCouponError(
+          `Minimum cart amount should be ₹${minAmount} to apply this coupon`
+        );
+        return;
+      }
+
+      if (maxAmount !== null && currentSubtotal > maxAmount) {
+        setIsCoupnApplied(false);
+        setCouponSuccess("");
+        setCouponError(
+          `Maximum cart amount should be ₹${maxAmount} for this coupon`
+        );
+        return;
+      }
     }
+  }, [cartItems, isCouponApplied, couponData]);
+
+  const couponValidation = (
+    max_cart_amount: any,
+    min_cart_amount: any,
+    totalAmount: number
+  ) => {
+    const min =
+      min_cart_amount !== null &&
+      min_cart_amount !== undefined &&
+      min_cart_amount !== ""
+        ? parseFloat(min_cart_amount)
+        : null;
+    const max =
+      max_cart_amount !== null &&
+      max_cart_amount !== undefined &&
+      max_cart_amount !== ""
+        ? parseFloat(max_cart_amount)
+        : null;
+
+    if (min !== null && totalAmount < min) {
+      setCouponSuccess("");
+      setIsCoupnApplied(false);
+      setCouponError(`Minimum cart amount should be ₹${min} to apply this coupon`);
+      return false;
+    }
+
+    if (max !== null && totalAmount > max) {
+      setCouponSuccess("");
+      setIsCoupnApplied(false);
+      setCouponError(`Maximum cart amount should be ₹${max} for this coupon`);
+      return false;
+    }
+
+    // Category match check
+    if (couponData && couponData.category_id) {
+      try {
+        const couponCategories = JSON.parse(couponData.category_id);
+        const hasMatchingCategory =
+          !couponCategories ||
+          cartItems?.some((item) =>
+            couponCategories.includes(String(item.category_id))
+          );
+        if (!hasMatchingCategory) {
+          setCouponSuccess("");
+          setIsCoupnApplied(false);
+          setCouponError("Coupon is not applicable to items in your cart");
+          return false;
+        }
+      } catch (e) {}
+    }
+
+    setCouponError("");
+    setCouponSuccess("coupon is valid");
+    setIsCoupnApplied(true);
+    return true;
   };
 
 
@@ -348,13 +427,14 @@ export default function ShoppingCart() {
           session_id: sessionId,
           shipping_method: deliveryType,
           payment_method: payment_method,
+          delivery_amount: payment_method === "cod" ? 49 : 0,
           coupon_code:
             isCouponApplied && couponData && couponSuccess
               ? couponData?.code
               : "",
           discount_amount:
             isCouponApplied && couponData && couponSuccess
-              ? (subtotal || 0) - calculateTotal()
+              ? parseFloat(Number((subtotal || 0) - calculateTotal()).toFixed(2))
               : 0,
         }),
       });
@@ -651,16 +731,26 @@ export default function ShoppingCart() {
                         />
                         <button
                           onClick={() => {
-                            couponValidation(
-                              couponData && couponData.max_cart_amount,
-                              couponData && couponData.min_cart_amount,
+                            if (!coupon_code || !coupon_code.trim()) {
+                              setCouponError("Please enter a coupon code");
+                              return;
+                            }
+                            if (!couponData || !couponData.code) {
+                              setCouponError("Invalid coupon code");
+                              return;
+                            }
+                            const currentSubtotal =
                               cartItems?.reduce(
                                 (acc, item) =>
                                   acc + item.product_price * item.quantity,
-                                0,
-                              ),
+                                0
+                              ) || 0;
+
+                            couponValidation(
+                              couponData.max_cart_amount,
+                              couponData.min_cart_amount,
+                              currentSubtotal
                             );
-                            couponData && setIsCoupnApplied(true);
                           }}
                           className="bg-black hover:bg-neutral-850 text-white font-extrabold text-xs px-5 py-2.5 rounded-lg whitespace-nowrap cursor-pointer transition-colors"
                         >
@@ -737,11 +827,13 @@ export default function ShoppingCart() {
                           <span className="text-green-700 font-bold">
                             - ₹
                             {isCouponApplied && couponData && couponSuccess
-                              ? cartItems?.reduce(
-                                (acc, item) =>
-                                  acc + item.product_price * item.quantity,
-                                0,
-                              ) - calculateTotal()
+                              ? Number(
+                                  cartItems?.reduce(
+                                    (acc, item) =>
+                                      acc + item.product_price * item.quantity,
+                                    0,
+                                  ) - calculateTotal()
+                                ).toFixed(2)
                               : 0}
                           </span>
                         </div>
@@ -765,14 +857,16 @@ export default function ShoppingCart() {
                           </span>
                           <span className="text-xl font-black text-neutral-950">
                             ₹
-                            {calculateTotal() +
+                            {(
+                              calculateTotal() +
                               calculateShippingValue(
                                 totalWeight,
                                 cartItems?.reduce(
                                   (acc, item) => acc + item.quantity,
                                   0,
                                 ),
-                              )}
+                              )
+                            ).toFixed(2)}
                           </span>
                         </div>
                       </div>
@@ -1001,7 +1095,7 @@ export default function ShoppingCart() {
                           <div
                             onClick={() => setPaymentMethod("razorpay")}
                             className={`flex flex-col justify-between p-4 rounded-2xl border-2 cursor-pointer transition-all ${payment_method === "razorpay"
-                              ? "border-black bg-black text-white shadow-sm"
+                              ? "border-[#22c55e] bg-[#22c55e] text-white shadow-sm"
                               : "border-neutral-200 bg-white hover:border-neutral-300"
                               }`}
                           >
@@ -1017,7 +1111,7 @@ export default function ShoppingCart() {
                           <div
                             onClick={() => setPaymentMethod("cod")}
                             className={`flex flex-col justify-between p-4 rounded-2xl border-2 cursor-pointer transition-all ${payment_method === "cod"
-                              ? "border-black bg-black text-white shadow-sm"
+                              ? "border-[#22c55e] bg-[#22c55e] text-white shadow-sm"
                               : "border-neutral-200 bg-white hover:border-neutral-300"
                               }`}
                           >
@@ -1025,7 +1119,7 @@ export default function ShoppingCart() {
                               COD
                             </span>
                             <span className={`text-[10px] font-bold mt-1 ${payment_method === "cod" ? "text-neutral-300" : "text-neutral-400"}`}>
-                              Cash on delivery
+                              Cash on delivery (+₹49)
                             </span>
                           </div>
                         </div>
@@ -1045,7 +1139,7 @@ export default function ShoppingCart() {
                           <span className="text-green-700 font-black">
                             - ₹
                             {isCouponApplied && couponData && couponSuccess
-                              ? (subtotal || 0) - calculateTotal()
+                              ? Number((subtotal || 0) - calculateTotal()).toFixed(2)
                               : 0}
                           </span>
                         </div>
@@ -1063,20 +1157,31 @@ export default function ShoppingCart() {
                           </span>
                         </div>
 
+                        {payment_method === "cod" && (
+                          <div className="flex justify-between text-xs text-neutral-500 font-bold uppercase tracking-wider">
+                            <span>COD Charges</span>
+                            <span className="text-neutral-800 font-black">
+                              ₹49
+                            </span>
+                          </div>
+                        )}
+
                         <div className="flex justify-between items-baseline pt-4 border-t border-neutral-100">
                           <span className="text-sm font-extrabold text-neutral-900 uppercase">
                             Total
                           </span>
                           <span className="text-2xl font-black text-neutral-950">
                             ₹
-                            {calculateTotal() +
+                            {(
+                              calculateTotal() +
                               calculateShippingValue(
                                 totalWeight,
                                 cartItems?.reduce(
                                   (acc, item) => acc + item.quantity,
                                   0,
                                 ),
-                              )}
+                              ) + (payment_method === "cod" ? 49 : 0)
+                            ).toFixed(2)}
                           </span>
                         </div>
                       </div>
