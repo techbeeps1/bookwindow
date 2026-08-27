@@ -7,9 +7,6 @@ import config from "@/app/config";
 
 export function OtherBookOffers({ description, similarProducts, onItemsCountUpdate }: any) {
 
-  console.log("similarProducts:", similarProducts);
-  console.log("Length:", similarProducts?.length);
-
   return (
     
     <section className="px-[20px]  py-[60px]">
@@ -35,7 +32,7 @@ export function OtherBookOffers({ description, similarProducts, onItemsCountUpda
           </Typography>
           </>)
         }
-        {similarProducts && similarProducts.length &&( <>
+        {(similarProducts && similarProducts.length > 0) && ( <>
           <Typography
             variant="h2"
             color="blue-gray"

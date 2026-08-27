@@ -2,12 +2,14 @@
 
 import config from "@/app/config";
 import React, { FormEvent } from "react";
+import toast from "react-hot-toast";
 
 const ForgotPassword: React.FC = () => {
-  const [alertMessage, setAlertMessage] = React.useState("");
-  const [alertType, setAlertType] = React.useState<"error" | "success" | "">("");
+  const [isLoading, setIsLoading] = React.useState(false);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+if (isLoading) return; // Prevent multiple submissions
+    setIsLoading(true);
     event.preventDefault();
     const form = event.currentTarget;
     const formData = new FormData(event.currentTarget);
@@ -23,32 +25,23 @@ const ForgotPassword: React.FC = () => {
       );
 
       const data = await response.json();
-      console.log("data", data);
+     
 
       if (response.ok) {
-        setAlertType("success");
-        setAlertMessage("Reset link sent to your email.");
+        setIsLoading(false);
+     toast.success("Reset request successful! Please check your email.");
         form.reset();
       } else {
-        setAlertType("error");
-        setAlertMessage(data?.error || "Reset request failed.");
+        toast.error(data?.error || "Reset request failed.");
+         setIsLoading(false);
       }
     } catch (error) {
       console.error("Error during Submission:", error);
-      setAlertType("error");
-      setAlertMessage("Something went wrong. Please try again later.");
+      toast.error("Something went wrong. Please try again later.");
+      setIsLoading(false);
     }
   }
 
-  React.useEffect(() => {
-    if (alertMessage) {
-      const timer = setTimeout(() => {
-        setAlertMessage("");
-        setAlertType("");
-      }, 5000);
-      return () => clearTimeout(timer);
-    }
-  }, [alertMessage]);
 
   return (
     <div className="w-full">
@@ -99,7 +92,32 @@ const ForgotPassword: React.FC = () => {
           type="submit"
           className="w-full py-4 bg-black hover:bg-neutral-900 text-white rounded-xl font-black text-xs uppercase tracking-widest transition-all duration-200 shadow-md hover:shadow-lg active:scale-98 flex items-center justify-center cursor-pointer"
         >
-          Reset Password
+          {isLoading ? (
+            <>
+            <svg
+              className="animate-spin h-5 w-5 text-white"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                className="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                strokeWidth="4"
+              />
+              <path
+                className="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              />
+            </svg> 
+            <span className="ms-2">Please wait...</span></>
+          ) : (
+            "Reset Password"
+          )   }
         </button>
       </form>
 
@@ -120,25 +138,6 @@ const ForgotPassword: React.FC = () => {
         </a>
       </div>
 
-      {/* Alert Box */}
-      {alertMessage && (
-        <div
-          className={`w-full p-4 mt-4 text-xs font-semibold rounded-xl border flex items-center justify-between transition-all duration-300 ${
-            alertType === "error"
-              ? "bg-red-50 text-red-800 border-red-200"
-              : "bg-green-50 text-green-800 border-green-200"
-          }`}
-        >
-          <span>{alertMessage}</span>
-          <button
-            type="button"
-            onClick={() => setAlertMessage("")}
-            className="text-lg font-bold leading-none ml-2 hover:opacity-75 focus:outline-none cursor-pointer"
-          >
-            &times;
-          </button>
-        </div>
-      )}
     </div>
   );
 };

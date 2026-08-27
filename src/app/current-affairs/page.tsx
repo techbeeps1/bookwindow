@@ -51,63 +51,9 @@ function CurrentAffairs({
           &quot;{title}&quot;
         </Typography>
       </CardHeader>
-      {/* <CardBody
-        className="px-4 py-0 flex flex-wrap-reverse gap-x-6 justify-between items-center"
-        {...({} as React.ComponentProps<typeof CardBody>)}
-      > 
-       <div>
-          <Typography
-            variant="h6"
-            color="blue-gray"
-            {...({} as React.ComponentProps<typeof Typography>)}
-          >
-            by {client}
-          </Typography>
-          <Typography
-            variant="paragraph"
-            className="font-normal !text-gray-500"
-            {...({} as React.ComponentProps<typeof Typography>)}
-          >
-            {clientInfo}
-          </Typography>
-        </div> 
-     <Image src={img} className="max-w-[8rem]" alt={client} /> 
-      {/* </CardBody> */}
     </Card>
   );
 }
-
-// const testimonials = [
-//   {
-//     title:
-//       "इंडिया ने तूफानी अंदाज में जीता पहला वनडे, इंग्लैंड को बुरी तरह धोया",
-//     slug: "/इंडिया-ने-तूफानी-अंदाज-में-जीता-पहला-वनडे,-इंग्लैंड-को-बुरी-तरह-धोया",
-//     client: "Shaheen Mistri",
-//     clientInfo: "Full Stack Developer @Netflix",
-//     img: "/image/netflix.svg",
-//   },
-//   {
-//     title: "Government vs private schools: What works better?",
-//     slug: "/Government-vs-private-schools:-What-works-better?",
-//     client: "India Development Review ",
-//     clientInfo: "Graphic Designer, @Coinbase",
-//     img: "/image/Logo-coinbase.svg",
-//   },
-//   {
-//     title: "राष्ट्रीय नमूना सर्वेक्षण (एनएसएस) की 75वीं वर्षगांठ",
-//     slug: "/राष्ट्रीय-नमूना-सर्वेक्षण-(एनएसएस)-की-75वीं-वर्षगांठ",
-//     client: "Pankil Goswami ",
-//     clientInfo: "Full Stack Developer @Netflix",
-//     img: "/image/netflix.svg",
-//   },
-//   {
-//     title: "Can neighbourhood repair shops help in reducing e-waste?",
-//     slug: "/Can-neighbourhood-repair-shops-help-in-reducing-e-waste?",
-//     client: "Debojit Dutta, Rakesh Swami, Srishti Gupta",
-//     clientInfo: "Graphic Designer, @Coinbase",
-//     img: "/image/Logo-coinbase.svg",
-//   },
-// ];
 
 export default function CurrentAffairsPage() {
   const [currentAffairsData, setCurrentAffairsData] = React.useState([] as any);

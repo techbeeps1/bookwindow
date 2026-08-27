@@ -1,32 +1,35 @@
 "use client";
-import React, { useState, useRef, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import Image from "next/image";
-import { CartPopup } from "@/components/cart-popup";
-import {
-  Typography,
-  Card,
-  CardBody,
-  CardHeader,
-} from "@material-tailwind/react";
+
+import React, { useState, useEffect, useMemo } from "react";
+import { useAppDispatch } from "@/hooks/useStore";
 import ProductDialog from "./product-detail-popup";
 import Link from "next/link";
 import { useAddToCartMutation } from "@/lib/api/cartApi";
 import { useSession } from "@/hooks/useSession";
 import { ImageBook } from "./ImageBook";
+import { useCart } from "@/hooks/useCart";
+import { openCartDrawer } from "@/lib/slices/uiSlice";
+import { motion } from "framer-motion";
+import { useAddToWishlistMutation, useViewWishlistIdQuery } from "@/lib/api/wishlistApi";
+import toast from "react-hot-toast";
+import { HiShoppingCart } from "react-icons/hi2";
+import { AiFillEye } from "react-icons/ai";
+import { FaHeart } from "react-icons/fa";
+
 
 interface BookCardProps {
   img: string;
   title: string;
-  desc: string;
-  category: string;
-  price: string;
-  offPrice?: string;
+  desc?: string;
+  category?: string;
+  price: string | number;
+  offPrice?: string | number;
   slug?: string;
   id?: string | any;
-  quantity: number;
+  quantity?: number;
   subcategoryName?: string;
   mainCategoryName?: string;
+  viewMode?: "grid" | "list";
   onItemsCountUpdate?: (count: number) => void;
 }
 
@@ -39,273 +42,360 @@ export function BookCard({
   offPrice,
   slug,
   id,
-  quantity,
+  quantity = 1,
   subcategoryName,
   mainCategoryName,
+  viewMode = "grid",
   onItemsCountUpdate,
 }: BookCardProps) {
   const sessionId = useSession();
-  const [showPopup, setShowPopup] = useState(false);
   const [open, setOpen] = React.useState(false);
-  const popupRef = useRef(null as any);
   const handleOpen = () => setOpen(!open);
 
-  const router = useRouter();
-  const [isWishlisted, setIsWishlisted] = useState(false);
-  const [showWishlistModal, setShowWishlistModal] = useState(false);
+  // Add to cart animation states
+  const [isAddedToCart, setIsAddedToCart] = useState(false);
+  const [cartButtonScale, setCartButtonScale] = useState(1);
+  const [cartBounce, setCartBounce] = useState(false);
+  const [addToWishlist, { isLoading: addWishlistLoading }] = useAddToWishlistMutation();
+  const { data: wishlistIds, refetch: refetchWishlist } = useViewWishlistIdQuery()
 
-  useEffect(() => {
-    if (typeof window !== "undefined" && id) {
-      const storedWishlist = localStorage.getItem("wishlist");
-      const wishlist = storedWishlist ? JSON.parse(storedWishlist) : [];
-      setIsWishlisted(wishlist.includes(id));
-    }
-  }, [id]);
 
-  const handleWishlistClick = () => {
-    if (typeof window !== "undefined") {
-      const customer = localStorage.getItem("customer");
-      if (!customer) {
-        setShowWishlistModal(true);
-        return;
-      }
-      
-      const storedWishlist = localStorage.getItem("wishlist");
-      let wishlist = storedWishlist ? JSON.parse(storedWishlist) : [];
-      if (wishlist.includes(id)) {
-        wishlist = wishlist.filter((itemId: string) => itemId !== id);
-        setIsWishlisted(false);
-      } else {
-        wishlist.push(id);
-        setIsWishlisted(true);
-      }
-      localStorage.setItem("wishlist", JSON.stringify(wishlist));
-    }
+  const wishlistSet = useMemo(
+    () => new Set(wishlistIds?.data ?? []),
+    [wishlistIds]
+  );
+
+  const isWishlisted = wishlistSet.has(id);
+
+  async function handleWishlistClick() {
+    await addToWishlist(id)
+    await refetchWishlist()
+    toast.success("Product added to wishlist")
+
   };
 
   const [addToCart, { isLoading }] = useAddToCartMutation();
-  const handleAddToCart = async (productId: string, quantity: number) => {
+  const dispatch = useAppDispatch();
+  const { refetch } = useCart();
+
+  const handleAddToCart = async (productId: string, qty: number) => {
     try {
+      setCartButtonScale(0.85);
+
       await addToCart({
         session_id: sessionId,
         product_id: productId,
-        quantity: quantity,
+        quantity: qty,
       }).unwrap();
+
+      setIsAddedToCart(true);
+      setCartBounce(true);
+      setTimeout(() => setCartButtonScale(1), 150);
+      setTimeout(() => setCartBounce(false), 600);
+
+      await refetch();
+      dispatch(openCartDrawer());
+
+      setTimeout(() => {
+        setIsAddedToCart(false);
+      }, 2000);
+
     } catch (error) {
-      console.error("Error adding to cart:", error);
+      console.error(error);
+      setCartButtonScale(1);
+      setIsAddedToCart(false);
     }
   };
 
-  const maxLength = 50; // Change this to your desired limit
+  const maxLength = 50;
   const formattedTitle = title?.replace(/#COMMA#/g, ",");
-
   const limitedTitle =
     formattedTitle?.length > maxLength
       ? formattedTitle.substring(0, maxLength) + "..."
       : formattedTitle;
 
-  return (
-    <div className="relative flex flex-col bg-transparent text-gray-700  mb-4 border-1 overflow-hidden">
-
-      <Link href={`/product-detail/${slug}`} className="">
-      <ImageBook src={img} alt={title} size="small" />
-      </Link>
-
-      {/* Floating Wishlist Icon */}
-      <button
-        onClick={handleWishlistClick}
-        className="absolute top-[15px] right-[15px] z-10 p-2 bg-white hover:bg-gray-100 text-gray-700 rounded-full shadow-md transition-all duration-200 active:scale-95 flex items-center justify-center border border-gray-100"
-        aria-label="Toggle wishlist"
+  // RENDER LIST VIEW
+  if (viewMode === "list") {
+    return (
+      <motion.div
+        className="bg-white rounded-2xl border p-3 sm:p-5 flex flex-row items-center justify-between gap-3 sm:gap-6 shadow-sm hover:shadow-md transition-all w-full relative group"
       >
-        {isWishlisted ? (
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="currentColor"
-            className="size-5 text-red-500"
-          >
-            <path d="M11.645 20.91l-.007-.003-.022-.012a15.247 15.247 0 01-.383-.218 25.18 25.18 0 01-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0112 5.052 5.5 5.5 0 0116.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 01-4.244 3.17 15.247 15.247 0 01-.383.219l-.022.012-.007.004-.003.001a.752.752 0 01-.704 0l-.003-.001z" />
-          </svg>
-        ) : (
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={1.5}
-            stroke="currentColor"
-            className="size-5 text-gray-600 hover:text-red-500 transition-colors"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"
-            />
-          </svg>
-        )}
-      </button>
+        {/* Book Cover Image */}
+        <div className="w-28 xs:w-32 sm:w-36 flex-shrink-0 rounded-xl">
+          <Link href={`/product/${slug}`}>
+            <ImageBook src={img} alt={title} size={viewMode === "list" ? "10px" : "30px"} />
+          </Link>
+        </div>
 
-      <div {...({} as React.ComponentProps<typeof CardBody>)} className="p-2">
-        {price !== offPrice && (
-          <p className="text-xs uppercase bg-black py-[5px] px-5 w-fit text-white rounded-[4px] font-sans absolute top-[15px] left-[15px] ">
-            Sale
-          </p>
-        )}
-
-        <Link href={`/product-detail/${slug}`}>
-          <Typography
-            variant="h6"
-            color="blue-gray"
-            className="font-bold normal-case text-sm mb-3"
-            {...({} as React.ComponentProps<typeof Typography>)}
-          >
-            {limitedTitle}
-          </Typography>
-        </Link>
-        
-        <div className="flex justify-between items-center">
-          <div className="flex gap-2">
-            {" "}
-            {price !== offPrice && (
-              <Typography
-                variant="h5"
-                color="red"
-                className={offPrice ? "line-through text-xs" : ""}
-                {...({} as React.ComponentProps<typeof Typography>)}
-              >
-                ₹{price}
-              </Typography>
+        {/* Book Information */}
+        <div className="flex-1 min-w-0 space-y-1 sm:space-y-2 text-left">
+          <div className="flex flex-wrap items-center justify-start gap-2">
+            {(subcategoryName || category) && (
+              <span className="text-[10px] sm:text-[11px] font-bold text-black bg-gray-100 px-2 py-0.5 rounded uppercase">
+                {subcategoryName || category || "Publication"}
+              </span>
             )}
-            <Typography
-              variant="h5"
-              color="blue-gray"
-              className="text-xs"
-              {...({} as React.ComponentProps<typeof Typography>)}
-            >
-              ₹{offPrice}
-            </Typography>
           </div>
-          <div className="flex gap-2 items-center">
+
+          <Link href={`/product/${slug}`}>
+            <h3 className="font-bold text-xs sm:text-base text-gray-900 hover:text-black transition-colors line-clamp-2 leading-tight">
+              {formattedTitle}
+            </h3>
+          </Link>
+
+          {desc && (
+            <p className="text-xs text-gray-600 line-clamp-2 max-w-xl hidden md:block">
+              {desc?.replace(/<[^>]*>?/gm, '')}
+            </p>
+          )}
+
+          {/* Pricing & Actions for Mobile (<640px) */}
+          <div className="flex sm:hidden items-center justify-between pt-2 border-t border-gray-100 gap-2 mt-1">
+            <div className="flex gap-1.5 items-center flex-wrap">
+              {offPrice && (
+                <span className="text-xs font-bold">
+                  ₹{offPrice}
+                </span>
+              )}
+              {price && price != 0 && price != offPrice && (
+                <span className={`${offPrice ? "text-red-500 line-through text-[10px] font-bold" : "text-xs font-bold mr-1"}`}>
+                  ₹{price}
+                </span>
+              )}
+            </div>
+
+            <div className="flex items-center gap-1.5">
+              {/* Add to Cart Button */}
+              <button
+                onClick={() => handleAddToCart(id, 1)}
+                disabled={isLoading}
+                className={`relative w-8 h-8 border border-gray-200 text-gray-700 bg-gray-100/80 hover:bg-black hover:text-white hover:border-black rounded-full transition-all duration-200 hover:scale-105 active:scale-95 shadow-sm flex items-center justify-center overflow-hidden ${isAddedToCart ? "bg-green-600 border-green-600 text-white hover:bg-green-700 hover:border-green-700 shadow-md" : ""
+                  }`}
+                style={{
+                  transform: `scale(${cartButtonScale})`,
+                }}
+                aria-label="Add to cart"
+                title="Add to cart"
+              >
+                <div className="relative w-4 h-4 flex items-center justify-center">
+                  {isLoading ? (
+                    <HiShoppingCart size={20} />
+                  ) : (
+                    <HiShoppingCart size={20} />
+                  )}
+                </div>
+              </button>
+
+              {/* Quick View Button */}
+              <button
+                onClick={handleOpen}
+                className="w-8 h-8 border border-gray-200 text-gray-700 bg-gray-100/80 hover:bg-black hover:text-white hover:border-black rounded-full transition-all duration-200 hover:scale-105 active:scale-95 shadow-sm flex items-center justify-center"
+                aria-label="Quick view product"
+                title="Quick view"
+              >
+                <AiFillEye />
+
+              </button>
+
+              {/* Wishlist Toggle Heart Button */}
+              <button
+                onClick={handleWishlistClick}
+                className="w-8 h-8 border border-gray-200 text-gray-500 bg-gray-100/80 hover:bg-red-50 hover:text-red-500 hover:border-red-200 rounded-full transition-all duration-200 hover:scale-105 active:scale-95 shadow-sm flex items-center justify-center"
+                title="Toggle Wishlist"
+              >
+                {isWishlisted ? (
+                  <FaHeart className="w-4 h-4 text-red-500" />
+                ) : (
+                  <FaHeart className="w-4 h-4" />
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Pricing & Action Buttons for Desktop (>=640px) */}
+        <div className="hidden sm:flex sm:w-auto sm:flex-col items-center justify-center border-l border-gray-100 sm:pl-6 gap-4">
+          <div className="flex gap-2 justify-between items-center">
+            {offPrice && (
+              <span className="text-sm font-bold">
+                ₹{offPrice}
+              </span>
+            )}
+            {price && price != 0 && price != offPrice && (
+              <span className={`${offPrice ? "text-red-500 line-through text-xs font-bold" : "text-xs font-bold mr-2"}`}>
+                ₹{price}
+              </span>
+            )}
+          </div>
+
+          <div className="flex items-center gap-2">
             {/* Add to Cart Button */}
             <button
-              onClick={() => {
-                setShowPopup(true);
-                handleAddToCart(id, 1);
+              onClick={() => handleAddToCart(id, 1)}
+              disabled={isLoading}
+              className={`relative w-9 h-9 border border-gray-200 text-gray-700 bg-gray-100/80 hover:bg-black hover:text-white hover:border-black rounded-full transition-all duration-200 hover:scale-105 active:scale-95 shadow-sm flex items-center justify-center overflow-hidden ${isAddedToCart ? "bg-green-600 border-green-600 text-white hover:bg-green-700 hover:border-green-700 shadow-md" : ""
+                }`}
+              style={{
+                transform: `scale(${cartButtonScale})`,
               }}
-              className="p-2 border border-gray-200 text-gray-500 hover:text-black hover:border-black hover:bg-gray-50 rounded-full transition-all duration-200 active:scale-95 flex items-center justify-center"
               aria-label="Add to cart"
+              title="Add to cart"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth="1.5"
-                stroke="currentColor"
-                className="size-[18px]"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"
-                />
-              </svg>
+              <div className="relative w-5 h-5 flex items-center justify-center">
+                {isLoading ? (
+                  <HiShoppingCart size={20} />
+                ) : (
+                  <HiShoppingCart size={20} />
+                )}
+              </div>
             </button>
-
-            {/* cart Popup */}
-            {showPopup && (
-              <CartPopup
-                popupRef={popupRef}
-                setShowPopup={setShowPopup}
-                showPopup={showPopup}
-                productName={title?.replace(/#COMMA#/g, ",")}
-                productImage={img}
-              ></CartPopup>
-            )}
 
             {/* Quick View Button */}
             <button
               onClick={handleOpen}
-              className="p-2 border border-gray-200 text-gray-500 hover:text-black hover:border-black hover:bg-gray-50 rounded-full transition-all duration-200 active:scale-95 flex items-center justify-center"
+              className="w-9 h-9 border border-gray-200 text-gray-700 bg-gray-100/80 hover:bg-black hover:text-white hover:border-black rounded-full transition-all duration-200 hover:scale-105 active:scale-95 shadow-sm flex items-center justify-center"
               aria-label="Quick view product"
+              title="Quick view"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="currentColor"
-                className="size-[18px]"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"
-                />
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
-                />
-              </svg>
+              <AiFillEye />
             </button>
 
-            {/* Product popup */}
-            {open && (
-              <ProductDialog
-                open={open}
-                handleOpen={handleOpen}
-                slug={slug}
-              ></ProductDialog>
-            )}
+            {/* Wishlist Toggle Heart Button */}
+            <button
+              onClick={handleWishlistClick}
+              className="w-9 h-9 border border-gray-200 text-gray-500 bg-gray-100/80 hover:bg-red-50 hover:text-red-500 hover:border-red-200 rounded-full transition-all duration-200 hover:scale-105 active:scale-95 shadow-sm flex items-center justify-center"
+              title="Toggle Wishlist"
+            >
+              {isWishlisted ? (
+                <FaHeart className="w-4 h-4 text-red-500" />
+              ) : (
+                <FaHeart className="w-4 h-4" />
+              )}
+            </button>
+          </div>
+        </div>
 
-            {/* Wishlist Login Prompt Modal */}
-            {showWishlistModal && (
-              <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm transition-all duration-300">
-                <div className="bg-white border border-gray-100 text-gray-900 rounded-3xl shadow-2xl max-w-md w-full p-8 relative mx-4 transition-all transform scale-100">
-                  {/* Close Button */}
-                  <button
-                    onClick={() => setShowWishlistModal(false)}
-                    className="absolute top-5 right-5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 cursor-pointer font-bold text-sm"
-                    aria-label="Close modal"
-                  >
-                    ✕
-                  </button>
-                  
-                  <div className="text-center">
-                    <h2 className="text-xl font-bold tracking-tight mb-2">Your Wishlist</h2>
-                    <div className="w-16 h-[2px] bg-gray-200 mx-auto my-4 rounded-full" />
-                    
-                    <p className="text-gray-600 text-sm leading-relaxed mb-8">
-                      You need to login first to create and save your wishlist
-                    </p>
-                    
-                    <div className="flex items-center justify-center gap-4">
-                      <button
-                        onClick={() => {
-                          setShowWishlistModal(false);
-                          router.push("/sign-in?tab=register");
-                        }}
-                        className="flex-1 py-3 px-5 border border-gray-300 hover:border-gray-400 text-gray-700 hover:bg-gray-50 transition-all rounded-full text-sm font-semibold uppercase tracking-wider"
-                      >
-                        Create Account
-                      </button>
-                      <button
-                        onClick={() => {
-                          setShowWishlistModal(false);
-                          router.push("/sign-in");
-                        }}
-                        className="flex-1 py-3 px-5 bg-black text-white hover:bg-neutral-800 transition-all rounded-full text-sm font-semibold uppercase tracking-wider"
-                      >
-                        Login
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
+        {/* Product Quick View Dialog */}
+        {open && (
+          <ProductDialog
+            open={open}
+            handleOpen={handleOpen}
+            slug={slug}
+          />
+        )}
+      </motion.div>
+    );
+  }
+
+  // RENDER GRID VIEW (DEFAULT)
+  return (
+    <motion.div
+      layout
+
+      className="group relative bg-white rounded-2xl border border-gray-200/80 hover:border-gray-300 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between overflow-hidden"
+    >
+
+      {/* Floating Wishlist Heart Icon */}
+      <button
+        onClick={handleWishlistClick}
+        className="absolute top-3 right-3 z-20 w-9 h-9 bg-white/95 backdrop-blur-md hover:bg-red-50 text-gray-500 hover:text-red-500 rounded-full shadow-md hover:shadow-lg transition-all duration-200 border border-gray-200/80 hover:border-red-200 active:scale-90 flex items-center justify-center"
+        aria-label="Toggle wishlist"
+        title="Toggle Wishlist"
+      >
+        {isWishlisted ? (
+          <FaHeart size={18} className="text-red-500" />
+        ) : (
+          <FaHeart size={18} />
+        )}
+      </button>
+
+      {/* Top Left Sale Tag */}
+      {price !== offPrice && (
+        <span className="text-xs uppercase bg-red-900 py-[5px] px-5 w-fit text-white font-semibold rounded-[4px] font-sans absolute top-3 left-3 z-20 shadow-sm">
+          Sale
+        </span>
+      )}
+
+      {/* Book Cover Image Container */}
+      <div className="relative pt-4 px-4 bg-gray-50/60 group-hover:bg-gray-50 transition-colors">
+        <Link href={`/product/${slug}`}>
+          <div className="w-full flex justify-center transform transition-transform duration-300">
+            <ImageBook src={img} alt={title} size="30px" />
+          </div>
+        </Link>
+      </div>
+
+      {/* Details & Bottom Bar */}
+      <div className="p-4 flex flex-col flex-1 justify-between">
+        <div>
+          <Link href={`/product/${slug}`}>
+            <h3 className="font-bold text-gray-900 text-sm line-clamp-2 hover:text-black transition-colors mb-3">
+              {limitedTitle}
+            </h3>
+          </Link>
+        </div>
+
+        {/* Price & Action Buttons */}
+        <div className="flex justify-between items-center pt-2 border-t border-gray-100">
+          <div className="flex gap-2 justify-between items-center">
+            {offPrice && (
+              <span className="text-sm font-bold">
+                ₹{offPrice}
+              </span>
             )}
+            {price && price != 0 && price != offPrice && (
+              <span className={`${offPrice ? "text-red-500 line-through text-xs font-bold" : "text-xs font-bold mr-2"}`}>
+                ₹{price}
+              </span>
+            )}
+          </div>
+
+          <div className="flex gap-2 items-center">
+            {/* Add to Cart Button */}
+            <button
+              onClick={() => handleAddToCart(id, 1)}
+              disabled={isLoading}
+              className={`relative w-9 h-9 border border-gray-200 text-gray-700 bg-gray-100/80 hover:bg-black hover:text-white hover:border-black rounded-full transition-all duration-200 hover:scale-105 active:scale-95 shadow-sm flex items-center justify-center overflow-hidden ${isAddedToCart ? "bg-green-600 border-green-600 text-white hover:bg-green-700 hover:border-green-700 shadow-md" : ""
+                }`}
+              style={{
+                transform: `scale(${cartButtonScale})`,
+              }}
+              aria-label="Add to cart"
+              title="Add to cart"
+            >
+              <div className="relative w-5 h-5 flex items-center justify-center">
+                {isLoading ? (
+                  <HiShoppingCart size={20} />
+                ) : (
+                  <HiShoppingCart size={20} />
+                )}
+              </div>
+            </button>
+
+            {/* Quick View Button */}
+            <button
+              onClick={handleOpen}
+              className="w-9 h-9 border border-gray-200 text-gray-700 bg-gray-100/80 hover:bg-black hover:text-white hover:border-black rounded-full transition-all duration-200 hover:scale-105 active:scale-95 shadow-sm flex items-center justify-center"
+              aria-label="Quick view product"
+              title="Quick view"
+            >
+              <AiFillEye size={20} />
+            </button>
           </div>
         </div>
       </div>
-    </div>
+
+      {/* Product Quick View Dialog */}
+      {open && (
+        <ProductDialog
+          open={open}
+          handleOpen={handleOpen}
+          slug={slug}
+        />
+      )}
+    </motion.div>
   );
 }
+
 export default BookCard;
+

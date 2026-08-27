@@ -3,7 +3,7 @@
 import React from "react";
 import CategoryCard from "@/components/category-card";
 import { motion } from "framer-motion";
-import {  Typography } from "@material-tailwind/react";
+import { Typography } from "@material-tailwind/react";
 
 
 
@@ -16,10 +16,9 @@ export function TopBookCategories({
   return (
     <section
       ref={divRef}
-      className={`relative w-full overflow-hidden ${
-        highlightDiv ? "bg-gray-300 shadow-2xl py-4" : ""
-      }`}
-    >     
+      className={`relative w-full overflow-hidden ${highlightDiv ? "bg-gray-300 shadow-2xl py-4" : ""
+        }`}
+    >
 
       <div className="container mx-auto px-8 relative z-10">
         {category_section ? (
@@ -31,8 +30,8 @@ export function TopBookCategories({
                 color="blue-gray"
                 className="text-2xl md:text-4xl"
                 {...({} as React.ComponentProps<typeof Typography>)}
-              >               
-                {category_section?.cat_sec_title}
+              >
+                {category_section?.popular_title}
               </Typography>
               <div className="w-20 h-[2px] bg-black my-4 rounded-full" />
               <Typography
@@ -41,17 +40,17 @@ export function TopBookCategories({
                 className="!text-gray-500 lg:w-6/12"
                 {...({} as React.ComponentProps<typeof Typography>)}
               >
-    
-                <div
+
+                {/* <div
                   className="mt-3 md:text-lg text-base"
                   dangerouslySetInnerHTML={{
-                    __html: category_section?.cat_sec_description || "",
+                    __html: category_section?.popular_subtitle || "",
                   }}
-                />
+                /> */}
               </Typography>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-8">
-              {category_section?.category_sections?.map((data: any, index: number) => (
+              {category_section?.popular_category?.map((data: any, index: number) => (
                 <motion.div
                   key={data?.id || index}
                   initial={{ opacity: 0, y: 30 }}
@@ -61,9 +60,8 @@ export function TopBookCategories({
                 >
                   <CategoryCard
                     cat_image={data.cat_image}
-                    cat_title={data.cat_title}
-                    cat_content={data.cat_content}
-                    cat_icon={data.cat_icon}
+                    cat_title={data.name}
+                    cat_slug={data.slug}
                   />
                 </motion.div>
               ))}

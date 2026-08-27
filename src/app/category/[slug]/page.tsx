@@ -1,280 +1,105 @@
-"use client";
+import { Metadata } from "next";
+import config from "@/app/config";
+import CategoryPage from "./CategoryPage";
+import { truncateDescription } from "@/helper/helperfun";
+import { notFound } from "next/navigation";
 
+type Props = {
+  params: Promise<{
+    slug: string;
+  }>;
+};
 
-import BookCard from "@/components/book-card";
-import { useEffect, useState } from "react";
-import { use } from "react";
-import axios from "axios";
-import config from "../../config";
-import CategoryPublicationSidebar from "@/components/category-publication-sidebar";
+async function getCategory(slug: string) {
+  const res = await fetch(`${config.apiUrl}api/category/${slug}`, {
+    next: {
+      revalidate: 600,
+    },
+  });
 
-export default function Category({ params }:  {
-  params: Promise<{ slug: string }>;
-}) {
-
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 6;
-
-
-    const { slug } = use(params);
-  const [products, setProducts] = useState([] as any);
-  const [filteredProducts, setFilteredProducts] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [isProductFetched, setIsProductFetched] = useState(false);
-  const [childCategory, setChildCategory] = useState([] as any);
-
-  const [selectedCategoryIds, setSelectedCategoryIds] = useState<number[]>([]);
-  const [selectedPublicationIds, setSelectedPublicationIds] = useState<
-    number[]
-  >([]);
-
-  
-  
- useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
-
-  useEffect(() => {
-    const fetchProductsByCategory = async () => {
-      setLoading(true);
-      try {
-        const response = await axios({
-          method: "get",
-          url: `${config.apiUrl}api/category/${slug}`,
-          responseType: "json",
-        });
-   
-        console.log("response", response?.data);
-        setChildCategory(response.data?.category);
-        setProducts(response.data?.products);
-        setIsProductFetched(true)
-      } catch (error) {
-        console.error("Error loading products:", error);
-        setProducts([]);
-        setIsProductFetched(true)
-      } finally {
-        setLoading(false);
-      }
+  if (!res.ok) {
+    return {
+      success: false,
+      error: "Failed to fetch category data",
     };
-    if (slug) {
-      fetchProductsByCategory();
+  }
+
+  return res.json();
+}
+
+export async function generateMetadata({
+  params,
+}: Props): Promise<Metadata> {
+  const { slug } = await params;
+
+  try {
+    const data = await getCategory(slug);
+    if (data.success === false) {
+      return {
+        title: "Category Not Found | Bookwindow",
+        description: "Explore book categories on Bookwindow.",
+      };
     }
-  }, [slug]);
 
-// Filter products based on selected categories and publications
-  useEffect(() => {
-    const filtered = products.filter((product: any) => {
-      const categoryMatch =
-        selectedCategoryIds.length === 0 ||
-        selectedCategoryIds.includes(product.sub_category_id);
-      const publicationMatch =
-        selectedPublicationIds.length === 0 ||
-        selectedPublicationIds.includes(product.production_id);
+    const categoryName =
+      (Array.isArray(data?.category) ? data.category[0]?.name : data?.category?.name) ||
+      slug.replace(/-/g, " ");
 
-      return categoryMatch && publicationMatch;
-    });
-    setFilteredProducts(filtered);
-  }, [products, selectedCategoryIds, selectedPublicationIds]);
+    const title =
+      data.seo?.meta_title?.trim() ||
+      `${categoryName} Books | Bookwindow`;
 
-  const handleCategorySelect = (categoryId: number | "clear") => {
-    if (categoryId === "clear") {
-      setSelectedCategoryIds([]); // Clear all filters
-    } else {
-      setSelectedCategoryIds(
-        (prev) =>
-          prev.includes(categoryId)
-            ? prev.filter((id) => id !== categoryId) // uncheck
-            : [...prev, categoryId] // check
-      );
-    }
-  };
+    const description =
+      data.seo?.meta_description?.trim() ||
+      `Buy ${categoryName} competitive exam and academic books online at Bookwindow. Fast shipping across India.`;
 
-  const handlePublicationSelect = (publicationId: number | "clear") => {
-    if (publicationId === "clear") {
-      setSelectedPublicationIds([]);
-    } else {
-      setSelectedPublicationIds((prev) =>
-        prev.includes(publicationId)
-          ? prev.filter((id) => id !== publicationId)
-          : [...prev, publicationId]
-      );
-    }
-  };
+    const keywords = data.seo?.meta_keywords
+      ? data.seo.meta_keywords.split(",").map((k: string) => k.trim())
+      : undefined;
 
-  const displayedProducts = filteredProducts;
-  // filteredProducts.length > 0 ? filteredProducts : products;
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = displayedProducts.slice(
-    indexOfFirstItem,
-    indexOfLastItem
-  );
+    const imageUrl = data.seo?.image
+      ? `${config.apiUrl}storage/app/public/${data.seo.image}`
+      : "/logo.png";
 
-  const totalPages = Math.ceil(displayedProducts.length / itemsPerPage);
+    return {
+      title,
+      description,
+      keywords,
+      alternates: {
+        canonical: `/category/${slug}`,
+      },
+      robots: {
+        index: true,
+        follow: true,
+      },
+      openGraph: {
+        title,
+        description,
+        url: `https://bookwindow.in/category/${slug}`,
+        type: "website",
+        images: [imageUrl],
+      },
+      twitter: {
+        card: "summary_large_image",
+        title,
+        description,
+        images: [imageUrl],
+      },
+    };
+  } catch {
+    return {
+      title: "Book Categories | Bookwindow",
+      description: "Explore books by category on Bookwindow.",
+    };
+  }
+}
 
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [filteredProducts, products]);
+export default async function Page({ params }: Props) {
+  const { slug } = await params;
 
-  return (
-    <>
-
-            <section className="container mx-auto mb-10 mt-10 md:flex border border-1">
-        <CategoryPublicationSidebar
-          onCategorySelect={handleCategorySelect}
-          onPublicationSelect={handlePublicationSelect}
-          selectedCategoryIds={selectedCategoryIds}
-          selectedPublicationIds={selectedPublicationIds}
-          childCategory={childCategory}
-          products={products}
-          category_id={
-            childCategory[0]?.parent_id
-          }
-        />
-        {!isProductFetched ? (
-          [1, 2,3,4].map((_i) => (
-            <div
-              key={_i}
-              className="grid grid-cols-1 w-full p-4 text-center text-6xl font-extrabold"
-            >
-              <div
-                role="status"
-                className="animate-pulse  rtl:space-x-reverse md:flex flex-col md:items-center p-4"
-              >
-                <div className="flex items-center justify-center w-full h-48 bg-gray-300 rounded-sm  dark:bg-gray-700">
-                  <svg
-                    className="w-20 h-20 text-gray-200 dark:text-gray-600"
-                    aria-hidden="true"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="currentColor"
-                    viewBox="0 0 20 18"
-                  >
-                    <path d="M18 0H2a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2Zm-5.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Zm4.376 10.481A1 1 0 0 1 16 15H4a1 1 0 0 1-.895-1.447l3.5-7A1 1 0 0 1 7.468 6a.965.965 0 0 1 .9.5l2.775 4.757 1.546-1.887a1 1 0 0 1 1.618.1l2.541 4a1 1 0 0 1 .028 1.011Z" />
-                  </svg>
-                </div>
-                <div className="w-full m-0 mt-2">
-                  <div className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-48 mb-4"></div>
-                  <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[480px] mb-2.5"></div>
-                  <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 mb-2.5"></div>
-                  <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[440px] mb-2.5"></div>
-                  <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[460px] mb-2.5"></div>
-                  <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[360px]"></div>
-                </div>
-                <span className="sr-only">Loading...</span>
-              </div>
-            </div>
-          ))
-        ) : displayedProducts?.length === 0 ? (
-          <div className="grid grid-cols-1 shadow-lg w-full p-4 text-center text-6xl font-extrabold">
-            No record Found!
-          </div>
-        ) : (
-          <div className="col-8">
-            <div className="grid grid-cols-2 gap-[15px] md:grid-cols-3 xl:grid-cols-4 p-8">
-              {currentItems.map((product: any) => {
-                const subcategory = childCategory?.find(
-                  (sub: any) => sub.id === product.sub_category_id
-                );
-             
-                return (
-                  <BookCard
-                    key={product.id}
-                    img={`${config.apiUrl}storage/app/public/${product.image}`}
-                    category={(product?.mrp && product?.price
-                      ? ((product?.mrp - product?.price) / product?.mrp) * 100
-                      : 0
-                    ).toFixed(2)}
-                    title={product.name}
-                    desc={product.description}
-                    price={product.mrp}
-                    offPrice={product.price}
-                    slug={product.slug}
-                    id={product.id}
-                    quantity={product.quantity}
-                    onItemsCountUpdate={()=>{}}
-                    subcategoryName={subcategory?.name}
-                    mainCategoryName={"slug"}
-                  />
-                );
-              })}
-            </div>
-          </div>
-        )}
-      </section>
-      {totalPages > 1 && (
-        <div className="flex justify-center mt-12 mb-12 items-center space-x-6">
-          {/* Previous Button */}
-          <button
-            type="button"
-            onClick={() => {
-              setCurrentPage((prev) => Math.max(prev - 1, 1));
-              window.scrollTo({ top: 0, behavior: "smooth" });
-            }}
-            disabled={currentPage === 1}
-            className={`flex items-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-full border transition-all duration-200 active:scale-95 ${
-              currentPage === 1
-                ? "bg-[#f5f5f5] text-neutral-400 border-transparent cursor-not-allowed opacity-60"
-                : "bg-white text-black border-neutral-300 hover:bg-neutral-50 hover:border-neutral-400 hover:shadow-sm"
-            }`}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={2.5}
-              stroke="currentColor"
-              className="w-4 h-4 pointer-events-none"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M15.75 19.5 8.25 12l7.5-7.5"
-              />
-            </svg>
-            <span>Previous</span>
-          </button>
-
-          {/* Page Info */}
-          <div className="flex items-center bg-[#f4f4f4] px-4 py-2 rounded-full border border-neutral-200">
-            <span className="text-sm font-bold text-neutral-800">
-              Page <span className="text-black">{currentPage}</span> of{" "}
-              <span className="text-black">{totalPages}</span>
-            </span>
-          </div>
-
-          {/* Next Button */}
-          <button
-            type="button"
-            onClick={() => {
-              setCurrentPage((prev) => Math.min(prev + 1, totalPages));
-              window.scrollTo({ top: 0, behavior: "smooth" });
-            }}
-            disabled={currentPage === totalPages}
-            className={`flex items-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-full border transition-all duration-200 active:scale-95 ${
-              currentPage === totalPages
-                ? "bg-[#f5f5f5] text-neutral-400 border-transparent cursor-not-allowed opacity-60"
-                : "bg-white text-black border-neutral-300 hover:bg-neutral-50 hover:border-neutral-400 hover:shadow-sm"
-            }`}
-          >
-            <span>Next</span>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={2.5}
-              stroke="currentColor"
-              className="w-4 h-4 pointer-events-none"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="m8.25 4.5 7.5 7.5-7.5 7.5"
-              />
-            </svg>
-          </button>
-        </div>
-      )}
-
-    </>
-  );
+  const data = await getCategory(slug);
+  if (data.success === false) {
+    notFound();
+  }
+  return <CategoryPage categoryData={data} slug={slug} />;
 }
