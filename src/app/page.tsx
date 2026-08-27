@@ -62,8 +62,19 @@ export async function generateMetadata(): Promise<Metadata> {
   }
 }
 
+import JsonLd from "@/components/seo/JsonLd";
+import { generateBreadcrumbSchema } from "@/helper/schemaHelper";
+
 export default async function Home() {
   const homePageData = await fetchHomePageData();
+  const breadcrumbSchema = generateBreadcrumbSchema([
+    { name: "Home", url: "/" },
+  ]);
 
-  return <HomePage homePageData={homePageData} />;
-}
+  return (
+    <>
+      <JsonLd schema={breadcrumbSchema} />
+      <HomePage homePageData={homePageData} />
+    </>
+  );
+}

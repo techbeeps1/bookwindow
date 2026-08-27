@@ -73,13 +73,26 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
+import JsonLd from "@/components/seo/JsonLd";
+import { generateBreadcrumbSchema, generateWebPageSchema } from "@/helper/schemaHelper";
+
 export default async function ReturnPolicy() {
   const returnPolicyData = await getReturnPolicyData();
 
+  const title = returnPolicyData?.title || "Return & Refund Policy";
+  const desc = returnPolicyData?.short_description || "Return, exchange, and refund policies for Bookwindow orders.";
+  const webPageSchema = generateWebPageSchema(title, desc, "/return-policy");
+  const breadcrumbSchema = generateBreadcrumbSchema([
+    { name: "Home", url: "/" },
+    { name: title, url: "/return-policy" },
+  ]);
+
   return (
     <>
+      <JsonLd schema={[webPageSchema, breadcrumbSchema]} />
       {/* Banner Section */}
       <section className="relative w-full h-[50vh] lg:mt-0 mt-[75px] flex items-center justify-center bg-gray-900 overflow-hidden">
+
         {/* Background Image with Dark Overlay */}
         <div className="absolute inset-0 z-0">
           <Image

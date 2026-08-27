@@ -73,13 +73,26 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
+import JsonLd from "@/components/seo/JsonLd";
+import { generateBreadcrumbSchema, generateWebPageSchema } from "@/helper/schemaHelper";
+
 export default async function PrivacyPolicy() {
   const privacyPolicyData = await getPrivacyPolicyData();
 
+  const title = privacyPolicyData?.title || "Privacy Policy";
+  const desc = privacyPolicyData?.short_description || "Privacy policy and data protection practices at Bookwindow.";
+  const webPageSchema = generateWebPageSchema(title, desc, "/privacy-policy");
+  const breadcrumbSchema = generateBreadcrumbSchema([
+    { name: "Home", url: "/" },
+    { name: title, url: "/privacy-policy" },
+  ]);
+
   return (
     <>
+      <JsonLd schema={[webPageSchema, breadcrumbSchema]} />
       {/* Banner Section */}
       <section className="relative w-full h-[50vh] lg:mt-0 mt-[75px] flex items-center justify-center bg-gray-900 overflow-hidden">
+
         {/* Background Image with Dark Overlay */}
         <div className="absolute inset-0 z-0">
           <Image

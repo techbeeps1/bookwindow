@@ -94,6 +94,9 @@ export async function generateMetadata({
   }
 }
 
+import JsonLd from "@/components/seo/JsonLd";
+import { generateCategoryGraphSchema } from "@/helper/schemaHelper";
+
 export default async function Page({ params }: Props) {
   const { slug } = await params;
 
@@ -101,5 +104,35 @@ export default async function Page({ params }: Props) {
   if (data.success === false) {
     notFound();
   }
-  return <CategoryPage categoryData={data} slug={slug} />;
+
+  const categoryName =
+    (Array.isArray(data?.category) ? data.category[0]?.name : data?.category?.name) ||
+    slug
+      .split("-")
+      .map((w: string) => w.charAt(0).toUpperCase() + w.slice(1))
+      .join(" ");
+
+  const categoryDescription =
+    data?.seo?.meta_description?.trim() ||
+    `Buy ${categoryName} competitive exam and academic books online at Bookwindow. Fast shipping across India.`;
+
+  const categoryGraphSchema = generateCategoryGraphSchema({
+    categoryName,
+    categoryUrl: `/category/${slug}`,
+    categoryDescription,
+    products: data?.products || [],
+    breadcrumbs: [
+      { name: "Home", url: "/" },
+      { name: "Categories", url: "/all-products" },
+      { name: categoryName, url: `/category/${slug}` },
+    ],
+  });
+
+  return (
+    <>
+      <JsonLd schema={categoryGraphSchema} />
+      <CategoryPage categoryData={data} slug={slug} />
+    </>
+  );
 }
+

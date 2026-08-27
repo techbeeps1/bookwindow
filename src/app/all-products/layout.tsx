@@ -15,10 +15,24 @@ export const metadata: Metadata = {
   },
 };
 
+import JsonLd from "@/components/seo/JsonLd";
+import { generateBreadcrumbSchema } from "@/helper/schemaHelper";
+
 export default function AllProductsLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return <>{children}</>;
+  const breadcrumbSchema = generateBreadcrumbSchema([
+    { name: "Home", url: "/" },
+    { name: "All Books", url: "/all-products" },
+  ]);
+
+  return (
+    <>
+      <JsonLd schema={breadcrumbSchema} />
+      {children}
+    </>
+  );
 }
+

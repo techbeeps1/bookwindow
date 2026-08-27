@@ -74,13 +74,23 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
+import JsonLd from "@/components/seo/JsonLd";
+import { generateAboutPageSchema, generateBreadcrumbSchema } from "@/helper/schemaHelper";
+
 export default async function AboutUs() {
   const aboutUsData = await getAboutUsData();
+  const aboutSchema = generateAboutPageSchema();
+  const breadcrumbSchema = generateBreadcrumbSchema([
+    { name: "Home", url: "/" },
+    { name: "About Us", url: "/about-us" },
+  ]);
 
   return (
     <>
+      <JsonLd schema={[aboutSchema, breadcrumbSchema]} />
       {/* Banner Section */}
       <section className="relative w-full h-[50vh] lg:mt-0 mt-[75px] flex items-center justify-center bg-gray-900 overflow-hidden">
+
         {/* Background Image with Dark Overlay */}
         <div className="absolute inset-0 z-0">
           <Image
