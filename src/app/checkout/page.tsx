@@ -51,7 +51,7 @@ export default function ShoppingCart() {
   const { refetch } = useViewCartQuery(sessionId);
 
   const [deliveryType, setDeliveryType] = useState("standard");
-  const [payment_method, setPaymentMethod] = useState("cod");
+  const [payment_method, setPaymentMethod] = useState("razorpay");
   const [orderNumber, setOrderNumber] = useState<number>(0);
   const [open, setOpen] = useState(false);
   const errorPopup = () => setOpen(!open);
@@ -354,10 +354,7 @@ export default function ShoppingCart() {
               : "",
           discount_amount:
             isCouponApplied && couponData && couponSuccess
-              ? cartItems?.reduce(
-                (acc, item) => acc + item.product_price * item.quantity,
-                0,
-              ) - calculateTotal()
+              ? (subtotal || 0) - calculateTotal()
               : 0,
         }),
       });
@@ -368,19 +365,14 @@ export default function ShoppingCart() {
         setOrderNumber(result?.order_number);
         refetch();
         router.push(`/view-orders?order_number=${result?.order_number}`);
-
-        // thankYouPopup();
-        setTimeout(() => {
-          // setCartItems([]);
-          setItemsCount(0);
-
-        }, 2000);
+        return;
       }
       if (response.ok && result?.razorpay_order_id) {
         // 1. Load Razorpay script
         const isScriptLoaded = await loadRazorpayScript();
         if (!isScriptLoaded) {
           alert("Failed to load Razorpay SDK");
+          setIsOrderProcess(false);
           return;
         }
         setIsOrderProcess(false);
@@ -393,6 +385,7 @@ export default function ShoppingCart() {
           description: "Order Payment",
           order_id: result.razorpay_order_id,
           handler: async function (response: any) {
+            setIsOrderProcess(true);
             // 3. Send the callback details to your server
             const verifyRes = await fetch(
               `${config.apiUrl}api/cart/razorpay/callback`,
@@ -416,12 +409,8 @@ export default function ShoppingCart() {
               router.push(
                 `/view-orders?order_number=${result?.order?.order_number}`,
               );
-              // thankYouPopup();
-              setTimeout(() => {
-                setCartItems([]);
-                setItemsCount(0);
-              }, 2000);
             } else {
+              setIsOrderProcess(false);
               errorPopup();
             }
           },
@@ -438,6 +427,7 @@ export default function ShoppingCart() {
           },
           modal: {
             ondismiss: async function () {
+              setIsOrderProcess(false);
               // Call your server's cancel API explicitly
               try {
                 await fetch(`${config.apiUrl}api/cart/razorpay/cancel`, {
@@ -464,16 +454,18 @@ export default function ShoppingCart() {
         const rzp = new window.Razorpay(options);
         rzp.open();
       } else {
+        setIsOrderProcess(false);
         if (result.message === "Your cart is empty") {
           setOpen(true);
           errorPopup();
         }
       }
       if (result.error) {
+        setIsOrderProcess(false);
         alert("Something went wrong. Please try again later.");
       }
-      setIsOrderProcess(false);
     } catch (error) {
+      setIsOrderProcess(false);
       setOpen(true);
       console.log("Error in:", error);
       errorPopup();
@@ -483,7 +475,7 @@ export default function ShoppingCart() {
   return (
     <>
       <section className="bg-white py-8 md:py-16 mb-4 min-h-screen">
-        {!cartFetched ? (
+        {!cartFetched || isorderProcess || orderNumber !== 0 ? (
           <FadeLoaderOverlay />
         ) : cartItems?.length > 0 && items_count > 0 ? (
           <div className="mx-auto container px-5">
@@ -501,10 +493,10 @@ export default function ShoppingCart() {
                       key={step}
                       onClick={() => goToStep(step)}
                       className={`pb-2 px-4 transition-all duration-300 border-b-2 cursor-pointer ${isCurrent
-                          ? "border-black text-black scale-105"
-                          : isDone
-                            ? "border-green-600 text-green-700"
-                            : "border-transparent text-neutral-300 hover:text-neutral-500"
+                        ? "border-black text-black scale-105"
+                        : isDone
+                          ? "border-green-600 text-green-700"
+                          : "border-transparent text-neutral-300 hover:text-neutral-500"
                         }`}
                     >
                       <span className="mr-1">{idx + 1}.</span> {step}
@@ -962,8 +954,8 @@ export default function ShoppingCart() {
                           <div
                             onClick={() => setDeliveryType("standard")}
                             className={`flex flex-col p-4 rounded-2xl border-2 cursor-pointer transition-all ${deliveryType === "standard"
-                                ? "border-black bg-white"
-                                : "border-neutral-200 bg-white hover:border-neutral-300"
+                              ? "border-black bg-white"
+                              : "border-neutral-200 bg-white hover:border-neutral-300"
                               }`}
                           >
                             <span className="text-xs font-bold uppercase tracking-wider text-neutral-850">
@@ -1005,35 +997,35 @@ export default function ShoppingCart() {
                           Payment Method
                         </p>
                         <div className="grid grid-cols-2 gap-3">
-                          {/* Cash On Delivery Option */}
-                          <div
-                            onClick={() => setPaymentMethod("cod")}
-                            className={`flex flex-col justify-between p-4 rounded-2xl border-2 cursor-pointer transition-all ${payment_method === "cod"
-                                ? "border-black bg-white"
-                                : "border-neutral-200 bg-white hover:border-neutral-300"
-                              }`}
-                          >
-                            <span className="text-xs font-bold uppercase tracking-wider text-neutral-855">
-                              COD
-                            </span>
-                            <span className="text-[10px] text-neutral-400 font-bold mt-1">
-                              Cash on delivery
-                            </span>
-                          </div>
-
                           {/* Online Payment Option */}
                           <div
                             onClick={() => setPaymentMethod("razorpay")}
                             className={`flex flex-col justify-between p-4 rounded-2xl border-2 cursor-pointer transition-all ${payment_method === "razorpay"
-                                ? "border-black bg-white"
-                                : "border-neutral-200 bg-white hover:border-neutral-300"
+                              ? "border-black bg-black text-white shadow-sm"
+                              : "border-neutral-200 bg-white hover:border-neutral-300"
                               }`}
                           >
-                            <span className="text-xs font-bold uppercase tracking-wider text-neutral-850">
+                            <span className={`text-xs font-bold uppercase tracking-wider ${payment_method === "razorpay" ? "text-white" : "text-neutral-850"}`}>
                               Online
                             </span>
-                            <span className="text-[10px] text-neutral-400 font-bold mt-1">
+                            <span className={`text-[10px] font-bold mt-1 ${payment_method === "razorpay" ? "text-neutral-300" : "text-neutral-400"}`}>
                               Razorpay secure
+                            </span>
+                          </div>
+
+                          {/* Cash On Delivery Option */}
+                          <div
+                            onClick={() => setPaymentMethod("cod")}
+                            className={`flex flex-col justify-between p-4 rounded-2xl border-2 cursor-pointer transition-all ${payment_method === "cod"
+                              ? "border-black bg-black text-white shadow-sm"
+                              : "border-neutral-200 bg-white hover:border-neutral-300"
+                              }`}
+                          >
+                            <span className={`text-xs font-bold uppercase tracking-wider ${payment_method === "cod" ? "text-white" : "text-neutral-855"}`}>
+                              COD
+                            </span>
+                            <span className={`text-[10px] font-bold mt-1 ${payment_method === "cod" ? "text-neutral-300" : "text-neutral-400"}`}>
+                              Cash on delivery
                             </span>
                           </div>
                         </div>
@@ -1053,11 +1045,7 @@ export default function ShoppingCart() {
                           <span className="text-green-700 font-black">
                             - ₹
                             {isCouponApplied && couponData && couponSuccess
-                              ? cartItems?.reduce(
-                                (acc, item) =>
-                                  acc + item.product_price * item.quantity,
-                                0,
-                              ) - calculateTotal()
+                              ? (subtotal || 0) - calculateTotal()
                               : 0}
                           </span>
                         </div>

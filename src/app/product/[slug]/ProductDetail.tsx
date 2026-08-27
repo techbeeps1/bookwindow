@@ -297,11 +297,10 @@ export default function ProductDetail({
                         setCurrentImageIndex(index);
                         setMainImage(`${config.apiUrl}storage/app/public/${img}`);
                       }}
-                      className={`relative w-16 h-20 rounded-xl overflow-hidden border-2 transition-all shrink-0 bg-neutral-50 p-1 cursor-pointer ${
-                        isSelected
-                          ? "border-black shadow-sm scale-102"
-                          : "border-neutral-200/80 opacity-70 hover:opacity-100 hover:border-neutral-400"
-                      }`}
+                      className={`relative w-16 h-20 rounded-xl overflow-hidden border-2 transition-all shrink-0 bg-neutral-50 p-1 cursor-pointer ${isSelected
+                        ? "border-black shadow-sm scale-102"
+                        : "border-neutral-200/80 opacity-70 hover:opacity-100 hover:border-neutral-400"
+                        }`}
                     >
                       <Image
                         src={`${config.apiUrl}storage/app/public/${img}`}
@@ -629,7 +628,10 @@ export default function ProductDetail({
               </div>
             </div>
 
-            {/* Description Section */}
+
+          </div>
+
+          <div className="mb-12">
             {productData?.description && (
               <div className="mb-6">
                 <h3 className="text-base font-extrabold text-neutral-900 mb-3 uppercase tracking-wider">
