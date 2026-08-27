@@ -9,6 +9,8 @@ import { MdKeyboardArrowLeft, MdKeyboardArrowRight } from "react-icons/md";
 import { FaChevronRight } from "react-icons/fa";
 import Link from "next/link";
 
+import { extractCategoryTitle } from "@/helper/helperfun";
+
 export default function CategoryPage({
   categoryData,
   slug,
@@ -28,42 +30,9 @@ export default function CategoryPage({
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
   const categoryTitle = useMemo(() => {
-    // 1. Direct field on categoryData
-    if (categoryData?.name && typeof categoryData.name === "string") return categoryData.name;
-    if (categoryData?.title && typeof categoryData.title === "string") return categoryData.title;
-    if (categoryData?.category_name && typeof categoryData.category_name === "string") return categoryData.category_name;
-
-    // 2. From SEO meta_title
-    if (categoryData?.seo?.meta_title && typeof categoryData.seo.meta_title === "string" && categoryData.seo.meta_title.trim()) {
-      const cleanTitle = categoryData.seo.meta_title
-        .replace(/\s*[-|–]\s*Bookwindow.*$/i, "")
-        .replace(/^Bookwindow\s*[-|–]\s*/i, "")
-        .trim();
-      if (cleanTitle && cleanTitle.toLowerCase() !== "category" && cleanTitle.toLowerCase() !== "bookwindow") {
-        return cleanTitle;
-      }
-    }
-
-    // 3. From slug (e.g. "defence-exam-books" -> "Defence Exam Books")
-    if (slug) {
-      return slug
-        .split("-")
-        .map((word) => {
-          const upper = word.toUpperCase();
-          if (
-            ["CBSE", "RBSE", "NCERT", "UPSC", "SSC", "RRB", "NEET", "JEE", "IIT", "RAS", "RPSC", "CTET", "REET", "GK", "GS", "PDF"].includes(
-              upper
-            )
-          ) {
-            return upper;
-          }
-          return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
-        })
-        .join(" ");
-    }
-
-    return "Category";
+    return extractCategoryTitle(categoryData, slug);
   }, [categoryData, slug]);
+
 
   const products = useMemo(
     () => categoryData?.products ?? [],

@@ -634,11 +634,11 @@ export default function ProductDetail({
           <div className="mb-12">
             {productData?.description && (
               <div className="mb-6">
-                <h3 className="text-base font-extrabold text-neutral-900 mb-3 uppercase tracking-wider">
+                <h3 className="text-base font-extrabold text-neutral-900 mb-3 uppercase tracking-wider px-4">
                   About this book
                 </h3>
                 <div
-                  className="text-neutral-700 leading-relaxed text-sm bg-neutral-50/70 rounded-2xl p-5 border border-neutral-200/80 prose prose-sm max-w-none"
+                  className="mx-4 text-neutral-700 leading-relaxed text-sm bg-neutral-50/70 rounded-2xl p-5 border border-neutral-200/80 prose prose-sm max-w-none"
                   dangerouslySetInnerHTML={{
                     __html: productData.description,
                   }}

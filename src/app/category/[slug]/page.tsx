@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 import config from "@/app/config";
 import CategoryPage from "./CategoryPage";
-import { truncateDescription } from "@/helper/helperfun";
+import { truncateDescription, extractCategoryTitle } from "@/helper/helperfun";
 import { notFound } from "next/navigation";
 
 type Props = {
@@ -41,9 +41,7 @@ export async function generateMetadata({
       };
     }
 
-    const categoryName =
-      (Array.isArray(data?.category) ? data.category[0]?.name : data?.category?.name) ||
-      slug.replace(/-/g, " ");
+    const categoryName = extractCategoryTitle(data, slug);
 
     const title =
       data.seo?.meta_title?.trim() ||
@@ -105,12 +103,7 @@ export default async function Page({ params }: Props) {
     notFound();
   }
 
-  const categoryName =
-    (Array.isArray(data?.category) ? data.category[0]?.name : data?.category?.name) ||
-    slug
-      .split("-")
-      .map((w: string) => w.charAt(0).toUpperCase() + w.slice(1))
-      .join(" ");
+  const categoryName = extractCategoryTitle(data, slug);
 
   const categoryDescription =
     data?.seo?.meta_description?.trim() ||
@@ -135,4 +128,5 @@ export default async function Page({ params }: Props) {
     </>
   );
 }
+
 
