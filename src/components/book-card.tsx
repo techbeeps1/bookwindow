@@ -311,7 +311,7 @@ export function BookCard({
 
       {/* Top Left Sale Tag */}
       {price !== offPrice && (
-        <span className="text-xs uppercase bg-black py-[5px] px-5 w-fit text-white rounded-[4px] font-sans absolute top-3 left-3 z-20">
+        <span className="text-xs uppercase bg-red-900 py-[5px] px-5 w-fit text-white font-semibold rounded-[4px] font-sans absolute top-3 left-3 z-20 shadow-sm">
           Sale
         </span>
       )}
