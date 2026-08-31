@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useMemo } from "react";
-import { useAppDispatch } from "@/hooks/useStore";
+import { useAppDispatch, useAppSelector } from "@/hooks/useStore";
 import ProductDialog from "./product-detail-popup";
 import Link from "next/link";
 import { useAddToCartMutation } from "@/lib/api/cartApi";
@@ -56,6 +56,7 @@ export function BookCard({
   const [isAddedToCart, setIsAddedToCart] = useState(false);
   const [cartButtonScale, setCartButtonScale] = useState(1);
   const [cartBounce, setCartBounce] = useState(false);
+  const { isAuthenticated } = useAppSelector((state) => state.auth);
   const [addToWishlist, { isLoading: addWishlistLoading }] = useAddToWishlistMutation();
   const { data: wishlistIds, refetch: refetchWishlist } = useViewWishlistIdQuery()
 
@@ -67,11 +68,30 @@ export function BookCard({
 
   const isWishlisted = wishlistSet.has(id);
 
-  async function handleWishlistClick() {
-    await addToWishlist(id)
-    await refetchWishlist()
-    toast.success("Product added to wishlist")
+  async function handleWishlistClick(e?: React.MouseEvent) {
+    e?.preventDefault();
+    e?.stopPropagation();
 
+    if (!isAuthenticated) {
+      toast.error("Sign in required");
+      return;
+    }
+
+    try {
+      const res: any = await addToWishlist(id).unwrap();
+      if (res?.status === false || res?.success === false || res?.error) {
+        toast.error(res?.message || res?.error || "Sign in required");
+        return;
+      }
+      await refetchWishlist();
+      toast.success(res?.message || "Product added to wishlist");
+    } catch (err: any) {
+      if (err?.status === 401 || err?.data?.error === "Unauthorized") {
+        toast.error("Sign in required");
+      } else {
+        toast.error(err?.data?.message || err?.data?.error || "Failed to update wishlist");
+      }
+    }
   };
 
   const [addToCart, { isLoading }] = useAddToCartMutation();
@@ -79,6 +99,11 @@ export function BookCard({
   const { refetch } = useCart();
 
   const handleAddToCart = async (productId: string, qty: number) => {
+    if (!isAuthenticated) {
+      toast.error("Sign in required");
+      return;
+    }
+
     try {
       setCartButtonScale(0.85);
 

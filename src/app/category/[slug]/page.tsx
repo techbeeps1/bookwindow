@@ -13,7 +13,7 @@ type Props = {
 async function getCategory(slug: string) {
   const res = await fetch(`${config.apiUrl}api/category/${slug}`, {
     next: {
-      revalidate: 600,
+      revalidate: 0, // 0 means do not cache, fetch fresh data every time
     },
   });
 
@@ -129,4 +129,4 @@ export default async function Page({ params }: Props) {
   );
 }
 
-
+
