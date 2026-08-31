@@ -1,121 +1,149 @@
 import type { MetadataRoute } from "next";
 import config from "./config";
 
-const BASE_URL = "https://bookwindow.in"; // Replace with your actual base URL
+const BASE_URL = "https://bookwindow.in";
 
 interface SitemapItem {
   url: string;
-  updated_at: string;
+  updated_at?: string;
 }
 
 interface SitemapResponse {
   pages?: SitemapItem[];
   products?: SitemapItem[];
+  product_categories?: SitemapItem[];
   categories?: SitemapItem[];
+  publications?: SitemapItem[];
+  posts?: SitemapItem[];
+  post_categories?: SitemapItem[];
 }
 
-async function getSitemapData(): Promise<SitemapResponse> {
-  const response = await fetch(`${config.apiUrl}api/sitemap-data/`);
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
-  if (!response.ok) {
-    throw new Error(`Sitemap API failed: ${response.status}`);
+async function getSitemapData(): Promise<SitemapResponse | null> {
+  try {
+    const response = await fetch(`${config.apiUrl}api/sitemap-data/`, {
+      cache: "no-store",
+      headers: {
+        "Cache-Control": "no-cache",
+        Pragma: "no-cache",
+      },
+    });
+
+    if (!response.ok) {
+      console.error(`Sitemap API failed with status: ${response.status}`);
+      return null;
+    }
+
+    return response.json();
+  } catch (error) {
+    console.error("Failed to fetch sitemap data:", error);
+    return null;
   }
-
-  return response.json();
 }
 
-function getPriority(url: string, type: string): number {
-  const slug = url.toLowerCase().replace(/^\/+|\/+$/g, "");
-
-  // Homepage
-  if (slug === "" || slug === "home") {
-    return 1.0;
-  }
-
-  // Important pages
-  if (
-    [
-      "about-us",
-      "contact-us",
-      "books",
-      "new-in",
-    ].includes(slug)
-  ) {
-    return 0.8;
-  }
-
-  // Policy pages
-  if (
-    [
-      "privacy-policy",
-      "return-policy",
-      "terms-and-conditions",
-    ].includes(slug)
-  ) {
-    return 0.3;
-  }
-
-  // Categories
-  if (type === "category") {
-    return 0.7;
-  }
-
-  // Products
-  if (type === "product") {
-    return 0.6;
-  }
-
-  // Other pages
-  return 0.5;
+function parseDate(dateStr?: string): Date {
+  if (!dateStr) return new Date();
+  const date = new Date(dateStr);
+  return isNaN(date.getTime()) ? new Date() : date;
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const data = await getSitemapData();
+  const urlMap = new Map<string, MetadataRoute.Sitemap[number]>();
 
-  const sitemap: MetadataRoute.Sitemap = [];
+  const addEntry = (
+    path: string,
+    lastModified?: string | Date,
+    priority: number = 0.7,
+    changeFrequency: MetadataRoute.Sitemap[number]["changeFrequency"] = "weekly"
+  ) => {
+    const cleanPath = path.replace(/^\/+/, "");
+    const fullUrl = cleanPath ? `${BASE_URL}/${cleanPath}` : `${BASE_URL}/`;
 
-  // Pages
-  for (const item of data.pages || []) {
-
-    if (item.url === "" || item.url === "home") {
-      sitemap.push({
-        url: `${BASE_URL}/`,
-        lastModified: new Date(item.updated_at),
-        priority: getPriority(item.url, "page"),
+    if (!urlMap.has(fullUrl)) {
+      urlMap.set(fullUrl, {
+        url: fullUrl,
+        lastModified:
+          lastModified instanceof Date
+            ? lastModified
+            : parseDate(lastModified),
+        priority,
+        changeFrequency,
       });
-    } else {
-      sitemap.push({
-        url: `${BASE_URL}/${item.url}`,
-        lastModified: new Date(item.updated_at),
-        priority: getPriority(item.url, "page"),
-      });
+    }
+  };
 
+  // 1. Core / Static Pages
+  addEntry("", new Date(), 1.0, "daily");
+  addEntry("all-products", new Date(), 0.8, "daily");
+  addEntry("publications", new Date(), 0.8, "daily");
+  addEntry("blogs", new Date(), 0.8, "daily");
+  addEntry("current-affairs", new Date(), 0.8, "daily");
+  addEntry("contact-us", new Date(), 0.8, "monthly");
+
+  if (data) {
+    // 2. CMS Pages (about-us, privacy-policy, etc.)
+    for (const item of data.pages || []) {
+      const slug = (item.url || "").toLowerCase().replace(/^\/+|\/+$/g, "");
+      if (!slug || slug === "home") continue;
+
+      const isPolicy = [
+        "privacy-policy",
+        "return-policy",
+        "terms-and-conditions",
+      ].includes(slug);
+
+      addEntry(
+        slug,
+        item.updated_at,
+        isPolicy ? 0.3 : 0.8,
+        isPolicy ? "monthly" : "weekly"
+      );
     }
 
+    // 3. Product Categories
+    const categories = data.product_categories || data.categories || [];
+    for (const item of categories) {
+      const slug = (item.url || "")
+        .replace(/^category\//, "")
+        .replace(/^\/+|\/+$/g, "");
+      if (slug) {
+        addEntry(`category/${slug}`, item.updated_at, 0.8, "daily");
+      }
+    }
+
+    // 4. Products
+    for (const item of data.products || []) {
+      const slug = (item.url || "")
+        .replace(/^(product|product-detail)\//, "")
+        .replace(/^\/+|\/+$/g, "");
+      if (slug) {
+        addEntry(`product/${slug}`, item.updated_at, 0.7, "weekly");
+      }
+    }
+
+    // 5. Publications
+    for (const item of data.publications || []) {
+      const slug = (item.url || "")
+        .replace(/^publication\//, "")
+        .replace(/^\/+|\/+$/g, "");
+      if (slug) {
+        addEntry(`publication/${slug}`, item.updated_at, 0.7, "weekly");
+      }
+    }
+
+    // 6. Blog Posts
+    for (const item of data.posts || []) {
+      const slug = (item.url || "")
+        .replace(/^blogs?\//, "")
+        .replace(/^\/+|\/+$/g, "");
+      if (slug) {
+        addEntry(`blogs/${slug}`, item.updated_at, 0.7, "weekly");
+      }
+    }
   }
 
-  // Categories
-  for (const item of data.categories || []) {
-    const cleanCategoryUrl = item.url.replace(/^category\//, "").replace(/^\/+/, "");
-    sitemap.push({
-      url: `${BASE_URL}/category/${cleanCategoryUrl}`,
-      lastModified: new Date(item.updated_at),
-      priority: getPriority(item.url, "category"),
-    });
-  }
-
-  // Products
-  for (const item of data.products || []) {
-    const cleanProductUrl = item.url
-      .replace(/^product\//, "")
-      .replace(/^product-detail\//, "")
-      .replace(/^\/+/, "");
-    sitemap.push({
-      url: `${BASE_URL}/product/${cleanProductUrl}`,
-      lastModified: new Date(item.updated_at),
-      priority: getPriority(item.url, "product"),
-    });
-  }
-
-  return sitemap;
-}
+  return Array.from(urlMap.values());
+}
