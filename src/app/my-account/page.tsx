@@ -482,6 +482,24 @@ function OrdersTab({ userOrders }: any) {
                     const isSuccess = ["delivered", "completed", "paid", "success"].some((s) => statusLower?.includes(s));
                     const isCancelled = ["cancelled", "failed", "refunded"].some((s) => statusLower?.includes(s));
 
+                    const isCodOrder =
+                      order?.order_details?.payment_method?.toLowerCase() === "cod" ||
+                      Number(order?.order_details?.delivery_amount) > 0 ||
+                      Number(order?.order_details?.cod_amount) > 0 ||
+                      Number(order?.order_details?.cod_charges) > 0;
+                    const codFee =
+                      Number(order?.order_details?.delivery_amount) ||
+                      Number(order?.order_details?.cod_amount) ||
+                      Number(order?.order_details?.cod_charges) ||
+                      (isCodOrder ? 49 : 0);
+                    const subtotalVal = Number(order?.order_details?.subtotal) || 0;
+                    const discountVal = Number(order?.order_details?.discount_amount) || 0;
+                    const shippingVal = Number(order?.order_details?.shipping_amount) || 49;
+                    const calculatedRowTotal =
+                      subtotalVal > 0
+                        ? (subtotalVal - discountVal + shippingVal + (isCodOrder ? codFee : 0)).toFixed(2)
+                        : order?.order_details?.total_amount;
+
                     return (
                       <tr key={order?.id} className={`hover:bg-neutral-50/40 transition-colors ${selectedRows[order.id] ? "bg-neutral-50/20" : ""}`}>
                         <td className="p-4 text-center">
@@ -514,7 +532,7 @@ function OrdersTab({ userOrders }: any) {
                           </span>
                         </td>
                         <td className="p-4 text-sm text-neutral-900 font-bold">
-                          ₹{order?.order_details?.total_amount}{" "}
+                          ₹{calculatedRowTotal}{" "}
                           <span className="text-neutral-400 font-semibold text-xs ml-1">
                             ({order?.items.length} {order?.items.length === 1 ? "item" : "items"})
                           </span>
@@ -695,10 +713,46 @@ function OrdersTab({ userOrders }: any) {
                     : `₹${selectedOrder?.order_details?.shipping_amount}`}
                 </span>
               </div>
-              <div className="flex justify-between pt-3.5 font-bold text-sm text-neutral-955">
-                <span className="text-neutral-900 font-extrabold uppercase tracking-wider text-xs flex items-center">Total Amount</span>
-                <span className="text-xl font-extrabold text-neutral-955">₹{selectedOrder?.order_details?.total_amount}</span>
-              </div>
+              {(selectedOrder?.order_details?.payment_method?.toLowerCase() === "cod" ||
+                Number(selectedOrder?.order_details?.delivery_amount) > 0 ||
+                Number(selectedOrder?.order_details?.cod_amount) > 0 ||
+                Number(selectedOrder?.order_details?.cod_charges) > 0) && (
+                <div className="flex justify-between py-3.5">
+                  <span className="text-neutral-455 font-bold uppercase tracking-wider text-xs">COD Charges</span>
+                  <span className="text-neutral-955 font-bold">
+                    ₹{selectedOrder?.order_details?.delivery_amount ||
+                      selectedOrder?.order_details?.cod_amount ||
+                      selectedOrder?.order_details?.cod_charges ||
+                      49}
+                  </span>
+                </div>
+              )}
+              {(() => {
+                const isSelectedCod =
+                  selectedOrder?.order_details?.payment_method?.toLowerCase() === "cod" ||
+                  Number(selectedOrder?.order_details?.delivery_amount) > 0 ||
+                  Number(selectedOrder?.order_details?.cod_amount) > 0 ||
+                  Number(selectedOrder?.order_details?.cod_charges) > 0;
+                const selectedCodFee =
+                  Number(selectedOrder?.order_details?.delivery_amount) ||
+                  Number(selectedOrder?.order_details?.cod_amount) ||
+                  Number(selectedOrder?.order_details?.cod_charges) ||
+                  (isSelectedCod ? 49 : 0);
+                const selectedSubtotal = Number(selectedOrder?.order_details?.subtotal) || 0;
+                const selectedDiscount = Number(selectedOrder?.order_details?.discount_amount) || 0;
+                const selectedShipping = Number(selectedOrder?.order_details?.shipping_amount) || 49;
+                const selectedTotal =
+                  selectedSubtotal > 0
+                    ? (selectedSubtotal - selectedDiscount + selectedShipping + (isSelectedCod ? selectedCodFee : 0)).toFixed(2)
+                    : selectedOrder?.order_details?.total_amount;
+
+                return (
+                  <div className="flex justify-between pt-3.5 font-bold text-sm text-neutral-955">
+                    <span className="text-neutral-900 font-extrabold uppercase tracking-wider text-xs flex items-center">Total Amount</span>
+                    <span className="text-xl font-extrabold text-neutral-955">₹{selectedTotal}</span>
+                  </div>
+                );
+              })()}
             </div>
           </div>
 
@@ -860,110 +914,151 @@ function PasswordTab({ customer }: any) {
 
 function AddressesTab({ customer, isEdited }: any) {
   const [isEdit, setIsEdit] = useState(false);
-  const [address, setAddress] = useState("");
-  const [address_2, setAddress2] = useState("");
-  const [city, setCity] = useState("");
-  const [state, setState] = useState("");
-  const [zipcode, setZipCode] = useState("");
+  const [address, setAddress] = useState(customer?.address || "");
+  const [address_2, setAddress2] = useState(customer?.address_2 || "");
+  const [city, setCity] = useState(customer?.city || "");
+  const [state, setState] = useState(customer?.state || "");
+  const [zipcode, setZipCode] = useState(customer?.zip_code || "");
 
-  const [customerData, setCustomerData] = useState({} as any);
+  const [states, setStates] = useState<any[]>([]);
+  const [statesLoading, setStatesLoading] = useState(false);
+  const [filteredCities, setFilteredCities] = useState<any[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  async function updateUser(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    if (!address) {
-      toast.error("Address Line 1 is required.");
-      return;
-    }
-    if (!customer?.email) {
-      toast.error("Customer email is not available.");
-      return;
-    }
-    if (zipcode && !/^\d{6}$/.test(zipcode)) {
-      toast.error("Please enter a valid 6-digit Indian postal code.");
-      return;
-    }
-    if (state && !states.some((s: any) => s.name === state)) {
-      toast.error("Please select a valid state from the list.");
-      return;
-    }
-    if (!city) {
-      toast.error("City is required.");
-      return;
-    }
-    if (address && (address.length < 5 || address.length > 100)) {
-      toast.error("Address Line 1 must be between 5 and 100 characters long.");
-      return;
-    }
-    const response = await fetch(`${config.apiUrl}api/v1/updateuser`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        email: customer?.email,
-        first_name: customer?.first_name,
-        last_name: customer?.last_name || customer?.first_name,
-        phone: customer?.phone,
-        date_of_birth: customer?.date_of_birth,
-        address: address ? address : customer?.address,
-        address_2: address_2 ? address_2 : customer?.address_2,
-        city: city ? city : customer?.city,
-        state: state ? state : customer?.state,
-        zip_code: zipcode ? zipcode : customer?.zip_code,
-        country: "India",
-      }),
-    });
-    if (response.ok) {
-      const data = await response.json();
-      setCustomerData(data);
-      toast.success("Address updated!");
-      isEdited();
-      setIsEdit(false);
-
-    } else {
-      toast.error("Failed to update address.");
-    }
-  }
-  const [selectedState, setSelectedState] = useState<string>("");
-  const [states, setStates] = useState([] as any);
-  const [statesFatched, setStatesFatched] = useState(false);
-  const [filteredCities, setFilteredCities] = useState([] as any);
+  // Sync state whenever customer data or isEdit changes
   useEffect(() => {
+    if (customer) {
+      setAddress(customer.address || "");
+      setAddress2(customer.address_2 || "");
+      setState(customer.state || "");
+      setCity(customer.city || "");
+      setZipCode(customer.zip_code || "");
+    }
+  }, [customer, isEdit]);
+
+  // Fetch states and cities once
+  useEffect(() => {
+    let isMounted = true;
     const fetchStatesAndCities = async () => {
+      setStatesLoading(true);
       try {
         const response = await axios({
           method: "get",
           url: `${config.apiUrl}api/state-of-india`,
           responseType: "json",
         });
-        setStates(response?.data);
-        setStatesFatched(true);
-        if (customer?.state) {
-
-          setSelectedState(customer.state);
+        if (isMounted) {
+          setStates(response?.data || []);
         }
       } catch (error) {
-        // error handling
+        console.error("Error fetching states:", error);
+      } finally {
+        if (isMounted) {
+          setStatesLoading(false);
+        }
       }
     };
     fetchStatesAndCities();
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
+  // Update filtered cities list whenever state or states array changes
   useEffect(() => {
-    let allCities = [];
-    if (selectedState) {
+    if (state && states.length > 0) {
       const selectedStateValue = states.find(
-        (pub: any) => pub.name === selectedState
+        (s: any) => s.name?.trim().toLowerCase() === state.trim().toLowerCase()
       );
-      allCities = selectedStateValue?.cities || [];
+      setFilteredCities(selectedStateValue?.cities || []);
+    } else {
+      setFilteredCities([]);
     }
-    setFilteredCities(allCities);
+  }, [state, states]);
 
-  }, [selectedState, states]);
+  const handleStateChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newState = e.target.value;
+    setState(newState);
+    setCity(""); // Reset city selection when state changes
+  };
 
-  useEffect(() => {
-    if (typeof window !== "undefined" && customerData?.customer) {
-      localStorage.setItem("customer", JSON.stringify(customerData.customer));
+  async function updateUser(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    const trimmedAddress = address?.trim() || "";
+    const trimmedAddress2 = address_2?.trim() || "";
+    const trimmedState = state?.trim() || "";
+    const trimmedCity = city?.trim() || "";
+    const trimmedZip = zipcode?.trim() || "";
+
+    if (!trimmedAddress) {
+      toast.error("Address Line 1 is required.");
+      return;
     }
-  }, [customerData]);
+
+    if (trimmedAddress.length < 5 || trimmedAddress.length > 100) {
+      toast.error("Address Line 1 must be between 5 and 100 characters long.");
+      return;
+    }
+
+    if (!trimmedState) {
+      toast.error("Please select a state.");
+      return;
+    }
+
+    if (!trimmedCity) {
+      toast.error("Please select a city.");
+      return;
+    }
+
+    if (trimmedZip && !/^\d{6}$/.test(trimmedZip)) {
+      toast.error("Please enter a valid 6-digit Indian postal code.");
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const cleanApiUrl = config.apiUrl.replace(/\/+$/, "");
+      const response = await fetch(`${cleanApiUrl}/api/v1/updateuser`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: customer?.email,
+          first_name: customer?.first_name,
+          last_name: customer?.last_name || customer?.first_name,
+          phone: customer?.phone,
+          date_of_birth: customer?.date_of_birth,
+          address: trimmedAddress,
+          address_2: trimmedAddress2,
+          city: trimmedCity,
+          state: trimmedState,
+          zip_code: trimmedZip,
+          country: "India",
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (typeof window !== "undefined" && data?.customer) {
+          localStorage.setItem("customer", JSON.stringify(data.customer));
+        }
+        toast.success("Address updated successfully!");
+        if (isEdited) {
+          isEdited();
+        }
+        setIsEdit(false);
+      } else {
+        const data = await response.json().catch(() => ({}));
+        toast.error(data?.message || data?.error || "Failed to update address.");
+      }
+    } catch (error) {
+      console.error("Error updating address:", error);
+      toast.error("An error occurred while updating address.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
 
   return (
     <>
@@ -976,7 +1071,6 @@ function AddressesTab({ customer, isEdited }: any) {
               className="w-9 h-9 rounded-full border border-neutral-200 hover:border-black flex items-center justify-center hover:bg-neutral-50 transition-colors cursor-pointer"
             >
               <IoIosArrowBack size={20} />
-
             </button>
             <div>
               <h1 className="text-xl sm:text-2xl font-bold uppercase tracking-tight">Edit Address</h1>
@@ -985,7 +1079,7 @@ function AddressesTab({ customer, isEdited }: any) {
           </div>
 
           <form className="space-y-4" onSubmit={updateUser}>
-            {/* Address */}
+            {/* Address Line 1 */}
             <div className="flex flex-col gap-1.5">
               <label className="text-sm font-semibold text-neutral-800 uppercase tracking-wider">Address Line 1</label>
               <div className="relative">
@@ -995,14 +1089,16 @@ function AddressesTab({ customer, isEdited }: any) {
                 <input
                   type="text"
                   name="address"
-                  defaultValue={customer?.address}
-                  onChange={(e: any) => setAddress(e.target.value)}
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
+                  placeholder="House / Flat No., Street, Area"
                   className="w-full pl-11 pr-4 py-3.5 text-base text-black bg-[#f4f4f4] hover:bg-neutral-100/50 focus:bg-white border border-neutral-200/80 rounded-xl outline-none focus:border-black focus:ring-2 focus:ring-black/5 transition-all duration-200"
+                  required
                 />
               </div>
             </div>
 
-            {/* Address 2 */}
+            {/* Address Line 2 */}
             <div className="flex flex-col gap-1.5">
               <label className="text-sm font-semibold text-neutral-800 uppercase tracking-wider">Address Line 2</label>
               <div className="relative">
@@ -1012,8 +1108,9 @@ function AddressesTab({ customer, isEdited }: any) {
                 <input
                   type="text"
                   name="address_2"
-                  defaultValue={customer?.address_2}
-                  onChange={(e: any) => setAddress2(e.target.value)}
+                  value={address_2}
+                  onChange={(e) => setAddress2(e.target.value)}
+                  placeholder="Landmark, Apartment, Suite (Optional)"
                   className="w-full pl-11 pr-4 py-3.5 text-base text-black bg-[#f4f4f4] hover:bg-neutral-100/50 focus:bg-white border border-neutral-200/80 rounded-xl outline-none focus:border-black focus:ring-2 focus:ring-black/5 transition-all duration-200"
                 />
               </div>
@@ -1021,7 +1118,6 @@ function AddressesTab({ customer, isEdited }: any) {
 
             {/* Country and State grid */}
             <div className="grid grid-cols-2 gap-4">
-
               <div className="flex flex-col gap-1.5">
                 <label className="text-sm font-semibold text-neutral-800 uppercase tracking-wider">Country</label>
                 <div className="relative">
@@ -1033,7 +1129,6 @@ function AddressesTab({ customer, isEdited }: any) {
                   >
                     India
                   </div>
-
                 </div>
               </div>
 
@@ -1047,24 +1142,20 @@ function AddressesTab({ customer, isEdited }: any) {
                   <select
                     className="w-full pl-11 pr-4 py-3.5 text-base text-black bg-[#f4f4f4] hover:bg-neutral-100/50 focus:bg-white border border-neutral-200/80 rounded-xl outline-none focus:border-black focus:ring-2 focus:ring-black/5 transition-all duration-200 appearance-none cursor-pointer"
                     name="state"
-                    onChange={(e: any) => { setState(e.target.value); setSelectedState(e.target.value); setCity(""); if (customer) customer.city = ""; }}
-                    defaultValue={customer?.state}
+                    value={state}
+                    onChange={handleStateChange}
+                    required
                   >
-                    <option value={customer?.state || ""}>
-                      {customer?.state || "Select state"}
-                    </option>
-                    {!statesFatched ? (
-                      <option className="text-sm text-red-400" disabled>
-                        loading ↻
-                      </option>
+                    <option value="">Select state</option>
+                    {statesLoading ? (
+                      <option disabled>Loading states...</option>
                     ) : (
-                      states?.map((state: any) => (
+                      states?.map((s: any) => (
                         <option
-                          value={state?.name}
-                          className="px-4 py-2 text-gray-600 hover:bg-gray-50 text-sm cursor-pointer"
-                          key={state?.id}
+                          value={s?.name}
+                          key={s?.id || s?.name}
                         >
-                          {state?.name}
+                          {s?.name}
                         </option>
                       ))
                     )}
@@ -1083,22 +1174,22 @@ function AddressesTab({ customer, isEdited }: any) {
                     <FaCity className="w-5 h-5" />
                   </div>
                   <select
-                    className="w-full pl-11 pr-4 py-3.5 text-base text-black bg-[#f4f4f4] hover:bg-neutral-100/50 focus:bg-white border border-neutral-200/80 rounded-xl outline-none focus:border-black focus:ring-2 focus:ring-black/5 transition-all duration-200 appearance-none cursor-pointer"
+                    className="w-full pl-11 pr-4 py-3.5 text-base text-black bg-[#f4f4f4] hover:bg-neutral-100/50 focus:bg-white border border-neutral-200/80 rounded-xl outline-none focus:border-black focus:ring-2 focus:ring-black/5 transition-all duration-200 appearance-none cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
                     name="city"
                     required
-                    onChange={(e: any) => setCity(e.target.value)}
-                    defaultValue={customer?.city}
+                    value={city}
+                    onChange={(e) => setCity(e.target.value)}
+                    disabled={!state || filteredCities.length === 0}
                   >
-                    <option value={customer?.city || ""}>
-                      {customer?.city ? customer.city : "Select city"}
+                    <option value="">
+                      {!state ? "Select state first" : filteredCities.length === 0 ? "No cities available" : "Select city"}
                     </option>
-                    {filteredCities?.map((city: any) => (
+                    {filteredCities?.map((c: any) => (
                       <option
-                        value={city?.name}
-                        className="px-4 py-2 text-gray-600 hover:bg-gray-50 text-sm cursor-pointer"
-                        key={city?.id}
+                        value={c?.name}
+                        key={c?.id || c?.name}
                       >
-                        {city?.name}
+                        {c?.name}
                       </option>
                     ))}
                   </select>
@@ -1115,8 +1206,9 @@ function AddressesTab({ customer, isEdited }: any) {
                   <input
                     type="text"
                     name="zip_code"
-                    defaultValue={customer?.zip_code}
-                    onChange={(e: any) => setZipCode(e.target.value)}
+                    value={zipcode}
+                    onChange={(e) => setZipCode(e.target.value)}
+                    placeholder="e.g. 302001"
                     className="w-full pl-11 pr-4 py-3.5 text-base text-black bg-[#f4f4f4] hover:bg-neutral-100/50 focus:bg-white border border-neutral-200/80 rounded-xl outline-none focus:border-black focus:ring-2 focus:ring-black/5 transition-all duration-200"
                   />
                 </div>
@@ -1127,9 +1219,32 @@ function AddressesTab({ customer, isEdited }: any) {
             <div className="pt-2">
               <button
                 type="submit"
-                className="w-full py-4 bg-black hover:bg-neutral-900 text-white rounded-xl font-bold text-sm uppercase tracking-widest transition-all duration-200 shadow-md cursor-pointer"
+                disabled={isSubmitting}
+                className="w-full py-4 bg-black hover:bg-neutral-900 text-white rounded-xl font-bold text-sm uppercase tracking-widest transition-all duration-200 shadow-md cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
-                Update Address
+                {isSubmitting && (
+                  <svg
+                    className="w-4 h-4 animate-spin"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    />
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                    />
+                  </svg>
+                )}
+                <span>{isSubmitting ? "Updating Address..." : "Update Address"}</span>
               </button>
             </div>
           </form>
@@ -1148,31 +1263,31 @@ function AddressesTab({ customer, isEdited }: any) {
               className="flex items-center gap-2 px-4 py-2 border border-neutral-200 hover:border-black rounded-xl text-xs font-bold uppercase tracking-wider text-neutral-700 hover:text-black transition-all bg-white cursor-pointer"
             >
               <MdModeEdit className="w-4 h-4" />
-
               <span>Edit Address</span>
             </button>
           </div>
 
-          {customer?.address && <div className="max-w-md bg-[#fbfbfb] border border-neutral-200/80 rounded-2xl p-6 sm:p-8 shadow-sm">
-            <h2 className="text-sm font-bold uppercase tracking-wider text-neutral-900 mb-4 border-b border-neutral-200 pb-2">Billing Address</h2>
-            <div className="text-sm space-y-2.5 font-semibold text-neutral-600 leading-relaxed">
-              <p className="font-bold text-neutral-900">{customer?.first_name} {customer?.last_name}</p>
-              <p className="flex items-center gap-2">
-                <MdLocationPin className="w-4 h-4" />
-                <span>{customer?.address || "No address specified"}</span>
-              </p>
-              {customer?.address_2 && (
-                <p className="pl-6 text-neutral-455">{customer?.address_2}</p>
-              )}
-              <p className="pl-6">
-                {customer?.city || ""}, {customer?.zip_code || "Zip"}
-              </p>
-              <p className="pl-6">
-                {customer?.state || "State"}, {"India"}
-              </p>
+          {customer?.address && (
+            <div className="max-w-md bg-[#fbfbfb] border border-neutral-200/80 rounded-2xl p-6 sm:p-8 shadow-sm">
+              <h2 className="text-sm font-bold uppercase tracking-wider text-neutral-900 mb-4 border-b border-neutral-200 pb-2">Billing Address</h2>
+              <div className="text-sm space-y-2.5 font-semibold text-neutral-600 leading-relaxed">
+                <p className="font-bold text-neutral-900">{customer?.first_name} {customer?.last_name}</p>
+                <p className="flex items-center gap-2">
+                  <MdLocationPin className="w-4 h-4" />
+                  <span>{customer?.address || "No address specified"}</span>
+                </p>
+                {customer?.address_2 && (
+                  <p className="pl-6 text-neutral-455">{customer?.address_2}</p>
+                )}
+                <p className="pl-6">
+                  {customer?.city || ""}, {customer?.zip_code || "Zip"}
+                </p>
+                <p className="pl-6">
+                  {customer?.state || "State"}, {"India"}
+                </p>
+              </div>
             </div>
-          </div>
-          }
+          )}
         </div>
       )}
     </>
@@ -1181,67 +1296,90 @@ function AddressesTab({ customer, isEdited }: any) {
 
 function AccountDetailsTab({ customer, isEdited }: any) {
   const [isEdit, setIsEdit] = useState(false);
-  const [lastName, setLastName] = useState("");
-  const [firstName, setFirstName] = useState("");
-  const [phone, setPhone] = useState("");
-  const [DOB, setDob] = useState("");
-  const [customerData, setCustomerData] = useState({} as any);
+  const [firstName, setFirstName] = useState(customer?.first_name || "");
+  const [lastName, setLastName] = useState(customer?.last_name || "");
+  const [phone, setPhone] = useState(customer?.phone || "");
+  const [DOB, setDob] = useState(customer?.date_of_birth || "");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Sync state whenever customer data or isEdit changes
+  useEffect(() => {
+    if (customer) {
+      setFirstName(customer.first_name || "");
+      setLastName(customer.last_name || "");
+      setPhone(customer.phone || "");
+      setDob(customer.date_of_birth || "");
+    }
+  }, [customer, isEdit]);
 
   async function updateUser(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    if (firstName === "" && !customer?.first_name) {
+    const trimmedFirstName = firstName?.trim() || "";
+    const trimmedLastName = lastName?.trim() || "";
+    const trimmedPhone = phone?.trim() || "";
+    const trimmedDOB = DOB?.trim() || "";
+
+    if (!trimmedFirstName) {
       toast.error("First name is required.");
       return;
     }
-    if (lastName === "" && !customer?.last_name) {
+    if (!trimmedLastName) {
       toast.error("Last name is required.");
       return;
     }
-    if (phone === "" && !customer?.phone) {
+    if (!trimmedPhone) {
       toast.error("Phone is required.");
       return;
     }
-    if (DOB === "" && !customer?.date_of_birth) {
+    if (!trimmedDOB) {
       toast.error("Date of birth is required.");
       return;
     }
 
+    setIsSubmitting(true);
 
-    const response = await fetch(`${config.apiUrl}api/v1/updateuser`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        email: customer?.email,
-        first_name: firstName ? firstName : customer?.first_name,
-        last_name: lastName ? lastName : customer?.last_name,
-        phone: phone ? phone : customer?.phone,
-        date_of_birth: DOB ? DOB : customer?.date_of_birth,
-        address: customer?.address,
-        address_2: customer?.address_2,
-        city: customer?.city,
-        state: customer?.state,
-        zip_code: customer?.zip_code,
-        country: "India",
-      }),
-    });
-    if (response.ok) {
-      const data = await response.json();
-      setCustomerData(data);
-      toast.success("User details updated!");
-      setIsEdit(false);
-      isEdited();
+    try {
+      const cleanApiUrl = config.apiUrl.replace(/\/+$/, "");
+      const response = await fetch(`${cleanApiUrl}/api/v1/updateuser`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: customer?.email,
+          first_name: trimmedFirstName,
+          last_name: trimmedLastName,
+          phone: trimmedPhone,
+          date_of_birth: trimmedDOB,
+          address: customer?.address,
+          address_2: customer?.address_2,
+          city: customer?.city,
+          state: customer?.state,
+          zip_code: customer?.zip_code,
+          country: "India",
+        }),
+      });
 
-    } else {
-      console.log("something went wrong!!");
+      if (response.ok) {
+        const data = await response.json();
+        if (typeof window !== "undefined" && data?.customer) {
+          localStorage.setItem("customer", JSON.stringify(data.customer));
+        }
+        toast.success("User details updated!");
+        setIsEdit(false);
+        if (isEdited) {
+          isEdited();
+        }
+      } else {
+        const data = await response.json().catch(() => ({}));
+        toast.error(data?.message || data?.error || "Failed to update profile.");
+      }
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      toast.error("An error occurred while updating profile.");
+    } finally {
+      setIsSubmitting(false);
     }
   }
-
-  useEffect(() => {
-    if (typeof window !== "undefined" && customerData?.customer) {
-      localStorage.setItem("customer", JSON.stringify(customerData.customer));
-    }
-  }, [customerData]);
 
   return (
     <>
@@ -1273,8 +1411,8 @@ function AccountDetailsTab({ customer, isEdited }: any) {
                   <input
                     type="text"
                     name="first_name"
-                    defaultValue={customer?.first_name}
-                    onChange={(e: any) => setFirstName(e.target.value)}
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
                     className="w-full pl-11 pr-4 py-3.5 text-base text-black bg-[#f4f4f4] hover:bg-neutral-100/50 focus:bg-white border border-neutral-200/80 rounded-xl outline-none focus:border-black focus:ring-2 focus:ring-black/5 transition-all duration-200"
                     required
                   />
@@ -1291,8 +1429,8 @@ function AccountDetailsTab({ customer, isEdited }: any) {
                   <input
                     type="text"
                     name="last_name"
-                    defaultValue={customer?.last_name}
-                    onChange={(e: any) => setLastName(e.target.value)}
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
                     className="w-full pl-11 pr-4 py-3.5 text-base text-black bg-[#f4f4f4] hover:bg-neutral-100/50 focus:bg-white border border-neutral-200/80 rounded-xl outline-none focus:border-black focus:ring-2 focus:ring-black/5 transition-all duration-200"
                     required
                   />
@@ -1309,8 +1447,8 @@ function AccountDetailsTab({ customer, isEdited }: any) {
                   <input
                     type="text"
                     name="phone"
-                    defaultValue={customer?.phone}
-                    onChange={(e: any) => setPhone(e.target.value)}
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
                     className="w-full pl-11 pr-4 py-3.5 text-base text-black bg-[#f4f4f4] hover:bg-neutral-100/50 focus:bg-white border border-neutral-200/80 rounded-xl outline-none focus:border-black focus:ring-2 focus:ring-black/5 transition-all duration-200"
                     required
                   />
@@ -1324,11 +1462,9 @@ function AccountDetailsTab({ customer, isEdited }: any) {
                   <input
                     type="date"
                     name="date_of_birth"
-                    defaultValue={customer?.date_of_birth}
-                    onChange={(e: any) => setDob(e.target.value)}
-
+                    value={DOB}
+                    onChange={(e) => setDob(e.target.value)}
                     max={new Date(new Date().setFullYear(new Date().getFullYear() - 10)).toISOString().split("T")[0]}
-
                     className="w-full pl-4 pr-4 py-3.5 text-base text-black bg-[#f4f4f4] hover:bg-neutral-100/50 focus:bg-white border border-neutral-200/80 rounded-xl outline-none focus:border-black focus:ring-2 focus:ring-black/5 transition-all duration-200"
                   />
                 </div>
@@ -1338,9 +1474,32 @@ function AccountDetailsTab({ customer, isEdited }: any) {
             <div className="pt-2">
               <button
                 type="submit"
-                className="w-full py-4 bg-black hover:bg-neutral-900 text-white rounded-xl font-bold text-sm uppercase tracking-widest transition-all duration-200 shadow-md cursor-pointer"
+                disabled={isSubmitting}
+                className="w-full py-4 bg-black hover:bg-neutral-900 text-white rounded-xl font-bold text-sm uppercase tracking-widest transition-all duration-200 shadow-md cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
-                Update Profile
+                {isSubmitting && (
+                  <svg
+                    className="w-4 h-4 animate-spin"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    />
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                    />
+                  </svg>
+                )}
+                <span>{isSubmitting ? "Updating Profile..." : "Update Profile"}</span>
               </button>
             </div>
           </form>
@@ -1393,5 +1552,4 @@ function AccountDetailsTab({ customer, isEdited }: any) {
       )}
     </>
   );
-
 }

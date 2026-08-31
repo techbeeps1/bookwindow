@@ -302,7 +302,7 @@ export default function WishlistPage() {
 
                       {/* Image Container */}
                       <div className="relative pt-4 px-4 bg-gray-50/60 group-hover:bg-gray-50 transition-colors">
-                        <Link href={`/product-detail/${item.slug || item.id}`}>
+                        <Link href={`/product/${item.slug || item.id}`}>
                           <div className="w-full flex justify-center transform group-hover:scale-[1.03] transition-transform duration-300">
                             <ImageBook src={getImageSrc(item)} alt={item.name || "Book"} size="30px" />
                           </div>
@@ -313,7 +313,7 @@ export default function WishlistPage() {
                       <div className="p-4 flex flex-col flex-1 justify-between">
                         <div>
                           {/* Title */}
-                          <Link href={`/product-detail/${item.slug || item.id}`}>
+                          <Link href={`/product/${item.slug || item.id}`}>
                             <h3 className="font-bold text-gray-900 text-sm line-clamp-2 hover:text-black transition-colors mb-3">
                               {item.name?.replace(/#COMMA#/g, ",")}
                             </h3>
@@ -417,7 +417,7 @@ export default function WishlistPage() {
                     >
                       {/* Book Image */}
                       <div className="w-28 xs:w-32 sm:w-36 flex-shrink-0 bg-gray-50 rounded-xl">
-                        <Link href={`/product-detail/${item.slug || item.id}`}>
+                        <Link href={`/product/${item.slug || item.id}`}>
                           <ImageBook src={getImageSrc(item)} alt={item.name || "Book"} size={viewMode === "list" ? "10px" : "30px"} />
                         </Link>
                       </div>
@@ -430,7 +430,7 @@ export default function WishlistPage() {
                           </span>
                         </div>
 
-                        <Link href={`/product-detail/${item.slug || item.id}`}>
+                        <Link href={`/product/${item.slug || item.id}`}>
                           <h3 className="font-bold text-xs sm:text-base text-gray-900 hover:text-black transition-colors line-clamp-2 leading-tight">
                             {item.name?.replace(/#COMMA#/g, ",")}
                           </h3>

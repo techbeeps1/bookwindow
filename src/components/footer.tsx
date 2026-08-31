@@ -192,6 +192,7 @@ export function Footer({ menuData }: any) {
           </div>
         </div>
       </div>
+
     </footer>
   );
 }

@@ -8,7 +8,7 @@ import logo from "../../public/logos/logo.svg";
 import { useAppDispatch } from "@/hooks/useStore";
 import { openCartDrawer } from "@/lib/slices/uiSlice";
 import { useCart } from "@/hooks/useCart";
-import { useViewProductsQuery } from "@/lib/api/productsApi";
+import { useLazyViewProductsQuery } from "@/lib/api/productsApi";
 import { logout } from "@/lib/slices/authSlice";
 import { useRouter } from "next/navigation";
 import { IoSearchSharp, IoClose } from "react-icons/io5";
@@ -47,7 +47,7 @@ export function Navbar({ menuData }: any) {
   const [openMobileSubmenus, setOpenMobileSubmenus] = useState<Record<number, boolean>>({});
   const [openMobileNestedSubmenus, setOpenMobileNestedSubmenus] = useState<Record<string | number, boolean>>({});
   const headerMenu = menuData;
-  const { data: productdatas } = useViewProductsQuery();
+  const [fetchProducts, { data: productdatas }] = useLazyViewProductsQuery();
   const products = productdatas;
   const { user, isAuthenticated, loading } = useAppSelector((state) => state.auth);
 
@@ -64,6 +64,9 @@ export function Navbar({ menuData }: any) {
       setFilteredProducts([]);
       return;
     }
+    if (!products) {
+      fetchProducts();
+    }
     const query = searchTerm.toLowerCase();
     if (products && products.length > 0) {
       const filtered = products.filter((p: any) =>
@@ -72,7 +75,7 @@ export function Navbar({ menuData }: any) {
 
       setFilteredProducts(filtered.slice(0, 8));
     }
-  }, [searchTerm, products]);
+  }, [searchTerm, products, fetchProducts]);
 
   const handleOpen = () => setOpen((cur) => !cur);
 
@@ -171,6 +174,9 @@ export function Navbar({ menuData }: any) {
                           type="text"
                           placeholder="What are you looking for?"
                           value={searchTerm}
+                          onFocus={() => {
+                            if (!products) fetchProducts();
+                          }}
                           onChange={(e) => setSearchTerm(e.target.value)}
                           className="w-full text-sm text-white bg-white/5 placeholder-white border-2 border-white/50  rounded-full py-2.5 pl-11 pr-12 transition-all duration-300 outline-none"
                         />
@@ -193,7 +199,7 @@ export function Navbar({ menuData }: any) {
                             {filteredProducts.map((product: any) => (
                               <Link
                                 key={product?.id}
-                                href={`/product-detail/${product?.slug}`}
+                                href={`/product/${product?.slug}`}
                                 onClick={() => setSearchTerm("")}
                                 className="flex gap-4 items-center px-4 py-3 hover:bg-neutral-100/70 rounded-xl transition-all duration-200 border-b border-neutral-100 last:border-b-0 text-left"
                               >
@@ -545,7 +551,7 @@ export function Navbar({ menuData }: any) {
                 {filteredProducts.map((product: any) => (
                   <Link
                     key={product?.id}
-                    href={`/product-detail/${product?.slug}`}
+                    href={`/product/${product?.slug}`}
                     onClick={() => setSearchTerm("")}
                     className="flex gap-4 items-center p-3 hover:bg-neutral-50 rounded-2xl transition-all border border-neutral-100 hover:border-neutral-200"
                   >
@@ -608,6 +614,9 @@ export function Navbar({ menuData }: any) {
             type="text"
             placeholder="Search books..."
             value={searchTerm}
+            onFocus={() => {
+              if (!products) fetchProducts();
+            }}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full text-xs text-white bg-white/5 placeholder-white border border-white rounded-full py-2.5 pl-9 pr-9 transition-all duration-300 outline-none "
           />

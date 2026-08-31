@@ -127,33 +127,43 @@ export default function Checkout({
     setEmail(value);
     setUserFound(null);
     setErrorMessage("");
-    setIsBuffering(true);
 
     if (debounceTimeout) {
       clearTimeout(debounceTimeout);
     }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!value || !emailRegex.test(value.trim())) {
+      setIsBuffering(false);
+      return;
+    }
+
+    setIsBuffering(true);
     const timeout = setTimeout(() => {
-      checkUser(value);
+      checkUser(value.trim());
     }, 500);
 
     setDebounceTimeout(timeout);
   };
 
   const checkUser = async (emailToCheck: string) => {
+    if (!emailToCheck) {
+      setIsBuffering(false);
+      return;
+    }
     try {
       const response = await axios.post(`${config.apiUrl}api/v1/checkuser`, {
         email: emailToCheck,
       });
 
-      if (response.data.success) {
+      if (response?.data?.success) {
         setUserFound(true);
         setErrorMessage("");
-      } else if (response.data.error) {
+      } else {
         setUserFound(false);
         setErrorMessage("This email is not registered with us.");
       }
-    } catch (error) {
-      console.error("API error:", error);
+    } catch {
       setUserFound(false);
       setErrorMessage("This email is not registered with us.");
     } finally {
@@ -161,27 +171,37 @@ export default function Checkout({
     }
   };
 
-  async function handleLogin(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const response = await fetch(`/api/auth/login`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email: email, password: password }),
-    });
-    if (response.ok) {
-      const data = await response.json();
-      setUserFound(false);
-
-      dispatch(
-        login({
-          user: data,
-        })
-      );
-      setLoginUpdated((prev) => prev + 1);
-    } else {
-      const data = await response.json();
-      console.error("Login failed", response.status);
-      alert(data?.error);
+  async function handleLogin(event?: FormEvent<HTMLFormElement> | any) {
+    if (event?.preventDefault) event.preventDefault();
+    if (!password) {
+      toast.error("Please enter your password to login");
+      return;
+    }
+    try {
+      const response = await fetch(`/api/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: email || formValues.email, password: password }),
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setUserFound(false);
+        setPassword("");
+        dispatch(
+          login({
+            user: data,
+          })
+        );
+        setLoginUpdated((prev) => prev + 1);
+        toast.success("Logged in successfully!");
+      } else {
+        const data = await response.json();
+        console.error("Login failed", response.status);
+        toast.error(data?.error || "Login failed");
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+      toast.error("Something went wrong during login");
     }
   }
 
@@ -341,10 +361,13 @@ export default function Checkout({
 
               {/* Password Input / Login */}
               {userFound === true && !isBuffering && (
-                <div className="space-y-4 bg-neutral-50 p-5 rounded-2xl border border-neutral-250">
+                <div className="space-y-3 bg-neutral-50 p-5 rounded-2xl border border-neutral-250">
+                  <p className="text-xs text-neutral-600 font-medium">
+                    This email is registered with us. You can log in with your password, or continue as a guest.
+                  </p>
                   <div className="flex flex-col gap-1.5">
                     <label className="text-xs font-semibold text-neutral-800 uppercase tracking-wider">
-                      Password
+                      Password (Optional for guest)
                     </label>
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400">
@@ -352,35 +375,34 @@ export default function Checkout({
                       </div>
                       <input
                         type="password"
-                        placeholder="********"
+                        placeholder="Enter password to log in"
                         name="password"
                         value={password}
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                           setPassword(e.target.value)
                         }
                         className="w-full pl-11 pr-4 py-3 text-sm text-black bg-[#f4f4f4] hover:bg-neutral-100/50 focus:bg-white border border-neutral-200/80 rounded-xl outline-none focus:border-black focus:ring-2 focus:ring-black/5 transition-all duration-200"
-                        required
                       />
                     </div>
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
                     <button
                       type="button"
-                      onClick={(e) => {
-                        const fakeFormEvent = {
-                          preventDefault: () => { },
-                          currentTarget: document.querySelector(
-                            "form"
-                          ) as HTMLFormElement,
-                        } as unknown as FormEvent<HTMLFormElement>;
-
-                        handleLogin(fakeFormEvent);
-                      }}
-                      className="bg-black hover:bg-neutral-900 text-white text-xs font-bold px-5 py-2.5 rounded-lg transition-colors cursor-pointer"
+                      onClick={() => handleLogin()}
+                      className="bg-black hover:bg-neutral-900 text-white text-xs font-bold px-5 py-2.5 rounded-xl transition-colors cursor-pointer"
                     >
                       Login
                     </button>
-
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setUserFound(null);
+                        setPassword("");
+                      }}
+                      className="bg-neutral-200 hover:bg-neutral-300 text-neutral-800 text-xs font-bold px-4 py-2.5 rounded-xl transition-colors cursor-pointer"
+                    >
+                      Continue as guest
+                    </button>
                   </div>
                 </div>
               )}

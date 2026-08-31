@@ -43,7 +43,7 @@ export async function generateMetadata(): Promise<Metadata> {
         title: seo.meta_title || "Bookwindow",
         description:
           seo.meta_description || "Buy books online at Bookwindow.",
-        url: "https://yourdomain.com",
+        url: "https://bookwindow.in",
         type: "website",
         images: [
           seo.meta_image
@@ -62,8 +62,19 @@ export async function generateMetadata(): Promise<Metadata> {
   }
 }
 
+import JsonLd from "@/components/seo/JsonLd";
+import { generateBreadcrumbSchema } from "@/helper/schemaHelper";
+
 export default async function Home() {
   const homePageData = await fetchHomePageData();
+  const breadcrumbSchema = generateBreadcrumbSchema([
+    { name: "Home", url: "/" },
+  ]);
 
-  return <HomePage homePageData={homePageData} />;
-}
+  return (
+    <>
+      <JsonLd schema={breadcrumbSchema} />
+      <HomePage homePageData={homePageData} />
+    </>
+  );
+}

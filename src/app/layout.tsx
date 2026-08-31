@@ -1,6 +1,7 @@
 import "./globals.css";
 import type { Metadata } from "next";
 import { Roboto } from "next/font/google";
+import Script from "next/script";
 import { FixedPlugin } from "@/components";
 //import MainWraper from "@/components/MainWraper";
 import ReduxProvider from "@/lib/provider";
@@ -12,7 +13,9 @@ import { Toaster } from "react-hot-toast";
 
 async function getMenu() {
   const response = await fetch(`${config.apiUrl}api/menus/header_menu`, {
-    cache: "no-store",
+    next: {
+      revalidate: 3600,
+    },
   });
   if (!response.ok) {
     throw new Error("Failed to fetch menu");
@@ -20,6 +23,9 @@ async function getMenu() {
 
   return response.json();
 }
+
+import JsonLd from "@/components/seo/JsonLd";
+import { generateOrganizationSchema, generateWebSiteSchema } from "@/helper/schemaHelper";
 
 const roboto = Roboto({
   subsets: ["latin"],
@@ -40,19 +46,43 @@ export default async function RootLayout({
   children: React.ReactNode;
 }) {
   const menuData = await getMenu();
+  const orgSchema = generateOrganizationSchema();
+  const webSiteSchema = generateWebSiteSchema();
+
   return (
     <html lang="en">
-      <head></head>
+      <head>
+        {/* Schema.org Global Structured Data */}
+        <JsonLd schema={[orgSchema, webSiteSchema]} />
+
+        {/* Google Analytics */}
+        <Script
+          strategy="afterInteractive"
+          src="https://www.googletagmanager.com/gtag/js?id=G-Q8BCCV1SLL"
+        />
+        <Script
+          id="google-analytics"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-Q8BCCV1SLL');
+            `,
+          }}
+        />
+      </head>
       <body className={roboto.className}>
         <ReduxProvider>
           <AppInitializer />
           <Navbar menuData={menuData.header} />
 
           {children}
-           <CartDrawer/>
-           <FixedPlugin />
+          <CartDrawer />
+          <FixedPlugin />
           <Footer menuData={menuData.footer} />
-          <Toaster position="top-right"   reverseOrder={false}/>
+          <Toaster position="top-right" reverseOrder={false} />
         </ReduxProvider>
       </body>
     </html>
