@@ -186,7 +186,7 @@ export default function Publications() {
   return (
     <div className="min-h-screen bg-gray-50/50 pb-20">
       {/* Hero Header Section */}
-      <section className="bg-white border-b border-gray-200 pt-10 pb-8 px-4 sm:px-6">
+      <section className="bg-white lg:mt-0 mt-[75px] border-b border-gray-200 pt-10 pb-8 px-4 sm:px-6">
         <div className="container mx-auto max-w-6xl">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
             <div className="max-w-2xl space-y-2.5">
@@ -199,7 +199,7 @@ export default function Publications() {
               </nav>
               <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 tracking-tight">
                 Explore Publications
-              </h1>              
+              </h1>
             </div>
 
             {/* Search Input */}
@@ -233,11 +233,10 @@ export default function Publications() {
                 <button
                   key={letter}
                   onClick={() => setSelectedLetter(letter)}
-                  className={`px-3 py-1 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
-                    selectedLetter === letter
-                      ? "bg-black text-white shadow-sm scale-105"
-                      : "bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-900"
-                  }`}
+                  className={`px-3 py-1 text-xs font-semibold rounded-lg transition-all cursor-pointer ${selectedLetter === letter
+                    ? "bg-black text-white shadow-sm scale-105"
+                    : "bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-900"
+                    }`}
                 >
                   {letter}
                 </button>
