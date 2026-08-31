@@ -6,7 +6,7 @@ import config from "@/app/config";
 import axios from "axios";
 import Image from "next/image";
 import Link from "next/link";
-import { IoCheckmarkCircle, IoBagHandle, IoArrowForward, IoLocationOutline, IoCallOutline, IoMailOutline } from "react-icons/io5";
+import { IoCheckmarkCircle, IoBagHandle, IoArrowForward, IoLocationSharp, IoCall, IoMailOutline, IoCallOutline } from "react-icons/io5";
 import FadeLoaderOverlay from "@/components/loader";
 
 interface CartItem {
@@ -106,8 +106,8 @@ export default function ShoppingCart() {
 
   const shippingCost =
     orderData?.shipping_amount !== undefined &&
-    orderData?.shipping_amount !== null &&
-    orderData?.shipping_amount !== ""
+      orderData?.shipping_amount !== null &&
+      orderData?.shipping_amount !== ""
       ? orderData?.shipping_amount
       : orderData?.shipping_method
         ? orderData?.shipping_method === "standard"
@@ -258,7 +258,7 @@ export default function ShoppingCart() {
               {fullAddress && (
                 <div className="bg-white rounded-3xl border border-neutral-200/80 p-5 sm:p-6 shadow-sm">
                   <div className="flex items-center gap-2 pb-3 mb-3 border-b border-neutral-100">
-                    <IoLocationOutline className="w-5 h-5 text-neutral-700" />
+                    <IoLocationSharp className="w-5 h-5 text-neutral-700" />
                     <h2 className="text-xs font-extrabold uppercase tracking-wider text-neutral-900">
                       Delivery Address
                     </h2>
@@ -271,7 +271,7 @@ export default function ShoppingCart() {
                   </p>
                   {customerPhone && (
                     <p className="flex items-center gap-1.5 text-xs text-neutral-500 font-semibold mt-3">
-                      <IoCallOutline className="w-3.5 h-3.5" />
+                      <IoCall className="w-3.5 h-3.5" />
                       <span>{customerPhone}</span>
                     </p>
                   )}
@@ -373,4 +373,4 @@ export default function ShoppingCart() {
       </section>
     </>
   );
-}
+}
