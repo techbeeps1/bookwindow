@@ -30,7 +30,7 @@ export default function CategoryPage({
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
   const categoryTitle = useMemo(() => {
-    return extractCategoryTitle(categoryData, slug);
+    return categoryData?.["parent-cateogry"]?.name || extractCategoryTitle(categoryData, slug);
   }, [categoryData, slug]);
 
 

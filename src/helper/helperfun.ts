@@ -63,7 +63,7 @@ export function cleanSlugToTitle(rawSlug?: string): string {
     if (decoded.includes("%")) {
       decoded = decodeURIComponent(decoded);
     }
-  } catch {}
+  } catch { }
 
   // Replace + with space, except when in 10+2 pattern
   decoded = decoded
@@ -93,6 +93,9 @@ function normalizeForComparison(str: string): string {
  */
 export function extractCategoryTitle(categoryData: any, slug?: string): string {
   // 1. If explicit category title/name field exists
+  if (categoryData?.["parent-cateogry"]?.name && typeof categoryData["parent-cateogry"].name === "string" && categoryData["parent-cateogry"].name.trim()) {
+    return categoryData["parent-cateogry"].name.trim();
+  }
   if (categoryData?.name && typeof categoryData.name === "string" && categoryData.name.trim()) {
     return formatTitleCase(categoryData.name.trim());
   }
@@ -135,4 +138,4 @@ export function extractCategoryTitle(categoryData: any, slug?: string): string {
   }
 
   return "Category";
-}
+}
