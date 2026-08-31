@@ -51,13 +51,12 @@ export function Footer({ menuData }: any) {
     console.log(data);
     setLoading(false);
     if (data.success) {
-      toast.success("Thank you for subscribe!");
+      toast.success("Thank you for subscribing!");
       setEmail("");
-    } if (data.mailchimp.title === "Member Exists") {
+    } else if (data?.mailchimp?.title === "Member Exists") {
       toast.success("You are already subscribed to our newsletter.");
-    }
-    else {
-      toast.error("Failed to subscribe. Please try again.");
+    } else {
+      toast.error(data?.message || "Failed to subscribe. Please try again.");
     }
   }
 
