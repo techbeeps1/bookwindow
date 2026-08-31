@@ -2,7 +2,7 @@
 import { useRouter } from "next/navigation";
 import { useSession } from "@/hooks/useSession";
 import { useState, useEffect, useMemo } from "react";
-import { useAppDispatch } from "@/hooks/useStore";
+import { useAppDispatch, useAppSelector } from "@/hooks/useStore";
 import OtherBookOffers from "@/components/other-book-offers";
 import { openCartDrawer } from "@/lib/slices/uiSlice";
 import Link from "next/link";
@@ -89,6 +89,7 @@ export default function ProductDetail({
   const [addToCart, { isLoading }] = useAddToCartMutation();
   const [clicktype, setClicktype] = useState("");
 
+  const { isAuthenticated } = useAppSelector((state) => state.auth);
   const [addToWishlist, { isLoading: addWishlistLoading }] = useAddToWishlistMutation();
   const { refetch } = useCart();
 
@@ -125,11 +126,31 @@ export default function ProductDetail({
     }
   };
 
-  async function handleWishlistClick() {
+  async function handleWishlistClick(e?: React.MouseEvent) {
+    e?.preventDefault();
+    e?.stopPropagation();
+
+    if (!isAuthenticated) {
+      toast.error("Sign in required");
+      return;
+    }
+
     if (productData?.id) {
-      await addToWishlist(productData?.id);
-      await refetchWishlist();
-      toast.success("Product added to wishlist");
+      try {
+        const res: any = await addToWishlist(productData.id).unwrap();
+        if (res?.status === false || res?.success === false || res?.error) {
+          toast.error(res?.message || res?.error || "Sign in required");
+          return;
+        }
+        await refetchWishlist();
+        toast.success(res?.message || "Product added to wishlist");
+      } catch (err: any) {
+        if (err?.status === 401 || err?.data?.error === "Unauthorized") {
+          toast.error("Sign in required");
+        } else {
+          toast.error(err?.data?.message || err?.data?.error || "Failed to update wishlist");
+        }
+      }
     }
   }
 
@@ -159,6 +180,10 @@ export default function ProductDetail({
   };
 
   const handleAddToCart = async (productId: string, quantity: number) => {
+    if (!isAuthenticated) {
+      toast.error("Sign in required");
+      return;
+    }
     setClicktype("addtocart");
     try {
       await addToCart({
@@ -178,6 +203,10 @@ export default function ProductDetail({
   };
 
   async function BuyNow(productId: string, quantity: number) {
+    if (!isAuthenticated) {
+      toast.error("Sign in required");
+      return;
+    }
     setClicktype("buynow");
     try {
       await addToCart({
