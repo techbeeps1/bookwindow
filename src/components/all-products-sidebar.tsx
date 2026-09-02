@@ -11,6 +11,8 @@ export default function AllProductSidebar({
   selectedCategoryIds,
   selectedPublicationIds,
   onPublicationSelect,
+  selectedLanguages = [],
+  onLanguageSelect,
 }: any) {
   const [publications, setPublications] = useState([] as any);
   const [categories, setCategories] = useState([] as any);
@@ -21,6 +23,7 @@ export default function AllProductSidebar({
 
   const [isCategoriesOpen, setIsCategoriesOpen] = useState(true);
   const [isPublicationsOpen, setIsPublicationsOpen] = useState(true);
+  const [isLanguageOpen, setIsLanguageOpen] = useState(true);
   const [categoryLimit, setCategoryLimit] = useState(8);
   const [publicationLimit, setPublicationLimit] = useState(8);
 
@@ -345,6 +348,73 @@ export default function AllProductSidebar({
                 </button>
               )}
             </div>
+          </div>
+        )}
+      </div>
+
+      {/* ================= Language Section ================= */}
+      <div className="flex flex-col gap-3">
+        {/* Accordion Header */}
+        <div
+          onClick={() => setIsLanguageOpen(!isLanguageOpen)}
+          className="flex items-center justify-between cursor-pointer pb-2 border-b border-neutral-100 hover:border-neutral-200 transition-colors"
+        >
+          <h3 className="text-sm font-bold text-neutral-900 tracking-wide select-none">
+            Language
+          </h3>
+          <div className="flex items-center gap-2">
+            {selectedLanguages.length > 0 && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onLanguageSelect && onLanguageSelect("clear");
+                }}
+                className="text-xs text-neutral-500 font-semibold transition-colors"
+              >
+                Clear
+              </button>
+            )}
+
+            <FaChevronDown
+              className={`w-3.5 h-3.5 text-black transition-transform duration-200 ${
+                isLanguageOpen ? "rotate-0" : "-rotate-90"
+              }`}
+            />
+          </div>
+        </div>
+
+        {isLanguageOpen && (
+          <div className="flex flex-col gap-1 mt-1 pr-1">
+            <div
+              onClick={() => onLanguageSelect && onLanguageSelect("clear")}
+              className={`flex items-center gap-3 px-2 py-2 rounded-lg cursor-pointer transition-all duration-200 ${selectedLanguages.length === 0
+                ? "font-semibold"
+                : "text-neutral-600 hover:bg-neutral-50/60"
+                }`}
+            >
+              {selectedLanguages.length === 0 ? <CheckedIcon /> : <UncheckedIcon />}
+              <span className="text-xs select-none">All Languages</span>
+            </div>
+            
+            {["Hindi", "English"].map((lang) => {
+              const isChecked = selectedLanguages.includes(lang);
+
+              return (
+                <div
+                  key={lang}
+                  className={`flex items-center justify-between px-2 py-2 rounded-lg cursor-pointer transition-all duration-200 ${isChecked
+                    ? "text-black font-semibold"
+                    : "text-neutral-600 hover:bg-neutral-50/60"
+                    }`}
+                  onClick={() => onLanguageSelect && onLanguageSelect(lang)}
+                >
+                  <div className="flex items-center gap-3 min-w-0 flex-1">
+                    {isChecked ? <CheckedIcon /> : <UncheckedIcon />}
+                    <span className="text-xs truncate select-none">{lang}</span>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         )}
       </div>
