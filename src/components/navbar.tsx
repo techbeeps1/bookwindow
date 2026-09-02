@@ -67,10 +67,11 @@ export function Navbar({ menuData }: any) {
     if (!products) {
       fetchProducts();
     }
-    const query = searchTerm.toLowerCase();
+    const query = searchTerm.toLowerCase().trim();
     if (products && products.length > 0) {
       const filtered = products.filter((p: any) =>
-        p.name?.toLowerCase().includes(query)
+        p.name?.toLowerCase().includes(query) ||
+        p.model?.toLowerCase().includes(query)
       );
 
       setFilteredProducts(filtered.slice(0, 8));

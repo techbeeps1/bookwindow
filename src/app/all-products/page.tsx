@@ -17,6 +17,7 @@ export default function Category() {
   const [loading, setLoading] = useState(true);
   const [selectedCategoryIds, setSelectedCategoryIds] = useState<number[]>([]);
   const [selectedPublicationIds, setSelectedPublicationIds] = useState<number[]>([]);
+  const [selectedLanguageIds, setSelectedLanguageIds] = useState<string[]>([]);
 
   // Toolbar states
   const [searchQuery, setSearchQuery] = useState("");
@@ -53,12 +54,19 @@ export default function Category() {
         selectedPublicationIds.length === 0 ||
         selectedPublicationIds.includes(product.production_id);
 
+      const languageMatch =
+        selectedLanguageIds.length === 0 ||
+        selectedLanguageIds.some(
+          (lang) => 
+            product.book_language?.toLowerCase() === lang.toLowerCase()
+        );
+
       const searchMatch =
         !searchQuery.trim() ||
         product.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         product.description?.toLowerCase().includes(searchQuery.toLowerCase());
 
-      return categoryMatch && publicationMatch && searchMatch;
+      return categoryMatch && publicationMatch && languageMatch && searchMatch;
     });
 
     if (sortBy === "price-low") {
@@ -70,7 +78,7 @@ export default function Category() {
     }
 
     setFilteredProducts(filtered);
-  }, [products, selectedCategoryIds, selectedPublicationIds, searchQuery, sortBy]);
+  }, [products, selectedCategoryIds, selectedPublicationIds, selectedLanguageIds, searchQuery, sortBy]);
 
   const handleCategorySelect = (categoryId: number | "clear") => {
     if (categoryId === "clear") {
@@ -96,6 +104,18 @@ export default function Category() {
     }
   };
 
+  const handleLanguageSelect = (language: string | "clear") => {
+    if (language === "clear") {
+      setSelectedLanguageIds([]);
+    } else {
+      setSelectedLanguageIds((prev) =>
+        prev.includes(language)
+          ? prev.filter((l) => l !== language)
+          : [...prev, language]
+      );
+    }
+  };
+
   const displayedProducts = filteredProducts;
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -116,8 +136,10 @@ export default function Category() {
         <AllProductSidebar
           onCategorySelect={handleCategorySelect}
           onPublicationSelect={handlePublicationSelect}
+          onLanguageSelect={handleLanguageSelect}
           selectedCategoryIds={selectedCategoryIds}
           selectedPublicationIds={selectedPublicationIds}
+          selectedLanguages={selectedLanguageIds}
           products={products}
         />
 

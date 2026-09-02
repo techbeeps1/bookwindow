@@ -16,6 +16,7 @@ export default function PublisherPage({ categoryData }: { categoryData: any }) {
 
   const [selectedCategoryIds, setSelectedCategoryIds] = useState<number[]>([]);
   const [selectedPublicationIds, setSelectedPublicationIds] = useState<number[]>([]);
+  const [selectedLanguageIds, setSelectedLanguageIds] = useState<string[]>([]);
 
   // Toolbar States
   const [searchQuery, setSearchQuery] = useState("");
@@ -53,12 +54,20 @@ const publicationData = useMemo(
       const publicationMatch =
         selectedPublicationIds.length === 0 ||
         selectedPublicationIds.includes(product.production_id);
+        
+      const languageMatch =
+        selectedLanguageIds.length === 0 ||
+        selectedLanguageIds.some(
+          (lang) => 
+            product.book_language?.toLowerCase() === lang.toLowerCase()
+        );
+        
       const searchMatch =
         !searchQuery.trim() ||
         product.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         product.description?.toLowerCase().includes(searchQuery.toLowerCase());
 
-      return categoryMatch && publicationMatch && searchMatch;
+      return categoryMatch && publicationMatch && languageMatch && searchMatch;
     });
 
     // Apply sorting
@@ -72,7 +81,7 @@ const publicationData = useMemo(
 
     
     return filtered;
-  }, [products, selectedCategoryIds, selectedPublicationIds, searchQuery, sortBy]);
+  }, [products, selectedCategoryIds, selectedPublicationIds, selectedLanguageIds, searchQuery, sortBy]);
 
   const handleCategorySelect = (categoryId: number | "clear") => {
     if (categoryId === "clear") {
@@ -98,6 +107,18 @@ const publicationData = useMemo(
     }
   };
 
+  const handleLanguageSelect = (language: string | "clear") => {
+    if (language === "clear") {
+      setSelectedLanguageIds([]);
+    } else {
+      setSelectedLanguageIds((prev) =>
+        prev.includes(language)
+          ? prev.filter((l) => l !== language)
+          : [...prev, language]
+      );
+    }
+  };
+
   const displayedProducts = filteredProducts;
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -118,15 +139,16 @@ const publicationData = useMemo(
         <CategoryPublicationSidebar
           onCategorySelect={handleCategorySelect}
           onPublicationSelect={handlePublicationSelect}
+          onLanguageSelect={handleLanguageSelect}
           selectedCategoryIds={selectedCategoryIds}
           selectedPublicationIds={selectedPublicationIds}
+          selectedLanguages={selectedLanguageIds}
           childCategory={childCategory}
           products={products}
           publications={publicationData}
           category_id={childCategory[0]?.parent_id}
           isFetched={false}
           publicationVisible={false}
-        
         />
 
         <div className="flex-1 w-full min-w-0">
