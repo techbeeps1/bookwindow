@@ -53,206 +53,202 @@ function Hero({ bannerData, mbannerData }: any) {
   //const slides = (bannerData && Array.isArray(bannerData) && bannerData.length > 0) ? bannerData : defaultSlides;
 
   const slides =
-  bannerData &&
-  Array.isArray(bannerData) &&
-  bannerData.length > 0
-    ? bannerData
-    : defaultSlides;
+    bannerData &&
+      Array.isArray(bannerData) &&
+      bannerData.length > 0
+      ? bannerData
+      : defaultSlides;
 
-const mobileSlides =
-  mbannerData &&
-  Array.isArray(mbannerData) &&
-  mbannerData.length > 0
-    ? mbannerData
-    : slides;
-    
+  const mobileSlides =
+    mbannerData &&
+      Array.isArray(mbannerData) &&
+      mbannerData.length > 0
+      ? mbannerData
+      : slides;
 
- const nextSlide = () => {
-  setCurrent((prev) => {
-    if (typeof window !== "undefined" && window.innerWidth < 768) {
-      if (mobileSlides.length <= 1) return 0;
 
-      return prev === mobileSlides.length - 1
+  const nextSlide = () => {
+    setCurrent((prev) => {
+      if (typeof window !== "undefined" && window.innerWidth < 768) {
+        if (mobileSlides.length <= 1) return 0;
+
+        return prev === mobileSlides.length - 1
+          ? 0
+          : prev + 1;
+      }
+
+      if (slides.length <= 1) return 0;
+
+      return prev === slides.length - 1
         ? 0
         : prev + 1;
-    }
-
-    if (slides.length <= 1) return 0;
-
-    return prev === slides.length - 1
-      ? 0
-      : prev + 1;
-  });
-};
-  
-
-  const prevSlide = () => {
-  setCurrent((prev) => {
-    if (typeof window !== "undefined" && window.innerWidth < 768) {
-      if (mobileSlides.length <= 1) return 0;
-
-      return prev === 0
-        ? mobileSlides.length - 1
-        : prev - 1;
-    }
-
-    if (slides.length <= 1) return 0;
-
-    return prev === 0
-      ? slides.length - 1
-      : prev - 1;
-  });
-};
-
-  // Auto-play slides every 6 seconds
-useEffect(() => {
-  const handleResize = () => {
-    const isMobile = window.innerWidth < 768;
-
-    const activeLength = isMobile
-      ? mobileSlides.length
-      : slides.length;
-
-    setCurrent((prev) => {
-      if (activeLength === 0) return 0;
-
-      return prev >= activeLength ? 0 : prev;
     });
   };
 
-  handleResize();
 
-  window.addEventListener("resize", handleResize);
+  const prevSlide = () => {
+    setCurrent((prev) => {
+      if (typeof window !== "undefined" && window.innerWidth < 768) {
+        if (mobileSlides.length <= 1) return 0;
 
-  return () => {
-    window.removeEventListener("resize", handleResize);
+        return prev === 0
+          ? mobileSlides.length - 1
+          : prev - 1;
+      }
+
+      if (slides.length <= 1) return 0;
+
+      return prev === 0
+        ? slides.length - 1
+        : prev - 1;
+    });
   };
-}, [slides.length, mobileSlides.length]);
+
+  // Auto-play slides every 6 seconds
+  useEffect(() => {
+    const handleResize = () => {
+      const isMobile = window.innerWidth < 768;
+
+      const activeLength = isMobile
+        ? mobileSlides.length
+        : slides.length;
+
+      setCurrent((prev) => {
+        if (activeLength === 0) return 0;
+
+        return prev >= activeLength ? 0 : prev;
+      });
+    };
+
+    handleResize();
+
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, [slides.length, mobileSlides.length]);
 
   return (
     <>
       <section className="relative w-full overflow-hidden bg-gray-900 group lg:mt-0 mt-[75px]">
-        <div className="relative w-full 2xl:h-[95vh] lg:h-[70vh] sm:h-[50vh] h-[520px] overflow-hidden">
+        <div className="relative w-full 2xl:h-[95vh] lg:h-[70vh] sm:h-[43vh] h-[520px] overflow-hidden">
           {/* Slider Content Row */}
-         {/* DESKTOP SLIDER */}
-<div
-  className={`hidden md:flex h-full ${
-    isDragging
-      ? ""
-      : "transition-transform duration-700 ease-in-out"
-  }`}
-  style={{
-    width: `${slides.length * 100}%`,
-    transform: `translateX(calc(-${
-      current * (100 / slides.length)
-    }% + ${dragOffset}px))`,
-    cursor: isDragging ? "grabbing" : "grab",
-  }}
-  onMouseDown={(e) => handlePointerDown(e.clientX)}
-  onMouseMove={(e) => handlePointerMove(e.clientX)}
-  onMouseUp={handlePointerUp}
-  onMouseLeave={handlePointerUp}
->
-  {slides.map((slide: any, idx: number) => {
-    const desktopSrc = slide?.slider_image
-      ? (
-          slide.slider_image.startsWith("/") ||
-          slide.slider_image.startsWith("http")
-            ? slide.slider_image
-            : `${config.apiUrl}storage/app/public/${slide.slider_image}`
-        )
-      : "/image/banner-img.jpg";
+          {/* DESKTOP SLIDER */}
+          <div
+            className={`hidden md:flex h-full ${isDragging
+              ? ""
+              : "transition-transform duration-700 ease-in-out"
+              }`}
+            style={{
+              width: `${slides.length * 100}%`,
+              transform: `translateX(calc(-${current * (100 / slides.length)
+                }% + ${dragOffset}px))`,
+              cursor: isDragging ? "grabbing" : "grab",
+            }}
+            onMouseDown={(e) => handlePointerDown(e.clientX)}
+            onMouseMove={(e) => handlePointerMove(e.clientX)}
+            onMouseUp={handlePointerUp}
+            onMouseLeave={handlePointerUp}
+          >
+            {slides.map((slide: any, idx: number) => {
+              const desktopSrc = slide?.slider_image
+                ? (
+                  slide.slider_image.startsWith("/") ||
+                    slide.slider_image.startsWith("http")
+                    ? slide.slider_image
+                    : `${config.apiUrl}storage/app/public/${slide.slider_image}`
+                )
+                : "/image/banner-img.jpg";
 
-    return (
-      <div
-        key={slide.id || idx}
-        onClick={() => {
-          if (!wasDragged.current) {
-            router.push(slide?.slider_url || "#");
-          }
-        }}
-        className="relative h-full cursor-pointer select-none"
-        style={{
-          width: `${100 / slides.length}%`,
-        }}
-      >
-        <div className="relative w-full h-full">
-          <Image
-            src={desktopSrc}
-            alt={slide.title || "Banner"}
-            fill
-            priority={idx === 0}
-            className="object-cover w-full h-full select-none pointer-events-none"
-            draggable={false}
-            sizes="100vw"
-          />
-        </div>
-      </div>
-    );
-  })}
-</div>
+              return (
+                <div
+                  key={slide.id || idx}
+                  onClick={() => {
+                    if (!wasDragged.current) {
+                      router.push(slide?.slider_url || "#");
+                    }
+                  }}
+                  className="relative h-full cursor-pointer select-none"
+                  style={{
+                    width: `${100 / slides.length}%`,
+                  }}
+                >
+                  <div className="relative w-full h-full">
+                    <Image
+                      src={desktopSrc}
+                      alt={slide.title || "Banner"}
+                      fill
+                      priority={idx === 0}
+                      className="object-cover w-full h-full select-none pointer-events-none"
+                      draggable={false}
+                      sizes="100vw"
+                    />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
 
 
-{/* MOBILE SLIDER */}
-<div
-  className={`flex md:hidden h-full ${
-    isDragging
-      ? ""
-      : "transition-transform duration-700 ease-in-out"
-  }`}
-  style={{
-    width: `${mobileSlides.length * 100}%`,
-    transform: `translateX(calc(-${
-      current * (100 / mobileSlides.length)
-    }% + ${dragOffset}px))`,
-    cursor: isDragging ? "grabbing" : "grab",
-  }}
-  onTouchStart={(e) =>
-    handlePointerDown(e.touches[0].clientX)
-  }
-  onTouchMove={(e) =>
-    handlePointerMove(e.touches[0].clientX)
-  }
-  onTouchEnd={handlePointerUp}
->
-  {mobileSlides.map((slide: any, idx: number) => {
-    const mobileSrc = slide?.mslider_image
-      ? (
-          slide.mslider_image.startsWith("/") ||
-          slide.mslider_image.startsWith("http")
-            ? slide.mslider_image
-            : `${config.apiUrl}storage/app/public/${slide.mslider_image}`
-        )
-      : "";
+          {/* MOBILE SLIDER */}
+          <div
+            className={`flex md:hidden h-full ${isDragging
+              ? ""
+              : "transition-transform duration-700 ease-in-out"
+              }`}
+            style={{
+              width: `${mobileSlides.length * 100}%`,
+              transform: `translateX(calc(-${current * (100 / mobileSlides.length)
+                }% + ${dragOffset}px))`,
+              cursor: isDragging ? "grabbing" : "grab",
+            }}
+            onTouchStart={(e) =>
+              handlePointerDown(e.touches[0].clientX)
+            }
+            onTouchMove={(e) =>
+              handlePointerMove(e.touches[0].clientX)
+            }
+            onTouchEnd={handlePointerUp}
+          >
+            {mobileSlides.map((slide: any, idx: number) => {
+              const mobileSrc = slide?.mslider_image
+                ? (
+                  slide.mslider_image.startsWith("/") ||
+                    slide.mslider_image.startsWith("http")
+                    ? slide.mslider_image
+                    : `${config.apiUrl}storage/app/public/${slide.mslider_image}`
+                )
+                : "";
 
-    return (
-      <div
-        key={slide.id || idx}
-        onClick={() => {
-          if (!wasDragged.current) {
-            router.push(slide?.mslider_url || "#");
-          }
-        }}
-        className="relative h-full cursor-pointer select-none"
-        style={{
-          width: `${100 / mobileSlides.length}%`,
-        }}
-      >
-        <div className="relative w-full h-full">
-          <Image
-            src={mobileSrc}
-            alt={slide.title || "Mobile Banner"}
-            fill
-            priority={idx === 0}
-            className="object-cover w-full h-full select-none pointer-events-none"
-            draggable={false}
-            sizes="100vw"
-          />
-        </div>
-      </div>
-    );
-  })}
-</div>
+              return (
+                <div
+                  key={slide.id || idx}
+                  onClick={() => {
+                    if (!wasDragged.current) {
+                      router.push(slide?.mslider_url || "#");
+                    }
+                  }}
+                  className="relative h-full cursor-pointer select-none"
+                  style={{
+                    width: `${100 / mobileSlides.length}%`,
+                  }}
+                >
+                  <div className="relative w-full h-full">
+                    <Image
+                      src={mobileSrc}
+                      alt={slide.title || "Mobile Banner"}
+                      fill
+                      priority={idx === 0}
+                      className="object-cover w-full h-full select-none pointer-events-none"
+                      draggable={false}
+                      sizes="100vw"
+                    />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
 
           {/* Navigation Arrows */}
           <button
@@ -287,35 +283,33 @@ useEffect(() => {
           </button>
 
           {/* Dots / Indicators */}
-         {/* DESKTOP DOTS */}
-<div className="hidden md:flex absolute bottom-4 md:bottom-6 left-1/2 -translate-x-1/2 z-30 items-center justify-center gap-3">
-  {slides.map((_: any, idx: number) => (
-    <button
-      key={idx}
-      onClick={() => setCurrent(idx)}
-      className={`transition-all duration-300 rounded-full ${
-        current === idx
-          ? "md:w-4 md:h-4 w-3 h-3 bg-white shadow-lg"
-          : "w-2 h-2 bg-white/50 hover:bg-white/85"
-      }`}
-    />
-  ))}
-</div>
+          {/* DESKTOP DOTS */}
+          <div className="hidden md:flex absolute bottom-4 md:bottom-6 left-1/2 -translate-x-1/2 z-30 items-center justify-center gap-3">
+            {slides.map((_: any, idx: number) => (
+              <button
+                key={idx}
+                onClick={() => setCurrent(idx)}
+                className={`transition-all duration-300 rounded-full ${current === idx
+                  ? "md:w-4 md:h-4 w-3 h-3 bg-white shadow-lg"
+                  : "w-2 h-2 bg-white/50 hover:bg-white/85"
+                  }`}
+              />
+            ))}
+          </div>
 
-{/* MOBILE DOTS */}
-<div className="flex md:hidden absolute bottom-4 left-1/2 -translate-x-1/2 z-30 items-center justify-center gap-3">
-  {mobileSlides.map((_: any, idx: number) => (
-    <button
-      key={idx}
-      onClick={() => setCurrent(idx)}
-      className={`transition-all duration-300 rounded-full ${
-        current === idx
-          ? "w-3 h-3 bg-white shadow-lg"
-          : "w-2 h-2 bg-white/50 hover:bg-white/85"
-      }`}
-    />
-  ))}
-</div>
+          {/* MOBILE DOTS */}
+          <div className="flex md:hidden absolute bottom-4 left-1/2 -translate-x-1/2 z-30 items-center justify-center gap-3">
+            {mobileSlides.map((_: any, idx: number) => (
+              <button
+                key={idx}
+                onClick={() => setCurrent(idx)}
+                className={`transition-all duration-300 rounded-full ${current === idx
+                  ? "w-3 h-3 bg-white shadow-lg"
+                  : "w-2 h-2 bg-white/50 hover:bg-white/85"
+                  }`}
+              />
+            ))}
+          </div>
 
         </div>
       </section>
