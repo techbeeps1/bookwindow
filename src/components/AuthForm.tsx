@@ -3,6 +3,7 @@
 import config from "@/app/config";
 import { useState, useRef, useEffect, FormEvent } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import Modal from "@/components/modal";
 import ForgotPassword from "@/components/forgot-password";
 import { login } from "@/lib/slices/authSlice";
@@ -600,6 +601,15 @@ export default function AuthForm({ mode }: AuthFormProps) {
                 )}
                 Sign Up
               </button>
+              <div className="mt-2 text-center text-xs text-neutral-500">
+                Are you a publisher or bookseller?{" "}
+                <Link
+                  href="/vendor-register"
+                  className="font-semibold text-black underline hover:text-red-600"
+                >
+                  Register as a Vendor
+                </Link>
+              </div>
             </form>
           )}
         </div>

@@ -105,6 +105,7 @@ export function Footer({ menuData }: any) {
             <p className="text-gray-400 text-sm font-sans leading-relaxed mt-2 max-w-xs">
               Your one-stop destination for school, college, competitive exam books, and educational resources.
             </p>
+
           </div>
 
           {/* Dynamic Link Columns */}

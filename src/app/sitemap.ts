@@ -82,6 +82,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   addEntry("blogs", new Date(), 0.8, "daily");
   addEntry("current-affairs", new Date(), 0.8, "daily");
   addEntry("contact-us", new Date(), 0.8, "monthly");
+  addEntry("vendor-register", new Date(), 0.8, "monthly");
 
   if (data) {
     // 2. CMS Pages (about-us, privacy-policy, etc.)
