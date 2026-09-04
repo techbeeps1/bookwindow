@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useAppSelector } from "@/hooks/useStore";
@@ -12,8 +12,9 @@ import { useLazyViewProductsQuery } from "@/lib/api/productsApi";
 import { logout } from "@/lib/slices/authSlice";
 import { useRouter } from "next/navigation";
 import { IoSearchSharp, IoClose } from "react-icons/io5";
-import { FaHeart, FaUser } from "react-icons/fa";
+import { FaHeart, FaUser, FaArrowRight } from "react-icons/fa";
 import { HiShoppingCart } from "react-icons/hi2";
+import { filterAndRankProducts } from "@/helper/searchHelper";
 
 
 const resolveUrl = (url: string) => {
@@ -41,8 +42,9 @@ const resolveUrl = (url: string) => {
 export function Navbar({ menuData }: any) {
 
   const [searchTerm, setSearchTerm] = useState("");
-
   const [filteredProducts, setFilteredProducts] = useState<any[]>([]);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const searchContainerRef = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
   const [openMobileSubmenus, setOpenMobileSubmenus] = useState<Record<number, boolean>>({});
   const [openMobileNestedSubmenus, setOpenMobileNestedSubmenus] = useState<Record<string | number, boolean>>({});
@@ -51,32 +53,61 @@ export function Navbar({ menuData }: any) {
   const products = productdatas;
   const { user, isAuthenticated, loading } = useAppSelector((state) => state.auth);
 
-
   const { data } = useCart();
   const dispatch = useAppDispatch();
   const router = useRouter();
 
-
-
-
+  // Smart multi-word search & ranking
   useEffect(() => {
     if (!searchTerm.trim()) {
       setFilteredProducts([]);
+      setIsDropdownOpen(false);
       return;
     }
     if (!products) {
       fetchProducts();
     }
-    const query = searchTerm.toLowerCase().trim();
     if (products && products.length > 0) {
-      const filtered = products.filter((p: any) =>
-        p.name?.toLowerCase().includes(query) ||
-        p.model?.toLowerCase().includes(query)
-      );
-
-      setFilteredProducts(filtered.slice(0, 8));
+      const ranked = filterAndRankProducts(products, searchTerm);
+      setFilteredProducts(ranked);
+      setIsDropdownOpen(true);
     }
   }, [searchTerm, products, fetchProducts]);
+
+  // Handle outside click & escape key to close search dropdown
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        searchContainerRef.current &&
+        !searchContainerRef.current.contains(e.target as Node)
+      ) {
+        setIsDropdownOpen(false);
+      }
+    };
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
+
+  const handleSearchSubmit = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    const query = searchTerm.trim();
+    if (query) {
+      setIsDropdownOpen(false);
+      setOpen(false);
+      router.push(`/search?q=${encodeURIComponent(query)}`);
+      setSearchTerm("");
+    }
+  };
 
   const handleOpen = () => setOpen((cur) => !cur);
 
@@ -165,71 +196,132 @@ export function Navbar({ menuData }: any) {
                   <div className="flex items-center justify-between gap-8 w-full">
                     {/* Centered Search Bar */}
                     <div className="flex-grow flex justify-center">
-                      <div className="relative w-full max-w-3xl group">
-                        {/* Search icon */}
-                        <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
-                          <IoSearchSharp className="w-[18px] h-[18px] transition-colors text-white" />
-                        </div>
-
-                        <input
-                          type="text"
-                          placeholder="What are you looking for?"
-                          value={searchTerm}
-                          onFocus={() => {
-                            if (!products) fetchProducts();
-                          }}
-                          onChange={(e) => setSearchTerm(e.target.value)}
-                          className="w-full text-sm text-white bg-white/5 placeholder-white border-2 border-white/50  rounded-full py-2.5 pl-11 pr-12 transition-all duration-300 outline-none"
-                        />
-
-                        {/* Clear Search Button */}
-                        {searchTerm && (
+                      <div ref={searchContainerRef} className="relative w-full max-w-3xl group">
+                        <form onSubmit={handleSearchSubmit} className="relative w-full">
+                          {/* Search icon button */}
                           <button
-                            type="button"
-                            onClick={() => setSearchTerm("")}
-                            className="absolute inset-y-0 right-4 flex items-center justify-center text-white/80 hover:text-white transition-colors z-10 cursor-pointer p-1 rounded-full hover:bg-white/10"
-                            aria-label="Clear search"
+                            type="submit"
+                            aria-label="Submit search"
+                            className="absolute inset-y-0 left-4 flex items-center text-white hover:text-white/80 transition-colors z-10 cursor-pointer"
                           >
-                            <IoClose className="w-5 h-5 text-white" />
+                            <IoSearchSharp className="w-[18px] h-[18px]" />
                           </button>
-                        )}
+
+                          <input
+                            type="text"
+                            placeholder="What are you looking for? (e.g. REET, UPSC, NCERT...)"
+                            value={searchTerm}
+                            onFocus={() => {
+                              if (!products) fetchProducts();
+                              if (searchTerm.trim()) setIsDropdownOpen(true);
+                            }}
+                            onChange={(e) => {
+                              setSearchTerm(e.target.value);
+                              setIsDropdownOpen(true);
+                            }}
+                            className="w-full text-sm text-white bg-white/5 placeholder-white/70 border-2 border-white/50 rounded-full py-2.5 pl-11 pr-12 transition-all duration-300 outline-none focus:border-white focus:bg-white/10"
+                          />
+
+                          {/* Clear Search Button */}
+                          {searchTerm && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setSearchTerm("");
+                                setIsDropdownOpen(false);
+                              }}
+                              className="absolute inset-y-0 right-4 flex items-center justify-center text-white/80 hover:text-white transition-colors z-10 cursor-pointer p-1 rounded-full hover:bg-white/10"
+                              aria-label="Clear search"
+                            >
+                              <IoClose className="w-5 h-5 text-white" />
+                            </button>
+                          )}
+                        </form>
 
                         {/* Dropdown popup */}
-                        {searchTerm && filteredProducts.length > 0 && (
-                          <div className="absolute top-full left-0 w-full z-50 bg-white/95 backdrop-blur-md border border-neutral-200/80 rounded-2xl shadow-2xl max-h-96 overflow-y-auto mt-3 p-2 flex flex-col gap-1 custom-scrollbar">
-                            {filteredProducts.map((product: any) => (
-                              <Link
-                                key={product?.id}
-                                href={`/product/${product?.slug}`}
-                                onClick={() => setSearchTerm("")}
-                                className="flex gap-4 items-center px-4 py-3 hover:bg-neutral-100/70 rounded-xl transition-all duration-200 border-b border-neutral-100 last:border-b-0 text-left"
-                              >
-                                <div className="relative w-10 h-14 bg-neutral-50 rounded-lg overflow-hidden flex-shrink-0 border border-neutral-200/50 shadow-sm">
-                                  <Image
-                                    src={`${config.apiUrl}storage/app/public/${product?.image}`}
-                                    alt={product?.name || "Product"}
-                                    className="object-cover"
-                                    fill
-                                    sizes="40px"
-                                  />
+                        {searchTerm.trim() !== "" && isDropdownOpen && (
+                          <div className="absolute top-full left-0 w-full z-50 bg-white/95 backdrop-blur-md border border-neutral-200/80 rounded-2xl shadow-2xl overflow-hidden mt-3 flex flex-col">
+                            {filteredProducts.length > 0 ? (
+                              <>
+                                <div className="max-h-80 overflow-y-auto p-2 flex flex-col gap-1 custom-scrollbar">
+                                  {filteredProducts.slice(0, 8).map((product: any) => (
+                                    <Link
+                                      key={product?.id}
+                                      href={`/product/${product?.slug}`}
+                                      onClick={() => {
+                                        setSearchTerm("");
+                                        setIsDropdownOpen(false);
+                                      }}
+                                      className="flex gap-4 items-center px-4 py-3 hover:bg-neutral-100/70 rounded-xl transition-all duration-200 border-b border-neutral-100 last:border-b-0 text-left"
+                                    >
+                                      <div className="relative w-10 h-14 bg-neutral-50 rounded-lg overflow-hidden flex-shrink-0 border border-neutral-200/50 shadow-sm">
+                                        <Image
+                                          src={`${config.apiUrl}storage/app/public/${product?.image}`}
+                                          alt={product?.name || "Product"}
+                                          className="object-cover"
+                                          fill
+                                          sizes="40px"
+                                        />
+                                      </div>
+                                      <div className="flex-1 min-w-0 text-left">
+                                        <h4 className="font-semibold text-sm text-neutral-800 hover:text-black transition-colors truncate">
+                                          {product?.name}
+                                        </h4>
+                                        {product?.author && (
+                                          <p className="text-xs text-neutral-500 truncate mt-0.5">
+                                            {product.author}
+                                          </p>
+                                        )}
+                                        <div className="flex items-center gap-2 mt-0.5">
+                                          {product.price && (
+                                            <span className="font-extrabold text-black text-sm">
+                                              ₹{product.price}
+                                            </span>
+                                          )}
+                                          {product.mrp && product.mrp != 0 && product.mrp != product.price && (
+                                            <span className="text-gray-400 line-through text-xs">
+                                              ₹{product.mrp}
+                                            </span>
+                                          )}
+                                        </div>
+                                      </div>
+                                    </Link>
+                                  ))}
                                 </div>
-                                <div className="flex-1 min-w-0 text-left">
-                                  <h4 className="font-semibold text-sm text-neutral-855 hover:text-black transition-colors truncate">
-                                    {product?.name}
-                                  </h4>
 
-
-                                  {product.price && <span className="font-extrabold text-black mt-1 mr-2">
-                                    ₹{product.price}
+                                {/* Bottom View All Action Bar */}
+                                <div className="p-3 bg-neutral-50/90 border-t border-neutral-200/60 flex items-center justify-between">
+                                  <span className="text-xs text-neutral-500 font-medium">
+                                    Found <strong className="text-black">{filteredProducts.length}</strong> related books
                                   </span>
-                                  }
-                                  {(product.mrp && product.mrp != 0 && product.mrp != product.price) && <span className={`${product.price ? "text-gray-500 line-through text-xs " : "text-sm font-bold mr-2"}`}>
-                                    ₹{product.mrp}
-                                  </span>
-                                  }
+                                  <button
+                                    type="button"
+                                    onClick={handleSearchSubmit}
+                                    className="inline-flex items-center gap-1.5 px-4 py-1.5 bg-black hover:bg-neutral-800 text-white text-xs font-semibold rounded-full transition-all active:scale-95 shadow-sm cursor-pointer"
+                                  >
+                                    <span>View all results</span>
+                                    <FaArrowRight className="w-2.5 h-2.5" />
+                                  </button>
                                 </div>
-                              </Link>
-                            ))}
+                              </>
+                            ) : (
+                              <div className="p-6 text-center">
+                                <p className="text-sm font-semibold text-neutral-700">
+                                  No instant matches for "{searchTerm}"
+                                </p>
+                                <p className="text-xs text-neutral-500 mt-1">
+                                  Press Enter or tap below to search full catalog
+                                </p>
+                                <button
+                                  type="button"
+                                  onClick={handleSearchSubmit}
+                                  className="mt-3 inline-flex items-center gap-2 px-4 py-2 bg-black hover:bg-neutral-800 text-white text-xs font-semibold rounded-full transition-all active:scale-95 shadow-sm cursor-pointer"
+                                >
+                                  <IoSearchSharp className="w-3.5 h-3.5" />
+                                  <span>Search full catalog</span>
+                                </button>
+                              </div>
+                            )}
                           </div>
                         )}
                       </div>
@@ -532,13 +624,18 @@ export function Navbar({ menuData }: any) {
       {searchTerm.trim() !== "" && (
         <div className="lg:hidden fixed inset-x-0 top-[74px] bottom-[64px] z-40 bg-white flex flex-col shadow-inner">
           {/* Header of Search Panel */}
-          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-gray-50/50">
-            <span className="text-sm font-semibold text-gray-850">
-              Search Results for "{searchTerm}"
-            </span>
+          <div className="flex items-center justify-between px-5 py-3.5 border-b border-gray-100 bg-gray-50/80">
+            <div>
+              <span className="text-sm font-semibold text-gray-800 block">
+                Search Results
+              </span>
+              <span className="text-xs text-gray-500">
+                Found {filteredProducts.length} results for "{searchTerm}"
+              </span>
+            </div>
             <button
               onClick={() => setSearchTerm("")}
-              className="p-1.5 rounded-full hover:bg-gray-100 text-gray-500 hover:text-gray-800 transition-colors"
+              className="p-1.5 rounded-full hover:bg-gray-200 text-gray-500 hover:text-gray-800 transition-colors"
               aria-label="Close search"
             >
               <XMarkIcon className="w-5 h-5" />
@@ -546,17 +643,17 @@ export function Navbar({ menuData }: any) {
           </div>
 
           {/* Results list */}
-          <div className="flex-1 overflow-y-auto px-4 py-4 custom-scrollbar">
+          <div className="flex-1 overflow-y-auto px-4 py-3 custom-scrollbar">
             {filteredProducts.length > 0 ? (
-              <div className="flex flex-col gap-3">
-                {filteredProducts.map((product: any) => (
+              <div className="flex flex-col gap-2.5">
+                {filteredProducts.slice(0, 15).map((product: any) => (
                   <Link
                     key={product?.id}
                     href={`/product/${product?.slug}`}
                     onClick={() => setSearchTerm("")}
-                    className="flex gap-4 items-center p-3 hover:bg-neutral-50 rounded-2xl transition-all border border-neutral-100 hover:border-neutral-200"
+                    className="flex gap-3.5 items-center p-2.5 hover:bg-neutral-50 rounded-xl transition-all border border-neutral-100"
                   >
-                    <div className="relative w-12 h-16 bg-neutral-50 rounded-xl overflow-hidden flex-shrink-0 border border-neutral-200 shadow-sm">
+                    <div className="relative w-12 h-16 bg-neutral-50 rounded-lg overflow-hidden flex-shrink-0 border border-neutral-200 shadow-xs">
                       <Image
                         src={`${config.apiUrl}storage/app/public/${product?.image}`}
                         alt={product?.name || "Product"}
@@ -566,11 +663,23 @@ export function Navbar({ menuData }: any) {
                       />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h4 className="font-semibold text-xs text-neutral-855 hover:text-black transition-colors text-left truncate">
+                      <h4 className="font-semibold text-xs text-neutral-800 hover:text-black transition-colors text-left line-clamp-2">
                         {product?.name}
                       </h4>
-                      <div className="text-xs font-extrabold text-neutral-900 mt-1 text-left">
-                        ₹{product?.price}
+                      {product?.author && (
+                        <p className="text-[11px] text-neutral-500 text-left truncate mt-0.5">
+                          {product.author}
+                        </p>
+                      )}
+                      <div className="flex items-center gap-2 mt-1">
+                        <span className="text-xs font-extrabold text-neutral-900">
+                          ₹{product?.price}
+                        </span>
+                        {product?.mrp && product.mrp != product.price && (
+                          <span className="text-[10px] text-gray-400 line-through">
+                            ₹{product.mrp}
+                          </span>
+                        )}
                       </div>
                     </div>
                   </Link>
@@ -579,12 +688,24 @@ export function Navbar({ menuData }: any) {
             ) : (
               <div className="flex flex-col items-center justify-center py-16 text-center">
                 <IoSearchSharp className="w-12 h-12 text-gray-300 mb-3" />
-                <p className="text-sm font-semibold text-gray-850">No results found</p>
+                <p className="text-sm font-semibold text-gray-800">No instant results found</p>
                 <p className="text-xs text-gray-500 mt-1 px-4">
-                  We couldn't find any books matching "{searchTerm}". Please try another search term.
+                  We couldn't find instant matches for "{searchTerm}". Tap below to search all books.
                 </p>
               </div>
             )}
+          </div>
+
+          {/* Sticky Bottom Action Bar */}
+          <div className="p-3 bg-white border-t border-gray-200/80 shadow-[0_-4px_12px_rgba(0,0,0,0.05)]">
+            <button
+              type="button"
+              onClick={handleSearchSubmit}
+              className="w-full py-2.5 bg-black hover:bg-neutral-800 text-white text-xs font-semibold rounded-xl flex items-center justify-center gap-2 active:scale-98 transition-all shadow-sm cursor-pointer"
+            >
+              <IoSearchSharp className="w-4 h-4" />
+              <span>View all {filteredProducts.length > 0 ? `${filteredProducts.length} ` : ""}results for "{searchTerm}"</span>
+            </button>
           </div>
         </div>
       )}
@@ -606,10 +727,14 @@ export function Navbar({ menuData }: any) {
           )}
         </div>
 
-        <div className="flex-grow relative group">
-          <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
-            <IoSearchSharp className="w-4 h-4 transition-colors text-white" />
-          </div>
+        <form onSubmit={handleSearchSubmit} className="flex-grow relative group">
+          <button
+            type="submit"
+            aria-label="Search"
+            className="absolute inset-y-0 left-3 flex items-center text-white cursor-pointer"
+          >
+            <IoSearchSharp className="w-4 h-4 transition-colors" />
+          </button>
 
           <input
             type="text"
@@ -621,9 +746,7 @@ export function Navbar({ menuData }: any) {
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full text-xs text-white bg-white/5 placeholder-white border border-white rounded-full py-2.5 pl-9 pr-9 transition-all duration-300 outline-none "
           />
-
-
-        </div>
+        </form>
 
         <div className="flex-shrink-0">
           <Link href="/wishlist" className="text-white hover:text-white/80 transition-colors">
