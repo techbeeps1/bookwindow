@@ -96,7 +96,7 @@ export default function VendorRegisterPage() {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  // Input change handler
+  // Input change handler with intelligent field-level sanitization
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -104,9 +104,48 @@ export default function VendorRegisterPage() {
     if (type === "checkbox") {
       const checked = (e.target as HTMLInputElement).checked;
       setFormData((prev) => ({ ...prev, [name]: checked }));
-    } else {
-      setFormData((prev) => ({ ...prev, [name]: value }));
+      return;
     }
+
+    let sanitizedValue = value;
+
+    // Field-specific real-time sanitization:
+    if (name === "support_phone") {
+      // Numbers only, strictly max 10 digits
+      sanitizedValue = value.replace(/\D/g, "").slice(0, 10);
+    } else if (name === "city" || name === "state") {
+      // Letters, spaces, dots, and hyphens only (no special characters or numbers)
+      sanitizedValue = value.replace(/[^a-zA-Z\s.'-]/g, "");
+    } else if (name === "pincode") {
+      // Numbers only, strictly max 6 digits
+      sanitizedValue = value.replace(/\D/g, "").slice(0, 6);
+    } else if (name === "pan_number") {
+      // Uppercase alphanumeric only, strictly max 10 characters
+      sanitizedValue = value.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 10);
+    } else if (name === "gstin") {
+      // Uppercase alphanumeric only, strictly max 15 characters
+      sanitizedValue = value.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 15);
+    } else if (name === "isbn_license") {
+      // Alphanumeric and hyphens only, strictly max 30 characters (no special characters)
+      sanitizedValue = value.replace(/[^a-zA-Z0-9-]/g, "").slice(0, 30);
+    } else if (name === "bank_name") {
+      // Letters, spaces, dots, hyphens, and ampersands only
+      sanitizedValue = value.replace(/[^a-zA-Z\s.&'-]/g, "");
+    } else if (name === "account_holder_name") {
+      // Letters, spaces, dots, and hyphens only (no numbers or special characters)
+      sanitizedValue = value.replace(/[^a-zA-Z\s.'-]/g, "");
+    } else if (name === "bank_account_number" || name === "confirm_bank_account_number") {
+      // Numbers only, strictly max 18 digits (no special characters)
+      sanitizedValue = value.replace(/\D/g, "").slice(0, 18);
+    } else if (name === "ifsc_code") {
+      // Uppercase alphanumeric only, strictly max 11 characters
+      sanitizedValue = value.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 11);
+    } else if (name === "upi_id") {
+      // Alphanumeric, dots, hyphens, underscores, and @ only
+      sanitizedValue = value.replace(/[^a-zA-Z0-9.\-_@]/g, "").slice(0, 64);
+    }
+
+    setFormData((prev) => ({ ...prev, [name]: sanitizedValue }));
   };
 
   // Logo file selection
@@ -170,8 +209,13 @@ export default function VendorRegisterPage() {
       return false;
     }
     const cleanPhone = formData.support_phone.replace(/\D/g, "");
-    if (cleanPhone.length < 10) {
-      toast.error("Please enter a valid 10-digit phone number.");
+    if (cleanPhone.length !== 10) {
+      toast.error("Mobile number must be exactly 10 digits.");
+      return false;
+    }
+    const phoneRegex = /^[6-9]\d{9}$/;
+    if (!phoneRegex.test(cleanPhone)) {
+      toast.error("Please enter a valid 10-digit mobile number starting with 6, 7, 8, or 9.");
       return false;
     }
     return true;
@@ -187,8 +231,18 @@ export default function VendorRegisterPage() {
       toast.error("City is required.");
       return false;
     }
+    const cityRegex = /^[a-zA-Z\s.'-]{2,50}$/;
+    if (!cityRegex.test(formData.city.trim())) {
+      toast.error("City name must contain only letters and spaces (2-50 characters, no special characters or numbers).");
+      return false;
+    }
     if (!formData.state.trim()) {
       toast.error("State is required.");
+      return false;
+    }
+    const stateRegex = /^[a-zA-Z\s.'-]{2,50}$/;
+    if (!stateRegex.test(formData.state.trim())) {
+      toast.error("State name must contain only letters and spaces (2-50 characters, no special characters or numbers).");
       return false;
     }
     if (!formData.pincode.trim()) {
@@ -197,13 +251,29 @@ export default function VendorRegisterPage() {
     }
     const cleanPin = formData.pincode.replace(/\D/g, "");
     if (cleanPin.length !== 6) {
-      toast.error("Pincode must be 6 digits.");
+      toast.error("Pincode must be exactly 6 digits.");
       return false;
     }
-    if (formData.pan_number.trim()) {
-      const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/i;
-      if (!panRegex.test(formData.pan_number.trim())) {
-        toast.error("Invalid PAN format (e.g. ABCDE1234F).");
+    if (!formData.pan_number.trim()) {
+      toast.error("PAN Number is required for tax verification.");
+      return false;
+    }
+    const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
+    if (!panRegex.test(formData.pan_number.trim())) {
+      toast.error("Invalid PAN format (e.g. ABCDE1234F). 10 alphanumeric characters required.");
+      return false;
+    }
+    if (formData.gstin.trim()) {
+      const gstinRegex = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/i;
+      if (!gstinRegex.test(formData.gstin.trim())) {
+        toast.error("Invalid GSTIN format (e.g. 08AAAAA0000A1Z5) - no special characters allowed.");
+        return false;
+      }
+    }
+    if (formData.isbn_license.trim()) {
+      const isbnRegex = /^[a-zA-Z0-9-]{3,30}$/;
+      if (!isbnRegex.test(formData.isbn_license.trim())) {
+        toast.error("Publisher code / ISBN must contain only letters, numbers, and hyphens (no special characters).");
         return false;
       }
     }
@@ -212,11 +282,56 @@ export default function VendorRegisterPage() {
 
   // Step 3 Validation
   const validateStep3 = (): boolean => {
-    if (formData.bank_account_number || formData.confirm_bank_account_number) {
-      if (
-        formData.bank_account_number !== formData.confirm_bank_account_number
-      ) {
-        toast.error("Bank account numbers do not match.");
+    if (!formData.bank_name.trim()) {
+      toast.error("Bank Name is required for order payouts.");
+      return false;
+    }
+    const bankNameRegex = /^[a-zA-Z\s.&'-]{2,100}$/;
+    if (!bankNameRegex.test(formData.bank_name.trim())) {
+      toast.error("Bank name must contain only letters and spaces (no special characters).");
+      return false;
+    }
+    if (!formData.account_holder_name.trim()) {
+      toast.error("Account Holder Name is required.");
+      return false;
+    }
+    const holderRegex = /^[a-zA-Z\s.'-]{2,100}$/;
+    if (!holderRegex.test(formData.account_holder_name.trim())) {
+      toast.error("Account holder name must contain only letters and spaces.");
+      return false;
+    }
+    if (!formData.bank_account_number.trim()) {
+      toast.error("Bank Account Number is required.");
+      return false;
+    }
+    const accountRegex = /^\d{9,18}$/;
+    if (!accountRegex.test(formData.bank_account_number.trim())) {
+      toast.error("Bank account number must be between 9 and 18 digits (numbers only, no special characters).");
+      return false;
+    }
+    if (!formData.confirm_bank_account_number.trim()) {
+      toast.error("Please re-enter and confirm your bank account number.");
+      return false;
+    }
+    if (
+      formData.bank_account_number !== formData.confirm_bank_account_number
+    ) {
+      toast.error("Bank account numbers do not match.");
+      return false;
+    }
+    if (!formData.ifsc_code.trim()) {
+      toast.error("IFSC Code is required.");
+      return false;
+    }
+    const ifscRegex = /^[A-Z]{4}0[A-Z0-9]{6}$/;
+    if (!ifscRegex.test(formData.ifsc_code.trim())) {
+      toast.error("Invalid IFSC code format (e.g. SBIN0001234). 11 characters required with no special characters.");
+      return false;
+    }
+    if (formData.upi_id.trim()) {
+      const upiRegex = /^[a-zA-Z0-9.\-_]{2,64}@[a-zA-Z]{2,32}$/;
+      if (!upiRegex.test(formData.upi_id.trim())) {
+        toast.error("Invalid UPI ID format (e.g. store@upi or 9876543210@paytm).");
         return false;
       }
     }
@@ -731,12 +846,15 @@ export default function VendorRegisterPage() {
                           type="tel"
                           name="support_phone"
                           required
-                          maxLength={15}
-                          placeholder="e.g. 07791026797"
+                          maxLength={10}
+                          placeholder="e.g. 9876543210"
                           value={formData.support_phone}
                           onChange={handleChange}
                           className="w-full bg-neutral-50 border border-neutral-300 rounded-xl px-4 py-3 text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-black focus:bg-white transition-all"
                         />
+                        <span className="block text-[11px] text-neutral-500 mt-1">
+                          10-digit mobile number (digits only, e.g. 9876543210)
+                        </span>
                       </div>
 
                       {/* Website */}
@@ -872,24 +990,20 @@ export default function VendorRegisterPage() {
                       {/* PAN Number */}
                       <div>
                         <label className="block text-xs font-bold uppercase tracking-wider text-neutral-700 mb-1.5">
-                          PAN Number
+                          PAN Number <span className="text-red-600">*</span>
                         </label>
                         <input
                           type="text"
                           name="pan_number"
+                          required
                           maxLength={10}
                           placeholder="e.g. ABCDE1234F"
                           value={formData.pan_number}
-                          onChange={(e) =>
-                            setFormData((prev) => ({
-                              ...prev,
-                              pan_number: e.target.value.toUpperCase(),
-                            }))
-                          }
+                          onChange={handleChange}
                           className="w-full uppercase bg-neutral-50 border border-neutral-300 rounded-xl px-4 py-3 text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-black focus:bg-white transition-all"
                         />
                         <span className="block text-[11px] text-neutral-500 mt-1">
-                          Business or Personal PAN for tax verification
+                          10-character PAN for tax verification (e.g. ABCDE1234F)
                         </span>
                       </div>
 
@@ -904,16 +1018,11 @@ export default function VendorRegisterPage() {
                           maxLength={15}
                           placeholder="e.g. 08AAAAA0000A1Z5"
                           value={formData.gstin}
-                          onChange={(e) =>
-                            setFormData((prev) => ({
-                              ...prev,
-                              gstin: e.target.value.toUpperCase(),
-                            }))
-                          }
+                          onChange={handleChange}
                           className="w-full uppercase bg-neutral-50 border border-neutral-300 rounded-xl px-4 py-3 text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-black focus:bg-white transition-all"
                         />
                         <span className="block text-[11px] text-neutral-500 mt-1">
-                          Optional if turnover is under GST threshold
+                          Optional if turnover is under GST threshold (15 alphanumeric)
                         </span>
                       </div>
 
@@ -925,13 +1034,14 @@ export default function VendorRegisterPage() {
                         <input
                           type="text"
                           name="isbn_license"
+                          maxLength={30}
                           placeholder="e.g. 1001000632563"
                           value={formData.isbn_license}
                           onChange={handleChange}
                           className="w-full bg-neutral-50 border border-neutral-300 rounded-xl px-4 py-3 text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-black focus:bg-white transition-all"
                         />
                         <span className="block text-[11px] text-neutral-500 mt-1">
-                          Publisher registration / ISBN identification
+                          Publisher registration / ISBN identification (no special characters)
                         </span>
                       </div>
                     </div>
@@ -979,11 +1089,12 @@ export default function VendorRegisterPage() {
                       {/* Bank Name */}
                       <div>
                         <label className="block text-xs font-bold uppercase tracking-wider text-neutral-700 mb-1.5">
-                          Bank Name
+                          Bank Name <span className="text-red-600">*</span>
                         </label>
                         <input
                           type="text"
                           name="bank_name"
+                          required
                           placeholder="e.g. State Bank of India"
                           value={formData.bank_name}
                           onChange={handleChange}
@@ -994,11 +1105,12 @@ export default function VendorRegisterPage() {
                       {/* Account Holder Name */}
                       <div>
                         <label className="block text-xs font-bold uppercase tracking-wider text-neutral-700 mb-1.5">
-                          Account Holder Name
+                          Account Holder Name <span className="text-red-600">*</span>
                         </label>
                         <input
                           type="text"
                           name="account_holder_name"
+                          required
                           placeholder="Name as per Bank Passbook"
                           value={formData.account_holder_name}
                           onChange={handleChange}
@@ -1009,26 +1121,33 @@ export default function VendorRegisterPage() {
                       {/* Bank Account Number */}
                       <div>
                         <label className="block text-xs font-bold uppercase tracking-wider text-neutral-700 mb-1.5">
-                          Bank Account Number
+                          Bank Account Number <span className="text-red-600">*</span>
                         </label>
                         <input
                           type="text"
                           name="bank_account_number"
+                          required
+                          maxLength={18}
                           placeholder="e.g. 123456789012"
                           value={formData.bank_account_number}
                           onChange={handleChange}
                           className="w-full bg-neutral-50 border border-neutral-300 rounded-xl px-4 py-3 text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-black focus:bg-white transition-all"
                         />
+                        <span className="block text-[11px] text-neutral-500 mt-1">
+                          9 to 18 digits (numbers only, no special characters)
+                        </span>
                       </div>
 
                       {/* Re-enter Bank Account Number */}
                       <div>
                         <label className="block text-xs font-bold uppercase tracking-wider text-neutral-700 mb-1.5">
-                          Confirm Account Number
+                          Confirm Account Number <span className="text-red-600">*</span>
                         </label>
                         <input
                           type="text"
                           name="confirm_bank_account_number"
+                          required
+                          maxLength={18}
                           placeholder="Re-enter bank account number"
                           value={formData.confirm_bank_account_number}
                           onChange={handleChange}
@@ -1039,22 +1158,21 @@ export default function VendorRegisterPage() {
                       {/* IFSC Code */}
                       <div>
                         <label className="block text-xs font-bold uppercase tracking-wider text-neutral-700 mb-1.5">
-                          IFSC Code
+                          IFSC Code <span className="text-red-600">*</span>
                         </label>
                         <input
                           type="text"
                           name="ifsc_code"
+                          required
                           maxLength={11}
                           placeholder="e.g. SBIN0001234"
                           value={formData.ifsc_code}
-                          onChange={(e) =>
-                            setFormData((prev) => ({
-                              ...prev,
-                              ifsc_code: e.target.value.toUpperCase(),
-                            }))
-                          }
+                          onChange={handleChange}
                           className="w-full uppercase bg-neutral-50 border border-neutral-300 rounded-xl px-4 py-3 text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-black focus:bg-white transition-all"
                         />
+                        <span className="block text-[11px] text-neutral-500 mt-1">
+                          11 characters (e.g. SBIN0001234, 5th character is 0)
+                        </span>
                       </div>
 
                       {/* UPI ID */}
