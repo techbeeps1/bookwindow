@@ -57,6 +57,20 @@ export function Navbar({ menuData, siteLogo }: { menuData: any; siteLogo?: strin
   const dispatch = useAppDispatch();
   const router = useRouter();
 
+  const resolveLogoUrl = (url?: string | null) => {
+    if (!url) return null;
+    if (url.includes("/storage/settings/")) {
+      return url.replace("/storage/settings/", "/storage/app/public/settings/");
+    }
+    return url;
+  };
+
+  const [logoSrc, setLogoSrc] = useState<any>(resolveLogoUrl(siteLogo) || logo);
+
+  useEffect(() => {
+    setLogoSrc(resolveLogoUrl(siteLogo) || logo);
+  }, [siteLogo]);
+
   // Smart multi-word search & ranking
   useEffect(() => {
     if (!searchTerm.trim()) {
@@ -182,13 +196,14 @@ export function Navbar({ menuData, siteLogo }: { menuData: any; siteLogo?: strin
                 <div className="flex-shrink-0 flex items-center">
                   <Link href="/">
                     <Image
-                      src={siteLogo || logo}
+                      src={logoSrc}
                       alt="Bookwindow Logo"
                       width={60}
                       height={42}
                       className="h-auto w-[60px] object-contain"
                       priority
-                      unoptimized={Boolean(siteLogo)}
+                      unoptimized={typeof logoSrc === "string"}
+                      onError={() => setLogoSrc(logo)}
                     />
                   </Link>
                 </div>
@@ -499,13 +514,14 @@ export function Navbar({ menuData, siteLogo }: { menuData: any; siteLogo?: strin
                 <div className="flex items-center justify-between w-full text-white">
                   <Link href="/" className="flex-shrink-0">
                     <Image
-                      src={siteLogo || logo}
+                      src={logoSrc}
                       alt="Bookwindow Logo"
                       width={60}
                       height={42}
                       className="h-[42px] w-auto object-contain"
                       priority
-                      unoptimized={Boolean(siteLogo)}
+                      unoptimized={typeof logoSrc === "string"}
+                      onError={() => setLogoSrc(logo)}
                     />
                   </Link>
 

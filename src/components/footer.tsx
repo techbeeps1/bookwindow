@@ -17,6 +17,20 @@ import { IoCubeOutline } from "react-icons/io5";
 export function Footer({ menuData, siteLogo }: { menuData: any; siteLogo?: string | null }) {
   const [email, setEmail] = React.useState("");
   const [loading, setLoading] = React.useState(false);
+
+  const resolveLogoUrl = (url?: string | null) => {
+    if (!url) return null;
+    if (url.includes("/storage/settings/")) {
+      return url.replace("/storage/settings/", "/storage/app/public/settings/");
+    }
+    return url;
+  };
+
+  const [logoSrc, setLogoSrc] = React.useState<any>(resolveLogoUrl(siteLogo) || logo);
+
+  React.useEffect(() => {
+    setLogoSrc(resolveLogoUrl(siteLogo) || logo);
+  }, [siteLogo]);
   function chunkArray(array: any[], size: number) {
     const result = [];
     for (let i = 0; i < array.length; i += size) {
@@ -97,12 +111,13 @@ export function Footer({ menuData, siteLogo }: { menuData: any; siteLogo?: strin
           <div className="flex flex-col gap-4 flex-shrink-0">
             <Link href="/">
               <Image
-                src={siteLogo || logo}
+                src={logoSrc}
                 alt="book window logo"
                 width={55}
                 height={40}
                 className="h-auto w-[55px] object-contain brightness-0 invert"
-                unoptimized={Boolean(siteLogo)}
+                unoptimized={typeof logoSrc === "string"}
+                onError={() => setLogoSrc(logo)}
               />
             </Link>
             <p className="text-gray-400 text-sm font-sans leading-relaxed mt-2 max-w-xs">
