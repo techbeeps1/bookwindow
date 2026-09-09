@@ -39,7 +39,7 @@ const resolveUrl = (url: string) => {
   return `/category/${cleanUrl}`;
 };
 
-export function Navbar({ menuData }: any) {
+export function Navbar({ menuData, siteLogo }: { menuData: any; siteLogo?: string | null }) {
 
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredProducts, setFilteredProducts] = useState<any[]>([]);
@@ -182,10 +182,13 @@ export function Navbar({ menuData }: any) {
                 <div className="flex-shrink-0 flex items-center">
                   <Link href="/">
                     <Image
-                      src={logo}
+                      src={siteLogo || logo}
                       alt="Bookwindow Logo"
+                      width={60}
+                      height={42}
                       className="h-auto w-[60px] object-contain"
                       priority
+                      unoptimized={Boolean(siteLogo)}
                     />
                   </Link>
                 </div>
@@ -496,10 +499,13 @@ export function Navbar({ menuData }: any) {
                 <div className="flex items-center justify-between w-full text-white">
                   <Link href="/" className="flex-shrink-0">
                     <Image
-                      src={logo}
+                      src={siteLogo || logo}
                       alt="Bookwindow Logo"
+                      width={60}
+                      height={42}
                       className="h-[42px] w-auto object-contain"
                       priority
+                      unoptimized={Boolean(siteLogo)}
                     />
                   </Link>
 

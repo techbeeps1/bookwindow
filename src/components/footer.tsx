@@ -14,7 +14,7 @@ import { RiShieldCheckLine } from "react-icons/ri";
 import { HiMiniUserGroup } from "react-icons/hi2";
 import { IoCubeOutline } from "react-icons/io5";
 
-export function Footer({ menuData }: any) {
+export function Footer({ menuData, siteLogo }: { menuData: any; siteLogo?: string | null }) {
   const [email, setEmail] = React.useState("");
   const [loading, setLoading] = React.useState(false);
   function chunkArray(array: any[], size: number) {
@@ -97,9 +97,12 @@ export function Footer({ menuData }: any) {
           <div className="flex flex-col gap-4 flex-shrink-0">
             <Link href="/">
               <Image
-                src={logo}
+                src={siteLogo || logo}
                 alt="book window logo"
+                width={55}
+                height={40}
                 className="h-auto w-[55px] object-contain brightness-0 invert"
+                unoptimized={Boolean(siteLogo)}
               />
             </Link>
             <p className="text-gray-400 text-sm font-sans leading-relaxed mt-2 max-w-xs">
