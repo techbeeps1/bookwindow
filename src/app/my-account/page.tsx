@@ -10,11 +10,12 @@ import { useDispatch } from "react-redux";
 import toast from "react-hot-toast";
 import { LuLayoutGrid } from "react-icons/lu";
 import { TbClipboardListFilled } from "react-icons/tb";
-import { FaHeart, FaPhoneAlt, FaUser, FaCity } from "react-icons/fa";
+import { FaHeart, FaPhoneAlt, FaUser, FaCity, FaSpinner, FaCheckCircle } from "react-icons/fa";
 import { MdLocationPin, MdLogout, MdDateRange, MdModeEdit } from "react-icons/md";
 import { IoIosArrowBack, IoMdLock, IoMdMail } from "react-icons/io";
 import { IoSearchSharp } from "react-icons/io5";
 import { FaGlobe } from "react-icons/fa6";
+import { fetchPincodeDetails, matchState, matchCity } from "@/lib/pincode";
 
 type AccountTab =
   | "dashboard"
@@ -919,6 +920,12 @@ function AddressesTab({ customer, isEdited }: any) {
   const [filteredCities, setFilteredCities] = useState<any[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const [isPincodeLoading, setIsPincodeLoading] = useState(false);
+  const [pincodeStatus, setPincodeStatus] = useState<{
+    type: "success" | "error" | "info" | null;
+    message: string;
+  }>({ type: null, message: "" });
+
   // Sync state whenever customer data or isEdit changes
   useEffect(() => {
     if (customer) {
@@ -974,6 +981,52 @@ function AddressesTab({ customer, isEdited }: any) {
     const newState = e.target.value;
     setState(newState);
     setCity(""); // Reset city selection when state changes
+    setPincodeStatus({ type: null, message: "" });
+  };
+
+  const lookupAndFillPincode = async (pin: string) => {
+    setIsPincodeLoading(true);
+    setPincodeStatus({ type: "info", message: "Fetching location..." });
+    try {
+      const data = await fetchPincodeDetails(pin);
+      if (data.success && data.state) {
+        const matchedState = matchState(data.state, states);
+        const stateName = matchedState ? matchedState.name : data.state;
+        const stateCities = matchedState?.cities || [];
+        const { cityName } = matchCity(data.district || "", data.cities || [], stateCities, data.block || "");
+
+        setState(stateName);
+        if (cityName) {
+          setCity(cityName);
+        }
+        setPincodeStatus({
+          type: "success",
+          message: cityName ? `Auto-filled: ${cityName}, ${stateName}` : `Auto-filled: ${stateName}`,
+        });
+      } else {
+        setPincodeStatus({
+          type: "error",
+          message: data.message || "Location not found for this PIN code.",
+        });
+      }
+    } catch {
+      setPincodeStatus({
+        type: "error",
+        message: "Could not auto-fill. Please select manually.",
+      });
+    } finally {
+      setIsPincodeLoading(false);
+    }
+  };
+
+  const handleZipCodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const clean = e.target.value.replace(/\D/g, "").slice(0, 6);
+    setZipCode(clean);
+    if (clean.length === 6) {
+      lookupAndFillPincode(clean);
+    } else {
+      setPincodeStatus({ type: null, message: "" });
+    }
   };
 
   async function updateUser(event: FormEvent<HTMLFormElement>) {
@@ -1173,11 +1226,16 @@ function AddressesTab({ customer, isEdited }: any) {
                     required
                     value={city}
                     onChange={(e) => setCity(e.target.value)}
-                    disabled={!state || filteredCities.length === 0}
+                    disabled={!state}
                   >
                     <option value="">
-                      {!state ? "Select state first" : filteredCities.length === 0 ? "No cities available" : "Select city"}
+                      {!state ? "Select state first" : "Select city"}
                     </option>
+                    {city && !filteredCities.some((c: any) => c?.name?.toLowerCase() === city?.toLowerCase()) && (
+                      <option value={city} key="custom-city">
+                        {city}
+                      </option>
+                    )}
                     {filteredCities?.map((c: any) => (
                       <option
                         value={c?.name}
@@ -1192,7 +1250,14 @@ function AddressesTab({ customer, isEdited }: any) {
 
               {/* Zipcode */}
               <div className="flex flex-col gap-1.5">
-                <label className="text-sm font-semibold text-neutral-800 uppercase tracking-wider">Zipcode</label>
+                <div className="flex items-center justify-between">
+                  <label className="text-sm font-semibold text-neutral-800 uppercase tracking-wider">Zipcode</label>
+                  {isPincodeLoading && (
+                    <span className="text-[10px] text-blue-600 font-semibold animate-pulse flex items-center gap-1">
+                      <FaSpinner className="animate-spin w-2.5 h-2.5" /> Fetching...
+                    </span>
+                  )}
+                </div>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400">
                     <MdLocationPin className="w-4 h-4" />
@@ -1200,12 +1265,36 @@ function AddressesTab({ customer, isEdited }: any) {
                   <input
                     type="text"
                     name="zip_code"
+                    maxLength={6}
                     value={zipcode}
-                    onChange={(e) => setZipCode(e.target.value)}
+                    onChange={handleZipCodeChange}
                     placeholder="e.g. 302001"
-                    className="w-full pl-11 pr-4 py-3.5 text-base text-black bg-[#f4f4f4] hover:bg-neutral-100/50 focus:bg-white border border-neutral-200/80 rounded-xl outline-none focus:border-black focus:ring-2 focus:ring-black/5 transition-all duration-200"
+                    className="w-full pl-11 pr-10 py-3.5 text-base text-black bg-[#f4f4f4] hover:bg-neutral-100/50 focus:bg-white border border-neutral-200/80 rounded-xl outline-none focus:border-black focus:ring-2 focus:ring-black/5 transition-all duration-200"
                   />
+                  {isPincodeLoading && (
+                    <div className="absolute inset-y-0 right-0 pr-3.5 flex items-center pointer-events-none text-blue-500">
+                      <FaSpinner className="animate-spin w-4 h-4" />
+                    </div>
+                  )}
+                  {!isPincodeLoading && pincodeStatus.type === "success" && (
+                    <div className="absolute inset-y-0 right-0 pr-3.5 flex items-center pointer-events-none text-emerald-500">
+                      <FaCheckCircle className="w-4 h-4" />
+                    </div>
+                  )}
                 </div>
+                {pincodeStatus.message && (
+                  <p
+                    className={`text-[11px] font-medium mt-0.5 leading-tight ${
+                      pincodeStatus.type === "success"
+                        ? "text-emerald-600 font-semibold"
+                        : pincodeStatus.type === "error"
+                        ? "text-amber-600 font-semibold"
+                        : "text-blue-600"
+                    }`}
+                  >
+                    {pincodeStatus.message}
+                  </p>
+                )}
               </div>
             </div>
 

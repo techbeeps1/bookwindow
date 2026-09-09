@@ -7,13 +7,13 @@ import React from "react";
 import { useAppSelector } from "@/hooks/useStore";
 import { useDispatch } from "react-redux";
 import { login } from "@/lib/slices/authSlice";
-import { count } from "node:console";
 import toast from "react-hot-toast";
-import { FaUser, FaPhoneAlt, FaCity } from "react-icons/fa";
+import { FaUser, FaPhoneAlt, FaCity, FaSpinner, FaCheckCircle } from "react-icons/fa";
 import { FaGlobe } from "react-icons/fa6";
 import { MdLocationPin } from "react-icons/md";
 import { IoMail } from "react-icons/io5";
 import { IoMdLock, IoIosArrowBack } from "react-icons/io";
+import { fetchPincodeDetails, matchState, matchCity } from "@/lib/pincode";
 
 type CheckoutProps = {
   onBack: () => void;
@@ -64,6 +64,12 @@ export default function Checkout({
 
   const [formValues, setFormValues] = useState(formData?.first_name ? formData : initialFormValues);
 
+  const [isPincodeLoading, setIsPincodeLoading] = useState<boolean>(false);
+  const [pincodeStatus, setPincodeStatus] = useState<{
+    type: "success" | "error" | "info" | null;
+    message: string;
+  }>({ type: null, message: "" });
+
   const { user, isAuthenticated, loading } = useAppSelector((state) => state.auth);
   const dispatch = useDispatch();
 
@@ -71,6 +77,9 @@ export default function Checkout({
   useEffect(() => {
     if (formData?.first_name) {
       setFormValues(formData);
+      if (formData?.state) {
+        setSelectedState(formData.state);
+      }
     }
   }, [formData]);
 
@@ -84,8 +93,61 @@ export default function Checkout({
   const handleStateChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const { value } = e.target;
     setSelectedState(value);
-    formValues.city = ""; // Reset city when state changes
-    setFormValues((prev: any) => ({ ...prev, state: value })); // Update form values
+    setFormValues((prev: any) => ({ ...prev, state: value, city: "" }));
+    setPincodeStatus({ type: null, message: "" });
+  };
+
+  const lookupAndFillPincode = async (pin: string) => {
+    setIsPincodeLoading(true);
+    setPincodeStatus({ type: "info", message: "Fetching location details..." });
+
+    try {
+      const data = await fetchPincodeDetails(pin);
+      if (data.success && data.state) {
+        const matchedState = matchState(data.state, states);
+        const stateName = matchedState ? matchedState.name : data.state;
+        const stateCities = matchedState?.cities || [];
+        const { cityName } = matchCity(data.district || "", data.cities || [], stateCities, data.block || "");
+
+        setSelectedState(stateName);
+        setFormValues((prev: any) => ({
+          ...prev,
+          zip_code: pin,
+          state: stateName,
+          city: cityName || prev.city || "",
+        }));
+
+        setPincodeStatus({
+          type: "success",
+          message: cityName
+            ? `Auto-filled: ${cityName}, ${stateName}`
+            : `Auto-filled: ${stateName}`,
+        });
+      } else {
+        setPincodeStatus({
+          type: "error",
+          message: data.message || "Location not found for this PIN code. Please select manually.",
+        });
+      }
+    } catch {
+      setPincodeStatus({
+        type: "error",
+        message: "Could not auto-fill location. Please select State and City manually.",
+      });
+    } finally {
+      setIsPincodeLoading(false);
+    }
+  };
+
+  const handleZipCodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const cleanPin = e.target.value.replace(/\D/g, "").slice(0, 6);
+    setFormValues((prev: any) => ({ ...prev, zip_code: cleanPin }));
+
+    if (cleanPin.length === 6) {
+      lookupAndFillPincode(cleanPin);
+    } else {
+      setPincodeStatus({ type: null, message: "" });
+    }
   };
 
   useEffect(() => {
@@ -208,6 +270,10 @@ export default function Checkout({
   useEffect(() => {
     const source = shippingData && shippingData;
     if (!source) return;
+
+    if (source.state) {
+      setSelectedState(source.state);
+    }
 
     setFormValues((prev: any) => {
       const alreadyFilled = Object.keys(prev).some((key) => prev[key]);
@@ -509,6 +575,59 @@ export default function Checkout({
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                {/* Postcode / PIN Code */}
+                <div className="flex flex-col gap-1.5">
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-semibold text-neutral-800 uppercase tracking-wider">
+                      Postcode
+                    </label>
+                    {isPincodeLoading && (
+                      <span className="text-[10px] text-blue-600 font-semibold animate-pulse flex items-center gap-1">
+                        <FaSpinner className="animate-spin w-2.5 h-2.5" /> Fetching...
+                      </span>
+                    )}
+                  </div>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400">
+                      <MdLocationPin className="w-5 h-5 pointer-events-none" />
+                    </div>
+                    <input
+                      type="text"
+                      placeholder="6-digit PIN code"
+                      name="zip_code"
+                      maxLength={6}
+                      value={formValues.zip_code}
+                      onChange={handleZipCodeChange}
+                      className="w-full pl-11 pr-10 py-3 text-sm text-black bg-[#f4f4f4] hover:bg-neutral-100/50 focus:bg-white border border-neutral-200/80 rounded-xl outline-none focus:border-black focus:ring-2 focus:ring-black/5 transition-all duration-200"
+                      required
+                    />
+                    {isPincodeLoading && (
+                      <div className="absolute inset-y-0 right-0 pr-3.5 flex items-center pointer-events-none text-blue-500">
+                        <FaSpinner className="animate-spin w-4 h-4" />
+                      </div>
+                    )}
+                    {!isPincodeLoading && pincodeStatus.type === "success" && (
+                      <div className="absolute inset-y-0 right-0 pr-3.5 flex items-center pointer-events-none text-emerald-500">
+                        <FaCheckCircle className="w-4 h-4" />
+                      </div>
+                    )}
+                  </div>
+                  {pincodeStatus.message && (
+                    <p
+                      className={`text-[11px] font-medium mt-0.5 leading-tight ${
+                        pincodeStatus.type === "success"
+                          ? "text-emerald-600 font-semibold"
+                          : pincodeStatus.type === "error"
+                          ? "text-amber-600 font-semibold"
+                          : "text-blue-600"
+                      }`}
+                    >
+                      {pincodeStatus.message}
+                    </p>
+                  )}
+                </div>
+
+                {/* State */}
                 <div className="flex flex-col gap-1.5">
                   <label className="text-xs font-semibold text-neutral-800 uppercase tracking-wider">
                     State
@@ -523,7 +642,7 @@ export default function Checkout({
                       value={formValues.state}
                       onChange={handleStateChange}
                     >
-                      <option defaultValue={shippingData?.state || ""}>
+                      <option value="">
                         {shippingData?.state || "Select state"}
                       </option>
                       {!statesFeteched ? (
@@ -545,6 +664,7 @@ export default function Checkout({
                   </div>
                 </div>
 
+                {/* City */}
                 <div className="flex flex-col gap-1.5">
                   <label className="text-xs font-semibold text-neutral-800 uppercase tracking-wider">
                     City
@@ -558,11 +678,20 @@ export default function Checkout({
                       name="city"
                       value={formValues.city}
                       onChange={handleInputChange}
-                      disabled={!selectedState}
+                      disabled={!selectedState && !formValues.state}
                     >
-                      <option defaultValue={formValues.city || ""}>
-                        {selectedState ? "Select city" : formValues.city || "Select city"}
+                      <option value="">
+                        {selectedState || formValues.state ? "Select city" : "Select city"}
                       </option>
+                      {/* Dynamic option in case auto-filled city is not in the preset DB cities */}
+                      {formValues.city &&
+                        !filteredCities.some(
+                          (city: any) => city?.name?.toLowerCase() === formValues.city?.toLowerCase()
+                        ) && (
+                          <option value={formValues.city} key="custom-city">
+                            {formValues.city}
+                          </option>
+                        )}
                       {filteredCities?.map((city: any) => (
                         <option
                           value={city?.name}
@@ -573,26 +702,6 @@ export default function Checkout({
                         </option>
                       ))}
                     </select>
-                  </div>
-                </div>
-
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-semibold text-neutral-800 uppercase tracking-wider">
-                    Postcode
-                  </label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400">
-                      <MdLocationPin className="w-5 h-5 pointer-events-none" />
-                    </div>
-                    <input
-                      type="text"
-                      placeholder="Postcode"
-                      name="zip_code"
-                      value={formValues.zip_code}
-                      onChange={handleInputChange}
-                      className="w-full pl-11 pr-4 py-3 text-sm text-black bg-[#f4f4f4] hover:bg-neutral-100/50 focus:bg-white border border-neutral-200/80 rounded-xl outline-none focus:border-black focus:ring-2 focus:ring-black/5 transition-all duration-200"
-                      required
-                    />
                   </div>
                 </div>
               </div>
