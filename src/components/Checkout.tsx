@@ -636,31 +636,15 @@ export default function Checkout({
                     <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400">
                       <MdLocationPin className="w-5 h-5 pointer-events-none" />
                     </div>
-                    <select
-                      className="w-full pl-11 pr-4 py-3 text-sm text-black bg-[#f4f4f4] hover:bg-neutral-100/50 focus:bg-white border border-neutral-200/80 rounded-xl outline-none focus:border-black focus:ring-2 focus:ring-black/5 transition-all duration-200 cursor-pointer"
+                    <input
+                      type="text"
+                      placeholder="State"
                       name="state"
                       value={formValues.state}
-                      onChange={handleStateChange}
-                    >
-                      <option value="">
-                        {shippingData?.state || "Select state"}
-                      </option>
-                      {!statesFeteched ? (
-                        <option className="text-sm text-red-400" disabled>
-                          loading ↻
-                        </option>
-                      ) : (
-                        states?.map((state: any) => (
-                          <option
-                            value={state?.name}
-                            className="px-4 py-2 text-gray-600 hover:bg-gray-50 text-sm cursor-pointer"
-                            key={state?.id}
-                          >
-                            {state?.name}
-                          </option>
-                        ))
-                      )}
-                    </select>
+                      readOnly
+                      className="w-full pl-11 pr-4 py-3 text-sm text-neutral-800 bg-[#f4f4f4] border border-neutral-200/80 rounded-xl outline-none cursor-not-allowed select-none transition-all duration-200"
+                      required
+                    />
                   </div>
                 </div>
 
@@ -673,35 +657,15 @@ export default function Checkout({
                     <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400">
                       <FaCity className="w-5 h-5 pointer-events-none" />
                     </div>
-                    <select
-                      className="w-full pl-11 pr-4 py-3 text-sm text-black bg-[#f4f4f4] hover:bg-neutral-100/50 focus:bg-white border border-neutral-200/80 rounded-xl outline-none focus:border-black focus:ring-2 focus:ring-black/5 transition-all duration-200 cursor-pointer disabled:bg-neutral-100 disabled:cursor-not-allowed"
+                    <input
+                      type="text"
+                      placeholder="City"
                       name="city"
                       value={formValues.city}
-                      onChange={handleInputChange}
-                      disabled={!selectedState && !formValues.state}
-                    >
-                      <option value="">
-                        {selectedState || formValues.state ? "Select city" : "Select city"}
-                      </option>
-                      {/* Dynamic option in case auto-filled city is not in the preset DB cities */}
-                      {formValues.city &&
-                        !filteredCities.some(
-                          (city: any) => city?.name?.toLowerCase() === formValues.city?.toLowerCase()
-                        ) && (
-                          <option value={formValues.city} key="custom-city">
-                            {formValues.city}
-                          </option>
-                        )}
-                      {filteredCities?.map((city: any) => (
-                        <option
-                          value={city?.name}
-                          className="px-4 py-2 text-gray-600 hover:bg-gray-50 text-sm cursor-pointer"
-                          key={city?.id}
-                        >
-                          {city?.name}
-                        </option>
-                      ))}
-                    </select>
+                      readOnly
+                      className="w-full pl-11 pr-4 py-3 text-sm text-neutral-800 bg-[#f4f4f4] border border-neutral-200/80 rounded-xl outline-none cursor-not-allowed select-none transition-all duration-200"
+                      required
+                    />
                   </div>
                 </div>
               </div>

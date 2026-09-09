@@ -1186,27 +1186,15 @@ function AddressesTab({ customer, isEdited }: any) {
                   <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400">
                     <MdLocationPin className="w-5 h-5" />
                   </div>
-                  <select
-                    className="w-full pl-11 pr-4 py-3.5 text-base text-black bg-[#f4f4f4] hover:bg-neutral-100/50 focus:bg-white border border-neutral-200/80 rounded-xl outline-none focus:border-black focus:ring-2 focus:ring-black/5 transition-all duration-200 appearance-none cursor-pointer"
+                  <input
+                    type="text"
                     name="state"
                     value={state}
-                    onChange={handleStateChange}
+                    readOnly
+                    placeholder="State"
+                    className="w-full pl-11 pr-4 py-3.5 text-base text-neutral-800 bg-[#f4f4f4] border border-neutral-200/80 rounded-xl outline-none cursor-not-allowed select-none transition-all duration-200"
                     required
-                  >
-                    <option value="">Select state</option>
-                    {statesLoading ? (
-                      <option disabled>Loading states...</option>
-                    ) : (
-                      states?.map((s: any) => (
-                        <option
-                          value={s?.name}
-                          key={s?.id || s?.name}
-                        >
-                          {s?.name}
-                        </option>
-                      ))
-                    )}
-                  </select>
+                  />
                 </div>
               </div>
             </div>
@@ -1220,31 +1208,15 @@ function AddressesTab({ customer, isEdited }: any) {
                   <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400">
                     <FaCity className="w-5 h-5" />
                   </div>
-                  <select
-                    className="w-full pl-11 pr-4 py-3.5 text-base text-black bg-[#f4f4f4] hover:bg-neutral-100/50 focus:bg-white border border-neutral-200/80 rounded-xl outline-none focus:border-black focus:ring-2 focus:ring-black/5 transition-all duration-200 appearance-none cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+                  <input
+                    type="text"
                     name="city"
-                    required
                     value={city}
-                    onChange={(e) => setCity(e.target.value)}
-                    disabled={!state}
-                  >
-                    <option value="">
-                      {!state ? "Select state first" : "Select city"}
-                    </option>
-                    {city && !filteredCities.some((c: any) => c?.name?.toLowerCase() === city?.toLowerCase()) && (
-                      <option value={city} key="custom-city">
-                        {city}
-                      </option>
-                    )}
-                    {filteredCities?.map((c: any) => (
-                      <option
-                        value={c?.name}
-                        key={c?.id || c?.name}
-                      >
-                        {c?.name}
-                      </option>
-                    ))}
-                  </select>
+                    readOnly
+                    placeholder="City"
+                    className="w-full pl-11 pr-4 py-3.5 text-base text-neutral-800 bg-[#f4f4f4] border border-neutral-200/80 rounded-xl outline-none cursor-not-allowed select-none transition-all duration-200"
+                    required
+                  />
                 </div>
               </div>
 

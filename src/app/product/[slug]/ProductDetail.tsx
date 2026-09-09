@@ -180,10 +180,6 @@ export default function ProductDetail({
   };
 
   const handleAddToCart = async (productId: string, quantity: number) => {
-    if (!isAuthenticated) {
-      toast.error("Sign in required");
-      return;
-    }
     setClicktype("addtocart");
     try {
       await addToCart({
@@ -203,10 +199,6 @@ export default function ProductDetail({
   };
 
   async function BuyNow(productId: string, quantity: number) {
-    if (!isAuthenticated) {
-      toast.error("Sign in required");
-      return;
-    }
     setClicktype("buynow");
     try {
       await addToCart({

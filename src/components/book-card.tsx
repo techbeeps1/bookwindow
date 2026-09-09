@@ -99,11 +99,6 @@ export function BookCard({
   const { refetch } = useCart();
 
   const handleAddToCart = async (productId: string, qty: number) => {
-    if (!isAuthenticated) {
-      toast.error("Sign in required");
-      return;
-    }
-
     try {
       setCartButtonScale(0.85);
 
