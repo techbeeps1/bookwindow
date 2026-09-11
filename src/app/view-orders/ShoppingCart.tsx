@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import config from "@/app/config";
 import axios from "axios";
-import Image from "next/image";
 import Link from "next/link";
 import { IoCheckmarkCircle, IoBagHandle, IoArrowForward, IoLocationSharp, IoCall, IoMailOutline, IoCallOutline } from "react-icons/io5";
 import FadeLoaderOverlay from "@/components/loader";
@@ -26,6 +25,7 @@ export default function ShoppingCart() {
 
   const [orderItems, setOrderItems] = useState<CartItem[]>([]);
   const [orderData, setOrderData] = useState<any>({});
+  const [customerData, setCustomerData] = useState<any>({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -50,6 +50,7 @@ export default function ShoppingCart() {
         const data = response?.data?.data;
         setOrderItems(data?.items || []);
         setOrderData(data?.order || {});
+        setCustomerData(data?.customer || {});
       } catch (error) {
         console.error("Error fetching order details:", error);
       } finally {
@@ -59,6 +60,102 @@ export default function ShoppingCart() {
 
     viewOrder();
   }, [orderNumber]);
+
+  const paymentMethodStr = String(orderData?.payment_method ?? "").toLowerCase().trim();
+  const isCod =
+    paymentMethodStr === "cod" ||
+    paymentMethodStr === "1" ||
+    paymentMethodStr.includes("cash") ||
+    Number(orderData?.delivery_amount) > 0 ||
+    Number(orderData?.cod_amount) > 0 ||
+    Number(orderData?.cod_charges) > 0;
+
+  const codCharge =
+    Number(orderData?.delivery_amount) ||
+    Number(orderData?.cod_amount) ||
+    Number(orderData?.cod_charges) ||
+    (isCod ? 49 : 0);
+
+  const subtotalAmount =
+    Number(orderData?.subtotal) ||
+    (Array.isArray(orderItems)
+      ? orderItems.reduce(
+          (acc, it) =>
+            acc + (Number(it?.total) || Number(it?.price || 0) * Number(it?.quantity || 1)),
+          0
+        )
+      : 0);
+
+  const discountAmount = Number(orderData?.discount_amount) || 0;
+
+  const shippingCost =
+    orderData?.shipping_amount !== undefined &&
+      orderData?.shipping_amount !== null &&
+      orderData?.shipping_amount !== ""
+      ? orderData?.shipping_amount
+      : orderData?.shipping_method
+        ? orderData?.shipping_method === "standard"
+          ? "49"
+          : orderData?.shipping_method
+        : "49";
+
+  const shippingCostNum = !isNaN(Number(shippingCost))
+    ? Number(shippingCost)
+    : !isNaN(Number(String(shippingCost || "").replace(/[^\d.]/g, "")))
+      ? Number(String(shippingCost || "").replace(/[^\d.]/g, ""))
+      : 49;
+
+  const codChargeNum = isCod ? codCharge : 0;
+
+  // Correct Total = Subtotal - Discount + Shipping + COD Charges
+  const calculatedTotal = subtotalAmount - discountAmount + shippingCostNum + codChargeNum;
+
+  const finalTotal =
+    Number(orderData?.total_amount) > 0
+      ? Number(orderData?.total_amount).toFixed(2)
+      : calculatedTotal > 0
+        ? calculatedTotal.toFixed(2)
+        : "0.00";
+
+  // Trigger GA4 and Meta Pixel Purchase Event (Must be called unconditionally before any returns)
+  useEffect(() => {
+    const orderNum = orderData?.order_number || orderNumber;
+    if (orderNum && Array.isArray(orderItems) && orderItems.length > 0 && Number(finalTotal) > 0) {
+      trackPurchase({
+        orderNumber: String(orderNum),
+        total: finalTotal,
+        subtotal: subtotalAmount,
+        shipping: shippingCostNum,
+        discount: discountAmount,
+        coupon: orderData?.coupon_code || "",
+        currency: "INR",
+        items: (orderItems || []).filter(Boolean).map((item) => ({
+          product_id: item.id || (item as any).product_id,
+          product_name: String(item.product_name || (item as any).name || "Book"),
+          price: Number(item.price) || 0,
+          quantity: Number(item.quantity) || 1,
+        })),
+      });
+    }
+  }, [orderData, orderItems, finalTotal, orderNumber, subtotalAmount, shippingCostNum, discountAmount]);
+
+  const customerName =
+    orderData?.billing_name ||
+    (orderData?.first_name ? `${orderData?.first_name} ${orderData?.last_name || ""}`.trim() : "") ||
+    (customerData?.first_name ? `${customerData?.first_name} ${customerData?.last_name || ""}`.trim() : "") ||
+    orderData?.name;
+
+  const fullAddress = [
+    orderData?.address,
+    orderData?.address_2,
+    orderData?.billing_city || orderData?.city || customerData?.city,
+    orderData?.billing_state || orderData?.state || customerData?.state,
+    orderData?.billing_zip || orderData?.zip_code || orderData?.zip || customerData?.zip_code,
+  ]
+    .filter(Boolean)
+    .join(", ");
+
+  const customerPhone = orderData?.customer_phone || orderData?.phone || customerData?.phone;
 
   if (loading) {
     return <FadeLoaderOverlay />;
@@ -86,91 +183,6 @@ export default function ShoppingCart() {
       </section>
     );
   }
-
-  const isCod =
-    orderData?.payment_method?.toLowerCase() === "cod" ||
-    Number(orderData?.delivery_amount) > 0 ||
-    Number(orderData?.cod_amount) > 0 ||
-    Number(orderData?.cod_charges) > 0;
-
-  const codCharge =
-    Number(orderData?.delivery_amount) ||
-    Number(orderData?.cod_amount) ||
-    Number(orderData?.cod_charges) ||
-    (isCod ? 49 : 0);
-
-  const subtotalAmount =
-    Number(orderData?.subtotal) ||
-    orderItems.reduce((acc, it) => acc + (Number(it.total) || Number(it.price) * Number(it.quantity)), 0);
-
-  const discountAmount = Number(orderData?.discount_amount) || 0;
-
-  const shippingCost =
-    orderData?.shipping_amount !== undefined &&
-      orderData?.shipping_amount !== null &&
-      orderData?.shipping_amount !== ""
-      ? orderData?.shipping_amount
-      : orderData?.shipping_method
-        ? orderData?.shipping_method === "standard"
-          ? "49"
-          : orderData?.shipping_method
-        : "49";
-
-  const shippingCostNum = !isNaN(Number(shippingCost))
-    ? Number(shippingCost)
-    : !isNaN(Number(String(shippingCost).replace(/[^\d.]/g, "")))
-      ? Number(String(shippingCost).replace(/[^\d.]/g, ""))
-      : 49;
-
-  const codChargeNum = isCod ? codCharge : 0;
-
-  // Correct Total = Subtotal - Discount + Shipping + COD Charges
-  const calculatedTotal = subtotalAmount - discountAmount + shippingCostNum + codChargeNum;
-
-  const finalTotal =
-    Number(orderData?.total_amount) > 0
-      ? Number(orderData?.total_amount).toFixed(2)
-      : calculatedTotal > 0
-        ? calculatedTotal.toFixed(2)
-        : "0.00";
-
-  // Trigger GA4 and Meta Pixel Purchase Event
-  useEffect(() => {
-    const orderNum = orderData?.order_number || orderNumber;
-    if (orderNum && Array.isArray(orderItems) && orderItems.length > 0 && Number(finalTotal) > 0) {
-      trackPurchase({
-        orderNumber: String(orderNum),
-        total: finalTotal,
-        subtotal: subtotalAmount,
-        shipping: shippingCostNum,
-        discount: discountAmount,
-        coupon: orderData?.coupon_code || "",
-        currency: "INR",
-        items: orderItems.map((item) => ({
-          product_id: item.id,
-          product_name: item.product_name,
-          price: item.price,
-          quantity: item.quantity,
-        })),
-      });
-    }
-  }, [orderData, orderItems, finalTotal, orderNumber, subtotalAmount, shippingCostNum, discountAmount]);
-
-  const customerName =
-    orderData?.billing_name ||
-    (orderData?.first_name ? `${orderData?.first_name} ${orderData?.last_name || ""}`.trim() : "") ||
-    orderData?.name;
-
-  const fullAddress = [
-    orderData?.address,
-    orderData?.billing_city || orderData?.city,
-    orderData?.billing_state || orderData?.state,
-    orderData?.billing_zip || orderData?.zip_code || orderData?.zip,
-  ]
-    .filter(Boolean)
-    .join(", ");
-
-  const customerPhone = orderData?.customer_phone || orderData?.phone;
 
   return (
     <>
@@ -214,7 +226,11 @@ export default function ShoppingCart() {
                 Payment
               </span>
               <span className="text-xs sm:text-sm font-black uppercase text-neutral-900 truncate block">
-                {isCod ? "COD" : orderData?.payment_method ? String(orderData?.payment_method).toUpperCase() : "Online"}
+                {isCod
+                  ? "COD"
+                  : paymentMethodStr
+                    ? paymentMethodStr.toUpperCase()
+                    : "Online"}
               </span>
             </div>
 
@@ -242,23 +258,28 @@ export default function ShoppingCart() {
                 <div className="divide-y divide-neutral-100 space-y-4">
                   {orderItems?.map((item) => (
                     <div key={item.id} className="pt-4 first:pt-0 flex items-center gap-4">
-                      <div className="relative w-16 h-16 sm:w-20 sm:h-20 bg-neutral-50 border border-neutral-200/80 rounded-xl p-1.5 flex items-center justify-center flex-shrink-0">
-                        <Image
+                      <div className="relative w-16 h-16 sm:w-20 sm:h-20 bg-neutral-50 border border-neutral-200/80 rounded-xl p-1.5 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                        <img
                           className="object-contain max-h-full max-w-full rounded-md"
                           src={
-                            item.product_image?.startsWith("http")
-                              ? item.product_image
-                              : `${config.apiUrl}storage/app/public/${item.product_image}`
+                            item?.product_image
+                              ? String(item.product_image).startsWith("http")
+                                ? item.product_image
+                                : `${config.apiUrl}storage/app/public/${item.product_image}`
+                              : "/placeholder.png"
                           }
-                          alt={item.product_name}
+                          alt={String(item?.product_name || "Book")}
                           width={80}
                           height={80}
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src = "/placeholder.png";
+                          }}
                         />
                       </div>
 
                       <div className="flex-1 min-w-0">
                         <h3 className="text-xs sm:text-sm font-bold text-neutral-900 line-clamp-2 leading-snug">
-                          {item.product_name ? item.product_name.replace(/#COMMA#/g, ",") : ""}
+                          {item?.product_name ? String(item.product_name).replace(/#COMMA#/g, ",") : "Book"}
                         </h3>
                         <div className="flex items-center gap-3 mt-1 text-xs text-neutral-500 font-semibold">
                           <span>Unit: ₹{item.price}</span>

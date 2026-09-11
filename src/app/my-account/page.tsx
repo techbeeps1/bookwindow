@@ -545,12 +545,15 @@ function OrdersTab({ userOrders, onRefreshOrders }: any) {
                 <tbody className="divide-y divide-neutral-150">
                   {currentItems.map((order: any, index: number) => {
                     const rowId = order?.order_details?.id || order?.order_details?.order_number || index;
-                    const statusLower = order?.order_details?.status?.toLowerCase();
-                    const isSuccess = ["delivered", "completed", "paid", "success"].some((s) => statusLower?.includes(s));
-                    const isCancelled = ["cancelled", "failed", "refunded"].some((s) => statusLower?.includes(s));
+                    const statusLower = String(order?.order_details?.status || "").toLowerCase();
+                    const isSuccess = ["delivered", "completed", "paid", "success"].some((s) => statusLower.includes(s));
+                    const isCancelled = ["cancelled", "failed", "refunded"].some((s) => statusLower.includes(s));
 
+                    const paymentMethodStr = String(order?.order_details?.payment_method ?? "").toLowerCase().trim();
                     const isCodOrder =
-                      order?.order_details?.payment_method?.toLowerCase() === "cod" ||
+                      paymentMethodStr === "cod" ||
+                      paymentMethodStr === "1" ||
+                      paymentMethodStr.includes("cash") ||
                       Number(order?.order_details?.delivery_amount) > 0 ||
                       Number(order?.order_details?.cod_amount) > 0 ||
                       Number(order?.order_details?.cod_charges) > 0;
@@ -849,23 +852,33 @@ function OrdersTab({ userOrders, onRefreshOrders }: any) {
                     : `₹${selectedOrder?.order_details?.shipping_amount}`}
                 </span>
               </div>
-              {(selectedOrder?.order_details?.payment_method?.toLowerCase() === "cod" ||
-                Number(selectedOrder?.order_details?.delivery_amount) > 0 ||
-                Number(selectedOrder?.order_details?.cod_amount) > 0 ||
-                Number(selectedOrder?.order_details?.cod_charges) > 0) && (
-                <div className="flex justify-between py-3.5">
-                  <span className="text-neutral-455 font-bold uppercase tracking-wider text-xs">COD Charges</span>
-                  <span className="text-neutral-955 font-bold">
-                    ₹{selectedOrder?.order_details?.delivery_amount ||
-                      selectedOrder?.order_details?.cod_amount ||
-                      selectedOrder?.order_details?.cod_charges ||
-                      49}
-                  </span>
-                </div>
-              )}
               {(() => {
+                const detailPayMethodStr = String(selectedOrder?.order_details?.payment_method ?? "").toLowerCase().trim();
+                const isDetailCod =
+                  detailPayMethodStr === "cod" ||
+                  detailPayMethodStr === "1" ||
+                  detailPayMethodStr.includes("cash") ||
+                  Number(selectedOrder?.order_details?.delivery_amount) > 0 ||
+                  Number(selectedOrder?.order_details?.cod_amount) > 0 ||
+                  Number(selectedOrder?.order_details?.cod_charges) > 0;
+                return isDetailCod ? (
+                  <div className="flex justify-between py-3.5">
+                    <span className="text-neutral-455 font-bold uppercase tracking-wider text-xs">COD Charges</span>
+                    <span className="text-neutral-955 font-bold">
+                      ₹{selectedOrder?.order_details?.delivery_amount ||
+                        selectedOrder?.order_details?.cod_amount ||
+                        selectedOrder?.order_details?.cod_charges ||
+                        49}
+                    </span>
+                  </div>
+                ) : null;
+              })()}
+              {(() => {
+                const selPayMethodStr = String(selectedOrder?.order_details?.payment_method ?? "").toLowerCase().trim();
                 const isSelectedCod =
-                  selectedOrder?.order_details?.payment_method?.toLowerCase() === "cod" ||
+                  selPayMethodStr === "cod" ||
+                  selPayMethodStr === "1" ||
+                  selPayMethodStr.includes("cash") ||
                   Number(selectedOrder?.order_details?.delivery_amount) > 0 ||
                   Number(selectedOrder?.order_details?.cod_amount) > 0 ||
                   Number(selectedOrder?.order_details?.cod_charges) > 0;
