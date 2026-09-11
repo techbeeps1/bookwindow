@@ -14,6 +14,12 @@ import { MdLocationPin } from "react-icons/md";
 import { IoMail } from "react-icons/io5";
 import { IoMdLock, IoIosArrowBack } from "react-icons/io";
 import { fetchPincodeDetails, matchState, matchCity } from "@/lib/pincode";
+import {
+  normalizeIndianPhoneNumber,
+  isValidIndianMobile,
+  getIndianMobileValidationError,
+  isValidIndianPinCode,
+} from "@/helper/helperfun";
 
 type CheckoutProps = {
   onBack: () => void;
@@ -316,11 +322,35 @@ export default function Checkout({
       }
     }
 
+    // Validate Indian mobile number (must be 10 digits starting with 6, 7, 8, or 9)
+    const phoneError = getIndianMobileValidationError(formValues.phone);
+    if (phoneError) {
+      toast.error(phoneError);
+      if (!isEdit && isAuthenticated && shippingData) {
+        setIsEdit(true);
+      }
+      return;
+    }
+
+    // Validate 6-digit Indian PIN code
+    const cleanZip = (formValues.zip_code || "").toString().replace(/\D/g, "");
+    if (!isValidIndianPinCode(cleanZip)) {
+      toast.error("Please enter a valid 6-digit Indian PIN code.");
+      if (!isEdit && isAuthenticated && shippingData) {
+        setIsEdit(true);
+      }
+      return;
+    }
+
+    const normalizedPhone = normalizeIndianPhoneNumber(formValues.phone);
+
     const source =
       formValues && formValues;
 
     const data = {
       ...source,
+      phone: normalizedPhone,
+      zip_code: cleanZip,
       email: email || formValues?.email || "",
       password: password || "",
       is_guest: !password,
@@ -334,110 +364,149 @@ export default function Checkout({
   return (
     <>
       <form
-        className="container mx-auto p-4 md:p-6 grid grid-cols-1 gap-8 mb-8 mt-4 max-w-screen-md"
+        className="w-full"
         onSubmit={handleNext}
       >
-        <div className="bg-white p-6 sm:p-8 rounded-2xl border border-neutral-200/80 shadow-sm space-y-6">
-          <div className="flex items-center gap-3 border-b border-neutral-100 pb-4 mb-6">
-            <button
-              type="button"
-              onClick={() => setIsEdit(!isEdit)}
-              className="p-2 hover:bg-neutral-100 rounded-full transition-colors text-neutral-500 hover:text-black cursor-pointer"
-              title="Toggle Edit Mode"
-            >
-              <IoIosArrowBack className="w-4 h-4" />
-            </button>
-            <h1 className="text-xl font-bold text-neutral-900 tracking-tight uppercase">Shipping Details</h1>
+        <div className="bg-white p-5 sm:p-7 md:p-8 rounded-2xl border border-neutral-200/80 shadow-sm space-y-6">
+          {/* Header */}
+          <div className="flex items-center justify-between border-b border-neutral-100 pb-4">
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={onBack}
+                className="p-2 hover:bg-neutral-100 rounded-xl transition-colors text-neutral-500 hover:text-black cursor-pointer flex items-center gap-1 text-sm font-semibold"
+                title="Back to Cart"
+              >
+                <IoIosArrowBack className="w-4 h-4" />
+                <span className="hidden sm:inline">Back</span>
+              </button>
+              <div>
+                <h1 className="text-xl font-bold text-neutral-900">
+                  Shipping Address
+                </h1>
+                <p className="text-sm text-neutral-500 mt-0.5">
+                  Where should we deliver your books?
+                </p>
+              </div>
+            </div>
+            <span className="hidden sm:inline-block px-3 py-1 bg-red-50 text-red-600 border border-red-200 text-xs font-semibold rounded-full">
+              Step 2 of 3
+            </span>
           </div>
 
           {(!isEdit && isAuthenticated) && shippingData ? (
-            <div className="text-sm space-y-2.5 leading-relaxed p-6 border border-neutral-200 bg-neutral-50/40 rounded-xl">
-              <div className="font-bold text-neutral-900">
-                {shippingData?.first_name || " "}{" "}
-                {shippingData?.last_name || " "}
+            <div className="p-5 sm:p-6 border border-neutral-200 bg-neutral-50/50 rounded-2xl space-y-2">
+              <div className="flex items-center justify-between border-b border-neutral-200/60 pb-3">
+                <span className="text-sm font-bold text-neutral-900">Saved Address</span>
+                <button
+                  type="button"
+                  onClick={() => setIsEdit(true)}
+                  className="text-xs font-semibold text-red-600 hover:text-red-700 hover:underline cursor-pointer flex items-center gap-1"
+                >
+                  Edit Address
+                </button>
               </div>
-              <div className="text-neutral-600 space-y-0.5 font-medium">
+
+              <div className="pt-1 text-sm text-neutral-700 space-y-1">
+                <p className="font-bold text-base text-neutral-900">
+                  {shippingData?.first_name || " "}{" "}
+                  {shippingData?.last_name || " "}
+                </p>
                 <p>{shippingData?.address || " "}</p>
                 {shippingData?.address_2 && <p>{shippingData?.address_2 || ""}</p>}
                 <p>
                   {shippingData?.city || ""},{" "}
-                  {shippingData?.state || ""} {shippingData?.zip_code || ""}
+                  {shippingData?.state || ""} - {shippingData?.zip_code || ""}
                 </p>
-                <p>Phone: {shippingData?.phone || ""}</p>
-              </div>
-              <div className="text-end pt-3 border-t border-neutral-200/60 mt-4">
-                <button
-                  type="button"
-                  onClick={() => setIsEdit(true)}
-                  className="bg-black hover:bg-neutral-900 text-white text-xs font-bold px-4 py-2 rounded-lg transition-colors cursor-pointer"
-                >
-                  Edit Address 🖊️
-                </button>
+                <p className="font-semibold text-neutral-900 pt-1">
+                  Mobile: +91 {shippingData?.phone || ""}
+                </p>
+                {!isValidIndianMobile(shippingData?.phone) && (
+                  <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-xl flex items-center justify-between text-red-700 text-xs font-medium">
+                    <span>⚠️ Saved mobile number is invalid.</span>
+                    <button
+                      type="button"
+                      onClick={() => setIsEdit(true)}
+                      className="font-bold underline text-red-700 hover:text-red-900 ml-2 cursor-pointer flex-shrink-0"
+                    >
+                      Update Address
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           ) : (
             <div className="space-y-5">
+              {/* Account / Login Prompt for Guests */}
               {!isAuthenticated && (
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-semibold text-neutral-800 uppercase tracking-wider">
-                    Email Address
-                  </label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400">
-                      <IoMail size={20} />
+                <>
+                  {/* <div className="p-3.5 rounded-xl bg-red-50/60 border border-red-200/80 flex items-center justify-between text-sm mb-1">
+                    <span className="text-neutral-700 font-medium">Have a Bookwindow account?</span>
+                    <a
+                      href="/login?redirect=/checkout"
+                      className="text-red-600 font-semibold hover:underline flex items-center gap-1 shrink-0"
+                    >
+                      <span>Log In</span>
+                      <span>&rarr;</span>
+                    </a>
+                  </div> */}
+
+                  <div className="flex flex-col gap-1">
+                    <label className="text-sm font-medium text-neutral-700">
+                      Email address
+                    </label>
+                    <div className="relative group">
+                      <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400 group-focus-within:text-red-600 transition-colors">
+                        <IoMail size={18} />
+                      </div>
+                      <input
+                        type="email"
+                        placeholder="name@mail.com"
+                        className="w-full pl-10 pr-4 py-3 text-sm text-neutral-900 bg-white hover:border-neutral-400 focus:border-red-600 border border-neutral-300 rounded-xl outline-none focus:ring-1 focus:ring-red-600 transition-colors placeholder:text-neutral-400 font-normal"
+                        required
+                        value={email || formValues.email}
+                        onChange={handleEmailChange}
+                      />
                     </div>
-                    <input
-                      type="email"
-                      placeholder="name@mail.com"
-                      className="w-full pl-11 pr-4 py-3 text-sm text-black bg-[#f4f4f4] hover:bg-neutral-100/50 focus:bg-white border border-neutral-200/80 rounded-xl outline-none focus:border-black focus:ring-2 focus:ring-black/5 transition-all duration-200"
-                      required
-                      value={email || formValues.email}
-                      onChange={handleEmailChange}
-                    />
                   </div>
-                </div>
+                </>
               )}
 
               {/* Buffering Spinner */}
               {isBuffering && (
-                <p className="text-blue-500 text-xs font-semibold mb-2">Checking email...</p>
+                <p className="text-neutral-500 text-xs font-semibold mb-2 flex items-center gap-1.5">
+                  <FaSpinner className="animate-spin text-red-600 w-3 h-3" />
+                  <span>Checking account...</span>
+                </p>
               )}
 
               {/* Error Message & Guest Mode */}
-              {userFound === false && !isBuffering && (
-                <div className="space-y-4 bg-neutral-50 p-5 rounded-2xl border border-neutral-250">
-                  <p className="text-neutral-500 text-xs font-bold uppercase tracking-wider">{errorMessage}</p>
-                  {errorMessage && (
-                    <>
-
-                      <div className="flex gap-2">
-                        <button
-                          type="button"
-                          onClick={() => setErrorMessage("")}
-                          className="bg-black hover:bg-neutral-900 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition-colors cursor-pointer"
-                        >
-                          Continue as guest
-                        </button>
-                      </div>
-
-                    </>
-                  )}
+              {userFound === false && !isBuffering && errorMessage && (
+                <div className="space-y-3 bg-neutral-50 p-4 rounded-xl border border-neutral-200">
+                  <p className="text-neutral-600 text-xs font-semibold">{errorMessage}</p>
+                  <button
+                    type="button"
+                    onClick={() => setErrorMessage("")}
+                    className="bg-black hover:bg-gray-900 text-white text-xs font-bold px-4 py-2 rounded-xl transition-colors cursor-pointer"
+                  >
+                    Continue as guest
+                  </button>
                 </div>
               )}
 
               {/* Password Input / Login */}
               {userFound === true && !isBuffering && (
-                <div className="space-y-3 bg-neutral-50 p-5 rounded-2xl border border-neutral-250">
-                  <p className="text-xs text-neutral-600 font-medium">
+                <div className="space-y-3 bg-red-50/30 p-5 rounded-2xl border border-red-200">
+                  <p className="text-sm text-neutral-700 font-medium">
                     This email is registered with us. You can log in with your password, or continue as a guest.
                   </p>
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-semibold text-neutral-800 uppercase tracking-wider">
+                  <div className="flex flex-col gap-1">
+                    <label className="text-sm font-medium text-neutral-700">
                       Password (Optional for guest)
                     </label>
-                    <div className="relative">
-                      <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400">
-                        <IoMdLock size={20} />
+                    <div className="relative group">
+                      <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400 group-focus-within:text-red-600 transition-colors">
+                        <IoMdLock size={18} />
                       </div>
                       <input
                         type="password"
@@ -447,15 +516,15 @@ export default function Checkout({
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                           setPassword(e.target.value)
                         }
-                        className="w-full pl-11 pr-4 py-3 text-sm text-black bg-[#f4f4f4] hover:bg-neutral-100/50 focus:bg-white border border-neutral-200/80 rounded-xl outline-none focus:border-black focus:ring-2 focus:ring-black/5 transition-all duration-200"
+                        className="w-full pl-10 pr-4 py-3 text-sm text-neutral-900 bg-white hover:border-neutral-400 focus:border-red-600 border border-neutral-300 rounded-xl outline-none focus:ring-1 focus:ring-red-600 transition-colors font-normal"
                       />
                     </div>
                   </div>
-                  <div className="flex flex-wrap items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-2 pt-1">
                     <button
                       type="button"
                       onClick={() => handleLogin()}
-                      className="bg-black hover:bg-neutral-900 text-white text-xs font-bold px-5 py-2.5 rounded-xl transition-colors cursor-pointer"
+                      className="bg-red-600 hover:bg-red-700 text-white text-xs font-semibold px-5 py-2.5 rounded-xl transition-colors cursor-pointer shadow-sm"
                     >
                       Login
                     </button>
@@ -465,7 +534,7 @@ export default function Checkout({
                         setUserFound(null);
                         setPassword("");
                       }}
-                      className="bg-neutral-200 hover:bg-neutral-300 text-neutral-800 text-xs font-bold px-4 py-2.5 rounded-xl transition-colors cursor-pointer"
+                      className="bg-neutral-100 hover:bg-neutral-200 text-neutral-800 text-xs font-semibold px-4 py-2.5 rounded-xl transition-colors cursor-pointer"
                     >
                       Continue as guest
                     </button>
@@ -473,14 +542,15 @@ export default function Checkout({
                 </div>
               )}
 
+              {/* First Name & Last Name */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-semibold text-neutral-800 uppercase tracking-wider">
-                    First Name
+                <div className="flex flex-col gap-1">
+                  <label className="text-sm font-medium text-neutral-700">
+                    First name <span className="text-red-600">*</span>
                   </label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400">
-                      <FaUser className="w-4 h-4 pointer-events-none" />
+                  <div className="relative group">
+                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400 group-focus-within:text-red-600 transition-colors">
+                      <FaUser className="w-3.5 h-3.5" />
                     </div>
                     <input
                       type="text"
@@ -488,19 +558,19 @@ export default function Checkout({
                       name="first_name"
                       value={formValues.first_name}
                       onChange={handleInputChange}
-                      className="w-full pl-11 pr-4 py-3 text-sm text-black bg-[#f4f4f4] hover:bg-neutral-100/50 focus:bg-white border border-neutral-200/80 rounded-xl outline-none focus:border-black focus:ring-2 focus:ring-black/5 transition-all duration-200"
+                      className="w-full pl-10 pr-4 py-3 text-sm text-neutral-900 bg-white hover:border-neutral-400 focus:border-red-600 border border-neutral-300 rounded-xl outline-none focus:ring-1 focus:ring-red-600 transition-colors placeholder:text-neutral-400 font-normal"
                       required
                     />
                   </div>
                 </div>
 
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-semibold text-neutral-800 uppercase tracking-wider">
-                    Last Name
+                <div className="flex flex-col gap-1">
+                  <label className="text-sm font-medium text-neutral-700">
+                    Last name <span className="text-red-600">*</span>
                   </label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400">
-                      <FaUser className="w-4 h-4 pointer-events-none" />
+                  <div className="relative group">
+                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400 group-focus-within:text-red-600 transition-colors">
+                      <FaUser className="w-3.5 h-3.5" />
                     </div>
                     <input
                       type="text"
@@ -508,119 +578,163 @@ export default function Checkout({
                       name="last_name"
                       value={formValues.last_name}
                       onChange={handleInputChange}
-                      className="w-full pl-11 pr-4 py-3 text-sm text-black bg-[#f4f4f4] hover:bg-neutral-100/50 focus:bg-white border border-neutral-200/80 rounded-xl outline-none focus:border-black focus:ring-2 focus:ring-black/5 transition-all duration-200"
+                      className="w-full pl-10 pr-4 py-3 text-sm text-neutral-900 bg-white hover:border-neutral-400 focus:border-red-600 border border-neutral-300 rounded-xl outline-none focus:ring-1 focus:ring-red-600 transition-colors placeholder:text-neutral-400 font-normal"
                       required
                     />
                   </div>
                 </div>
               </div>
 
-              <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-semibold text-neutral-800 uppercase tracking-wider">
-                  Phone Number
+              {/* Mobile Number */}
+              <div className="flex flex-col gap-1">
+                <label className="text-sm font-medium text-neutral-700">
+                  Mobile number <span className="text-red-600">*</span>
                 </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400">
-                    <FaPhoneAlt className="w-4 h-4 pointer-events-none" />
+                <div
+                  className={`flex rounded-xl overflow-hidden border transition-colors bg-white ${
+                    formValues.phone && !/^[6-9]/.test(formValues.phone)
+                      ? "border-red-400 focus-within:border-red-600 focus-within:ring-1 focus-within:ring-red-600"
+                      : isValidIndianMobile(formValues.phone)
+                      ? "border-emerald-400 focus-within:border-emerald-600 focus-within:ring-1 focus-within:ring-emerald-600"
+                      : "border-neutral-300 focus-within:border-red-600 focus-within:ring-1 focus-within:ring-red-600"
+                  }`}
+                >
+                  <div className="px-3.5 bg-neutral-50 border-r border-neutral-200 flex items-center gap-1.5 text-sm font-semibold text-neutral-700 select-none">
+                    <span>🇮🇳</span>
+                    <span>+91</span>
                   </div>
                   <input
                     type="tel"
-                    placeholder="Phone Number"
+                    placeholder="10-digit mobile number"
                     name="phone"
+                    maxLength={10}
                     value={formValues.phone}
-                    onChange={handleInputChange}
-                    className="w-full pl-11 pr-4 py-3 text-sm text-black bg-[#f4f4f4] hover:bg-neutral-100/50 focus:bg-white border border-neutral-200/80 rounded-xl outline-none focus:border-black focus:ring-2 focus:ring-black/5 transition-all duration-200"
+                    onChange={(e) => {
+                      const raw = e.target.value;
+                      if ((raw.startsWith("+") && !raw.startsWith("+91")) || (raw.startsWith("00") && !raw.startsWith("0091"))) {
+                        toast.error("Please enter a valid 10-digit mobile number.");
+                        return;
+                      }
+                      let clean = raw.replace(/\D/g, "");
+                      if (clean.startsWith("91") && clean.length > 10) {
+                        clean = clean.slice(2);
+                      } else if (clean.startsWith("0") && clean.length > 10) {
+                        clean = clean.slice(1);
+                      }
+                      clean = clean.slice(0, 10);
+                      setFormValues((prev: any) => ({ ...prev, phone: clean }));
+                    }}
+                    className="w-full px-4 py-3 text-sm text-neutral-900 bg-transparent outline-none placeholder:text-neutral-400 font-normal"
                     required
                   />
+                  {isValidIndianMobile(formValues.phone) && (
+                    <div className="flex items-center pr-3.5 text-emerald-600 pointer-events-none" title="Valid mobile number">
+                      <FaCheckCircle className="w-4 h-4" />
+                    </div>
+                  )}
                 </div>
+
+                {formValues.phone && formValues.phone.length > 0 && !/^[6-9]/.test(formValues.phone) && (
+                  <p className="text-xs text-red-600 font-medium mt-0.5">
+                    Please enter a valid 10-digit mobile number.
+                  </p>
+                )}
+                {formValues.phone && formValues.phone.length > 0 && /^[6-9]/.test(formValues.phone) && formValues.phone.length < 10 && (
+                  <p className="text-xs text-neutral-500 font-normal mt-0.5 flex items-center justify-between">
+                    <span>Must be 10 digits</span>
+                    <span>{formValues.phone.length}/10</span>
+                  </p>
+                )}
               </div>
 
-              <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-semibold text-neutral-800 uppercase tracking-wider">
-                  Address 1
+              {/* Address 1 */}
+              <div className="flex flex-col gap-1">
+                <label className="text-sm font-medium text-neutral-700">
+                  House / Flat no., Building, Street <span className="text-red-600">*</span>
                 </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400">
-                    <MdLocationPin className="w-5 h-5 pointer-events-none" />
+                <div className="relative group">
+                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400 group-focus-within:text-red-600 transition-colors">
+                    <MdLocationPin className="w-5 h-5" />
                   </div>
                   <input
                     type="text"
-                    placeholder="Address 1"
+                    placeholder="e.g. Flat 402, Sunshine Apartments, MG Road"
                     name="address"
                     value={formValues.address}
                     onChange={handleInputChange}
-                    className="w-full pl-11 pr-4 py-3 text-sm text-black bg-[#f4f4f4] hover:bg-neutral-100/50 focus:bg-white border border-neutral-200/80 rounded-xl outline-none focus:border-black focus:ring-2 focus:ring-black/5 transition-all duration-200"
+                    className="w-full pl-10 pr-4 py-3 text-sm text-neutral-900 bg-white hover:border-neutral-400 focus:border-red-600 border border-neutral-300 rounded-xl outline-none focus:ring-1 focus:ring-red-600 transition-colors placeholder:text-neutral-400 font-normal"
                     required
                   />
                 </div>
               </div>
 
-              <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-semibold text-neutral-800 uppercase tracking-wider">
-                  Address 2 (Optional)
+              {/* Address 2 (Optional) */}
+              <div className="flex flex-col gap-1">
+                <label className="text-sm font-medium text-neutral-700">
+                  Area, Landmark (Optional)
                 </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400">
-                    <MdLocationPin className="w-5 h-5 pointer-events-none" />
+                <div className="relative group">
+                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400 group-focus-within:text-red-600 transition-colors">
+                    <MdLocationPin className="w-5 h-5" />
                   </div>
                   <input
                     type="text"
-                    placeholder="Address 2 (Optional)"
+                    placeholder="e.g. Near City Hospital or Metro Gate 2"
                     name="address_2"
                     value={formValues.address_2}
                     onChange={handleInputChange}
-                    className="w-full pl-11 pr-4 py-3 text-sm text-black bg-[#f4f4f4] hover:bg-neutral-100/50 focus:bg-white border border-neutral-200/80 rounded-xl outline-none focus:border-black focus:ring-2 focus:ring-black/5 transition-all duration-200"
+                    className="w-full pl-10 pr-4 py-3 text-sm text-neutral-900 bg-white hover:border-neutral-400 focus:border-red-600 border border-neutral-300 rounded-xl outline-none focus:ring-1 focus:ring-red-600 transition-colors placeholder:text-neutral-400 font-normal"
                   />
                 </div>
               </div>
 
+              {/* PIN Code, State, City */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 {/* Postcode / PIN Code */}
-                <div className="flex flex-col gap-1.5">
+                <div className="flex flex-col gap-1">
                   <div className="flex items-center justify-between">
-                    <label className="text-xs font-semibold text-neutral-800 uppercase tracking-wider">
-                      Postcode
+                    <label className="text-sm font-medium text-neutral-700">
+                      PIN code <span className="text-red-600">*</span>
                     </label>
                     {isPincodeLoading && (
-                      <span className="text-[10px] text-blue-600 font-semibold animate-pulse flex items-center gap-1">
+                      <span className="text-xs text-red-600 font-medium animate-pulse flex items-center gap-1">
                         <FaSpinner className="animate-spin w-2.5 h-2.5" /> Fetching...
                       </span>
                     )}
                   </div>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400">
-                      <MdLocationPin className="w-5 h-5 pointer-events-none" />
+                  <div className="relative group">
+                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400 group-focus-within:text-red-600 transition-colors">
+                      <MdLocationPin className="w-5 h-5" />
                     </div>
                     <input
                       type="text"
-                      placeholder="6-digit PIN code"
+                      placeholder="6-digit PIN"
                       name="zip_code"
                       maxLength={6}
                       value={formValues.zip_code}
                       onChange={handleZipCodeChange}
-                      className="w-full pl-11 pr-10 py-3 text-sm text-black bg-[#f4f4f4] hover:bg-neutral-100/50 focus:bg-white border border-neutral-200/80 rounded-xl outline-none focus:border-black focus:ring-2 focus:ring-black/5 transition-all duration-200"
+                      className="w-full pl-10 pr-10 py-3 text-sm text-neutral-900 bg-white hover:border-neutral-400 focus:border-red-600 border border-neutral-300 rounded-xl outline-none focus:ring-1 focus:ring-red-600 transition-colors placeholder:text-neutral-400 font-normal"
                       required
                     />
                     {isPincodeLoading && (
-                      <div className="absolute inset-y-0 right-0 pr-3.5 flex items-center pointer-events-none text-blue-500">
+                      <div className="absolute inset-y-0 right-0 pr-3.5 flex items-center pointer-events-none text-red-600">
                         <FaSpinner className="animate-spin w-4 h-4" />
                       </div>
                     )}
                     {!isPincodeLoading && pincodeStatus.type === "success" && (
-                      <div className="absolute inset-y-0 right-0 pr-3.5 flex items-center pointer-events-none text-emerald-500">
+                      <div className="absolute inset-y-0 right-0 pr-3.5 flex items-center pointer-events-none text-emerald-600">
                         <FaCheckCircle className="w-4 h-4" />
                       </div>
                     )}
                   </div>
                   {pincodeStatus.message && (
                     <p
-                      className={`text-[11px] font-medium mt-0.5 leading-tight ${
-                        pincodeStatus.type === "success"
-                          ? "text-emerald-600 font-semibold"
-                          : pincodeStatus.type === "error"
-                          ? "text-amber-600 font-semibold"
-                          : "text-blue-600"
-                      }`}
+                      className={`text-xs font-medium mt-1 leading-tight ${pincodeStatus.type === "success"
+                        ? "text-emerald-700 font-semibold"
+                        : pincodeStatus.type === "error"
+                          ? "text-red-600 font-semibold"
+                          : "text-neutral-600"
+                        }`}
                     >
                       {pincodeStatus.message}
                     </p>
@@ -628,79 +742,91 @@ export default function Checkout({
                 </div>
 
                 {/* State */}
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-semibold text-neutral-800 uppercase tracking-wider">
-                    State
+                <div className="flex flex-col gap-1">
+                  <label className="text-sm font-medium text-neutral-700">
+                    State <span className="text-red-600">*</span>
                   </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400">
-                      <MdLocationPin className="w-5 h-5 pointer-events-none" />
+                      <MdLocationPin className="w-5 h-5" />
                     </div>
                     <input
                       type="text"
-                      placeholder="State"
+                      placeholder="Auto-detected"
                       name="state"
                       value={formValues.state}
                       readOnly
-                      className="w-full pl-11 pr-4 py-3 text-sm text-neutral-800 bg-[#f4f4f4] border border-neutral-200/80 rounded-xl outline-none cursor-not-allowed select-none transition-all duration-200"
+                      className="w-full pl-10 pr-4 py-3 text-sm text-neutral-800 bg-neutral-50 border border-neutral-250 rounded-xl outline-none cursor-not-allowed select-none font-medium"
                       required
                     />
                   </div>
                 </div>
 
                 {/* City */}
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-semibold text-neutral-800 uppercase tracking-wider">
-                    City
+                <div className="flex flex-col gap-1">
+                  <label className="text-sm font-medium text-neutral-700">
+                    City <span className="text-red-600">*</span>
                   </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400">
-                      <FaCity className="w-5 h-5 pointer-events-none" />
+                      <FaCity className="w-4 h-4" />
                     </div>
                     <input
                       type="text"
-                      placeholder="City"
+                      placeholder="Auto-detected"
                       name="city"
                       value={formValues.city}
                       readOnly
-                      className="w-full pl-11 pr-4 py-3 text-sm text-neutral-800 bg-[#f4f4f4] border border-neutral-200/80 rounded-xl outline-none cursor-not-allowed select-none transition-all duration-200"
+                      className="w-full pl-10 pr-4 py-3 text-sm text-neutral-800 bg-neutral-50 border border-neutral-250 rounded-xl outline-none cursor-not-allowed select-none font-medium"
                       required
                     />
                   </div>
                 </div>
               </div>
 
-              <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-semibold text-neutral-800 uppercase tracking-wider">
+              {/* Country */}
+              <div className="flex flex-col gap-1">
+                <label className="text-sm font-medium text-neutral-700">
                   Country
                 </label>
                 <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center justify-center pointer-events-none text-neutral-400">
-                    <FaGlobe className="w-4 h-4 pointer-events-none" />
+                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400">
+                    <FaGlobe className="w-4 h-4" />
                   </div>
-                  <div
-                    className="w-full pl-11 pr-4 py-3 text-sm text-black bg-[#f4f4f4] hover:bg-neutral-100/50 focus:bg-white border border-neutral-200/80 rounded-xl outline-none focus:border-black focus:ring-2 focus:ring-black/5 transition-all duration-200 cursor-not-allowed"
-                  >
+                  <div className="w-full pl-10 pr-4 py-3 text-sm text-neutral-700 bg-neutral-50 border border-neutral-250 rounded-xl outline-none select-none cursor-not-allowed font-medium">
                     {formValues?.country || "India"}
                   </div>
                 </div>
               </div>
+
+              <div className="flex items-center gap-2.5 pt-1">
+                <input
+                  type="checkbox"
+                  id="save_address"
+                  defaultChecked
+                  className="w-4 h-4 rounded text-red-600 border-neutral-300 focus:ring-red-600 cursor-pointer accent-red-600"
+                />
+                <label htmlFor="save_address" className="text-sm text-neutral-600 cursor-pointer select-none">
+                  Make this my default delivery address
+                </label>
+              </div>
             </div>
           )}
 
-          <div className="flex justify-between gap-4 mt-6 pt-4 border-t border-neutral-100">
+          {/* Action CTAs */}
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-3 pt-6 border-t border-neutral-100">
             <button
               type="button"
               onClick={onBack}
-              className="w-full sm:w-48 py-3.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-800 font-bold text-xs rounded-xl uppercase tracking-wider transition-colors cursor-pointer text-center"
+              className="w-full sm:w-auto px-6 py-3 bg-neutral-100 hover:bg-neutral-200 text-neutral-800 font-semibold text-sm rounded-xl transition-colors cursor-pointer text-center"
             >
-              Back
+              &larr; Back to Cart
             </button>
             <button
               type="submit"
-              className="w-full sm:w-48 py-3.5 bg-black hover:bg-neutral-900 text-white font-bold text-xs rounded-xl uppercase tracking-wider transition-colors cursor-pointer text-center shadow-md active:scale-98"
+              className="w-full sm:w-auto px-8 py-3 bg-black hover:bg-black/80 text-white font-semibold text-sm rounded-xl transition-all cursor-pointer text-center shadow-sm"
             >
-              Next
+              Proceed to Payment &rarr;
             </button>
           </div>
         </div>

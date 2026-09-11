@@ -7,6 +7,10 @@ import { IoIosMail } from "react-icons/io";
 import { IoCall, IoLocationSharp } from "react-icons/io5";
 import { BsBriefcaseFill } from "react-icons/bs";
 import { PiCity } from "react-icons/pi";
+import {
+  getIndianMobileValidationError,
+  normalizeIndianPhoneNumber,
+} from "@/helper/helperfun";
 
 
 
@@ -36,11 +40,13 @@ export default function Tutor() {
       return;
     }
 
-    if (phone.length > 10) {
+    const phoneError = getIndianMobileValidationError(phone);
+    if (phoneError) {
       setAlertType("error");
-      setAlertMessage("Phone number cannot be more than 10 characters.");
+      setAlertMessage(phoneError);
       return;
     }
+    const cleanPhone = normalizeIndianPhoneNumber(phone);
 
     if (!role) {
       setAlertType("error");
@@ -60,7 +66,7 @@ export default function Tutor() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: name,
-          phone: phone,
+          phone: cleanPhone,
           role: role,
           email: email,
           locality: locality,

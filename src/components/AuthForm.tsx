@@ -12,6 +12,10 @@ import toast from "react-hot-toast";
 import { FaCheckCircle, FaUser, FaPhoneAlt } from "react-icons/fa";
 import { IoMail } from "react-icons/io5";
 import { IoMdLock } from "react-icons/io";
+import {
+  getIndianMobileValidationError,
+  normalizeIndianPhoneNumber,
+} from "@/helper/helperfun";
 
 
 
@@ -214,6 +218,13 @@ export default function AuthForm({ mode }: AuthFormProps) {
       return;
     }
 
+    const phoneError = getIndianMobileValidationError(phone);
+    if (phoneError) {
+      toast.error(phoneError);
+      return;
+    }
+    const cleanPhone = normalizeIndianPhoneNumber(phone);
+
     if (captchaInput !== captcha) {
       toast.error("Invalid CAPTCHA. Please try again.");
       refreshCaptcha();
@@ -225,7 +236,7 @@ export default function AuthForm({ mode }: AuthFormProps) {
       const response = await fetch(`/api/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ first_name, last_name, phone, email, password }),
+        body: JSON.stringify({ first_name, last_name, phone: cleanPhone, email, password }),
       });
 
       const data = await response.json();
@@ -483,17 +494,18 @@ export default function AuthForm({ mode }: AuthFormProps) {
 
               <div className="flex flex-col gap-2">
                 <label className="text-xs font-semibold text-neutral-800 uppercase tracking-wider">
-                  Phone
+                  Mobile Number
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400">
                     <FaPhoneAlt className="w-4 h-4 pointer-events-none" />
                   </div>
                   <input
-                    type="text"
+                    type="tel"
                     name="phone"
                     required
-                    placeholder="9836348346"
+                    maxLength={10}
+                    placeholder="10-digit mobile number"
                     autoComplete="tel"
                     className="w-full pl-11 pr-4 py-3 text-sm text-black bg-[#f4f4f4] hover:bg-neutral-100/50 focus:bg-white border border-neutral-200/80 rounded-xl outline-none focus:border-black focus:ring-2 focus:ring-black/5 transition-all duration-200"
                   />

@@ -139,3 +139,62 @@ export function extractCategoryTitle(categoryData: any, slug?: string): string {
 
   return "Category";
 }
+
+/**
+ * Normalizes an Indian phone number string (strips non-digits, strips leading +91, 91, or 0 when > 10 digits).
+ * Returns at most 10 numeric digits.
+ */
+export function normalizeIndianPhoneNumber(phone: string): string {
+  if (!phone) return "";
+  let clean = phone.toString().replace(/\D/g, "");
+  if (clean.startsWith("91") && clean.length > 10) {
+    clean = clean.slice(2);
+  } else if (clean.startsWith("0") && clean.length > 10) {
+    clean = clean.slice(1);
+  }
+  return clean.slice(0, 10);
+}
+
+/**
+ * Validates whether a phone number is a valid 10-digit Indian mobile number
+ * (Starts with 6, 7, 8, or 9 and has exactly 10 digits).
+ */
+export function isValidIndianMobile(phone: string): boolean {
+  if (!phone) return false;
+  const normalized = normalizeIndianPhoneNumber(phone);
+  return /^[6-9]\d{9}$/.test(normalized);
+}
+
+/**
+ * Returns a human-readable validation error message, or null if valid.
+ */
+export function getIndianMobileValidationError(phone: string): string | null {
+  if (!phone || !phone.toString().trim()) {
+    return "Mobile number is required.";
+  }
+  const clean = phone.toString().trim();
+  // Check if foreign country code like +965, +1, etc. was provided
+  if (clean.startsWith("+") && !clean.startsWith("+91")) {
+    return "Please enter a valid 10-digit mobile number.";
+  }
+  if (clean.startsWith("00") && !clean.startsWith("0091")) {
+    return "Please enter a valid 10-digit mobile number.";
+  }
+  const normalized = normalizeIndianPhoneNumber(clean);
+  if (normalized.length === 0) {
+    return "Mobile number is required.";
+  }
+  if (!/^[6-9]/.test(normalized) || normalized.length !== 10) {
+    return "Please enter a valid 10-digit mobile number.";
+  }
+  return null;
+}
+
+/**
+ * Validates an Indian PIN code (6 digits, starts with 1-9)
+ */
+export function isValidIndianPinCode(pin: string): boolean {
+  if (!pin) return false;
+  const clean = pin.toString().replace(/\D/g, "");
+  return /^[1-9]\d{5}$/.test(clean);
+}

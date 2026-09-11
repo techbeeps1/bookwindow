@@ -127,10 +127,10 @@ export default function ShoppingCart() {
   const calculatedTotal = subtotalAmount - discountAmount + shippingCostNum + codChargeNum;
 
   const finalTotal =
-    calculatedTotal > 0
-      ? calculatedTotal.toFixed(2)
-      : Number(orderData?.total_amount) > 0
-        ? Number(orderData?.total_amount).toFixed(2)
+    Number(orderData?.total_amount) > 0
+      ? Number(orderData?.total_amount).toFixed(2)
+      : calculatedTotal > 0
+        ? calculatedTotal.toFixed(2)
         : "0.00";
 
   const customerName =
@@ -323,7 +323,7 @@ export default function ShoppingCart() {
                   <div className="flex justify-between items-center pt-2 border-t border-neutral-100">
                     <span className="text-neutral-400">Payment Mode</span>
                     <span className="text-neutral-900 font-extrabold">
-                      {isCod ? "Cash On Delivery (+₹49)" : "Online Payment"}
+                      {isCod ? `Cash On Delivery (+₹${codCharge})` : "Online Payment"}
                     </span>
                   </div>
 

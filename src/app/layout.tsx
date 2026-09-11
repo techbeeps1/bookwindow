@@ -90,7 +90,8 @@ export default async function RootLayout({
 
         {/* Schema.org Global Structured Data */}
         <JsonLd schema={[orgSchema, webSiteSchema]} />
-
+      </head>
+      <body className={roboto.className}>
         {/* Google Analytics (Dynamic with fallback) */}
         {gaId && (
           <>
@@ -116,6 +117,7 @@ export default async function RootLayout({
         {/* Additional GA snippet if configured */}
         {globalSettings?.scripts?.google_analytics?.script_code && (
           <div
+            id="ga-custom-script"
             style={{ display: "contents" }}
             dangerouslySetInnerHTML={{
               __html: globalSettings.scripts.google_analytics.script_code,
@@ -126,9 +128,21 @@ export default async function RootLayout({
         {/* Google Tag Manager (Head Script) */}
         {globalSettings?.scripts?.gtm?.head_code && (
           <div
+            id="gtm-head-script"
             style={{ display: "contents" }}
             dangerouslySetInnerHTML={{
               __html: globalSettings.scripts.gtm.head_code,
+            }}
+          />
+        )}
+
+        {/* GTM Body (NoScript) immediately after <body> */}
+        {globalSettings?.scripts?.gtm?.body_code && (
+          <div
+            id="gtm-body-noscript"
+            style={{ display: "contents" }}
+            dangerouslySetInnerHTML={{
+              __html: globalSettings.scripts.gtm.body_code,
             }}
           />
         )}
@@ -158,6 +172,7 @@ export default async function RootLayout({
         {/* Additional Meta Pixel Code if configured */}
         {globalSettings?.scripts?.meta_pixel?.pixel_code && (
           <div
+            id="meta-pixel-custom-code"
             style={{ display: "contents" }}
             dangerouslySetInnerHTML={{
               __html: globalSettings.scripts.meta_pixel.pixel_code,
@@ -168,20 +183,10 @@ export default async function RootLayout({
         {/* Custom Head Scripts (Search Console, Clarity, Custom Meta) */}
         {globalSettings?.scripts?.custom_head_scripts && (
           <div
+            id="custom-head-scripts"
             style={{ display: "contents" }}
             dangerouslySetInnerHTML={{
               __html: globalSettings.scripts.custom_head_scripts,
-            }}
-          />
-        )}
-      </head>
-      <body className={roboto.className}>
-        {/* GTM Body (NoScript) immediately after <body> */}
-        {globalSettings?.scripts?.gtm?.body_code && (
-          <div
-            style={{ display: "contents" }}
-            dangerouslySetInnerHTML={{
-              __html: globalSettings.scripts.gtm.body_code,
             }}
           />
         )}

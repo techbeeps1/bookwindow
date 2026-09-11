@@ -215,7 +215,7 @@ export default function VendorRegisterPage() {
     }
     const phoneRegex = /^[6-9]\d{9}$/;
     if (!phoneRegex.test(cleanPhone)) {
-      toast.error("Please enter a valid 10-digit mobile number starting with 6, 7, 8, or 9.");
+      toast.error("Please enter a valid 10-digit mobile number.");
       return false;
     }
     return true;

@@ -10,6 +10,10 @@ import { IoCall, IoLocationSharp } from "react-icons/io5";
 import { BiSolidMessageDetail } from "react-icons/bi";
 import { HiMiniPencilSquare } from "react-icons/hi2";
 import { FaUpload } from "react-icons/fa6";
+import {
+  getIndianMobileValidationError,
+  normalizeIndianPhoneNumber,
+} from "@/helper/helperfun";
 
 
 
@@ -49,11 +53,13 @@ export default function RequestProduct() {
       return;
     }
 
-    if (phone.length > 10) {
+    const phoneError = getIndianMobileValidationError(phone);
+    if (phoneError) {
       setAlertType("error");
-      setAlertMessage("Phone number cannot be more than 10 characters.");
+      setAlertMessage(phoneError);
       return;
     }
+    const cleanPhone = normalizeIndianPhoneNumber(phone);
 
     if (!request) {
       setAlertType("error");
@@ -68,7 +74,7 @@ export default function RequestProduct() {
     }
     const newFormData = new FormData();
     newFormData.append("name", name);
-    newFormData.append("phone", phone);
+    newFormData.append("phone", cleanPhone);
     newFormData.append("email", email);
     newFormData.append("request", request);
     newFormData.append("remark", remark);

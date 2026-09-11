@@ -16,6 +16,11 @@ import { IoIosArrowBack, IoMdLock, IoMdMail } from "react-icons/io";
 import { IoSearchSharp } from "react-icons/io5";
 import { FaGlobe } from "react-icons/fa6";
 import { fetchPincodeDetails, matchState, matchCity } from "@/lib/pincode";
+import {
+  getIndianMobileValidationError,
+  normalizeIndianPhoneNumber,
+  isValidIndianMobile,
+} from "@/helper/helperfun";
 
 type AccountTab =
   | "dashboard"
@@ -90,23 +95,22 @@ export default function AccountPage() {
       console.error("Error fetching orders:", error);
     }
   };
+  const fetchOrdersData = async () => {
+    if (!user?.id) return;
+    try {
+      const response = await axios({
+        method: "get",
+        url: `/api/my-account/user_order/${user?.id}`,
+        responseType: "json",
+      });
+      const orders = response?.data;
+      setUserOrders(orders?.data);
+    } catch (error) {
+      console.error("Error fetching orders:", error);
+    }
+  };
+
   useEffect(() => {
-    const fetchOrdersData = async () => {
-      try {
-        const response = await axios({
-          method: "get",
-          url: `/api/my-account/user_order/${user?.id}`,
-          responseType: "json",
-        });
-        const orders = response?.data;
-        setUserOrders(orders?.data);
-      } catch (error) {
-        console.error("Error fetching orders:", error);
-      }
-    };
-
-
-
     if (user?.id) {
       fetchOrdersData();
       CustomerDataFetch();
@@ -118,7 +122,7 @@ export default function AccountPage() {
       case "dashboard":
         return <DashboardTab customer={customer} logout={logoutUser} setActiveTab={setActiveTab} />;
       case "orders":
-        return <OrdersTab userOrders={userOrders} />;
+        return <OrdersTab userOrders={userOrders} onRefreshOrders={fetchOrdersData} />;
       case "password":
         return <PasswordTab customer={customer} />;
       case "addresses":
@@ -303,13 +307,67 @@ function DashboardTab({ customer, logout, setActiveTab }: any) {
   );
 }
 
-function OrdersTab({ userOrders }: any) {
+function OrdersTab({ userOrders, onRefreshOrders }: any) {
   const [isOrderShow, setIsOrderShow] = useState<boolean>(false);
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterTab, setFilterTab] = useState<"all" | "active" | "completed" | "cancelled">("all");
   const [selectedRows, setSelectedRows] = useState<Record<string, boolean>>({});
+
+  const [cancellingOrder, setCancellingOrder] = useState<any>(null);
+  const [cancelReasonPreset, setCancelReasonPreset] = useState<string>("Ordered by mistake");
+  const [cancelReasonCustom, setCancelReasonCustom] = useState<string>("");
+  const [isCancelling, setIsCancelling] = useState<boolean>(false);
+
+  const canCancelOrder = (order: any) => {
+    const status = order?.order_details?.status?.toLowerCase()?.trim() || "";
+    // Cannot cancel if already shipped, completed, delivered, cancelled, or declined
+    const nonCancellable = ["order_shipped", "shipped", "completed", "delivered", "cancelled", "declined"];
+    return !nonCancellable.includes(status);
+  };
+
+  const handleConfirmCancel = async () => {
+    if (!cancellingOrder) return;
+    const finalReason = cancelReasonPreset === "Other reason" 
+      ? (cancelReasonCustom.trim() || "Cancelled by customer") 
+      : (cancelReasonCustom.trim() ? `${cancelReasonPreset}: ${cancelReasonCustom.trim()}` : cancelReasonPreset);
+
+    try {
+      setIsCancelling(true);
+      const response = await axios.post("/api/my-account/cancel-order", {
+        order_number: cancellingOrder?.order_details?.order_number,
+        reason: finalReason,
+      });
+
+      if (response.data?.status) {
+        toast.success("Order cancelled successfully");
+        setCancellingOrder(null);
+        setCancelReasonCustom("");
+        if (onRefreshOrders) {
+          await onRefreshOrders();
+        }
+        if (selectedOrder && selectedOrder.order_details?.order_number === cancellingOrder.order_details?.order_number) {
+          setSelectedOrder((prev: any) => ({
+            ...prev,
+            order_details: {
+              ...prev.order_details,
+              status: "cancelled",
+              cancelled_by: "customer",
+              cancellation_reason: finalReason,
+            }
+          }));
+        }
+      } else {
+        toast.error(response.data?.message || "Failed to cancel order");
+      }
+    } catch (err: any) {
+      console.error("Cancellation error:", err);
+      toast.error(err.response?.data?.message || "Failed to cancel order. Please try again.");
+    } finally {
+      setIsCancelling(false);
+    }
+  };
 
   const itemsPerPage = 6;
 
@@ -364,23 +422,30 @@ function OrdersTab({ userOrders }: any) {
     setCurrentPage(1);
   }, [userOrders?.orders, searchQuery, filterTab]);
 
-  const isAllSelectedOnPage = currentItems.length > 0 && currentItems.every((item) => selectedRows[item.id]);
+  const isAllSelectedOnPage =
+    currentItems.length > 0 &&
+    currentItems.every((item: any) => {
+      const id = item?.order_details?.id || item?.order_details?.order_number;
+      return id ? selectedRows[id] : false;
+    });
 
   const handleSelectAll = () => {
     const newSelected = { ...selectedRows };
     if (isAllSelectedOnPage) {
-      currentItems.forEach((item) => {
-        delete newSelected[item.id];
+      currentItems.forEach((item: any) => {
+        const id = item?.order_details?.id || item?.order_details?.order_number;
+        if (id) delete newSelected[id];
       });
     } else {
-      currentItems.forEach((item) => {
-        newSelected[item.id] = true;
+      currentItems.forEach((item: any) => {
+        const id = item?.order_details?.id || item?.order_details?.order_number;
+        if (id) newSelected[id] = true;
       });
     }
     setSelectedRows(newSelected);
   };
 
-  const handleSelectRow = (id: string) => {
+  const handleSelectRow = (id: string | number) => {
     setSelectedRows((prev) => {
       const updated = { ...prev };
       if (updated[id]) {
@@ -478,7 +543,8 @@ function OrdersTab({ userOrders }: any) {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-neutral-150">
-                  {currentItems.map((order: any) => {
+                  {currentItems.map((order: any, index: number) => {
+                    const rowId = order?.order_details?.id || order?.order_details?.order_number || index;
                     const statusLower = order?.order_details?.status?.toLowerCase();
                     const isSuccess = ["delivered", "completed", "paid", "success"].some((s) => statusLower?.includes(s));
                     const isCancelled = ["cancelled", "failed", "refunded"].some((s) => statusLower?.includes(s));
@@ -495,20 +561,27 @@ function OrdersTab({ userOrders }: any) {
                       (isCodOrder ? 49 : 0);
                     const subtotalVal = Number(order?.order_details?.subtotal) || 0;
                     const discountVal = Number(order?.order_details?.discount_amount) || 0;
-                    const shippingVal = Number(order?.order_details?.shipping_amount) || 49;
+                    const shippingVal =
+                      order?.order_details?.shipping_amount !== undefined &&
+                      order?.order_details?.shipping_amount !== null
+                        ? Number(order?.order_details?.shipping_amount)
+                        : 49;
+                    const orderDbTotal = Number(order?.order_details?.total_amount);
                     const calculatedRowTotal =
-                      subtotalVal > 0
-                        ? (subtotalVal - discountVal + shippingVal + (isCodOrder ? codFee : 0)).toFixed(2)
-                        : order?.order_details?.total_amount;
+                      orderDbTotal > 0
+                        ? orderDbTotal.toFixed(2)
+                        : subtotalVal > 0
+                          ? (subtotalVal - discountVal + shippingVal + (isCodOrder ? codFee : 0)).toFixed(2)
+                          : "0.00";
 
                     return (
-                      <tr key={order?.id} className={`hover:bg-neutral-50/40 transition-colors ${selectedRows[order.id] ? "bg-neutral-50/20" : ""}`}>
+                      <tr key={rowId} className={`hover:bg-neutral-50/40 transition-colors ${selectedRows[rowId] ? "bg-neutral-50/20" : ""}`}>
                         <td className="p-4 text-center">
                           <div className="flex items-center justify-center">
                             <input
                               type="checkbox"
-                              checked={!!selectedRows[order.id]}
-                              onChange={() => handleSelectRow(order.id)}
+                              checked={!!selectedRows[rowId]}
+                              onChange={() => handleSelectRow(rowId)}
                               className="w-4 h-4 rounded border-neutral-300 text-black focus:ring-black accent-black cursor-pointer"
                             />
                           </div>
@@ -539,12 +612,22 @@ function OrdersTab({ userOrders }: any) {
                           </span>
                         </td>
                         <td className="p-4 text-right">
-                          <button
-                            onClick={() => handleViewOrder(order)}
-                            className="bg-white hover:bg-black hover:text-white text-black border border-neutral-300 hover:border-black text-xs font-bold uppercase tracking-wider px-3.5 py-1.5 rounded-xl transition-all cursor-pointer shadow-sm"
-                          >
-                            View
-                          </button>
+                          <div className="flex items-center justify-end gap-2">
+                            <button
+                              onClick={() => handleViewOrder(order)}
+                              className="bg-white hover:bg-black hover:text-white text-black border border-neutral-300 hover:border-black text-xs font-bold uppercase tracking-wider px-3.5 py-1.5 rounded-xl transition-all cursor-pointer shadow-sm"
+                            >
+                              View
+                            </button>
+                            {canCancelOrder(order) && (
+                              <button
+                                onClick={() => setCancellingOrder(order)}
+                                className="bg-white hover:bg-red-600 hover:text-white text-red-600 border border-red-200 hover:border-red-600 text-xs font-bold uppercase tracking-wider px-3 py-1.5 rounded-xl transition-all cursor-pointer shadow-sm"
+                              >
+                                Cancel
+                              </button>
+                            )}
+                          </div>
                         </td>
                       </tr>
                     );
@@ -663,6 +746,58 @@ function OrdersTab({ userOrders }: any) {
             </div>
           </div>
 
+          {/* Cancellation Info Banner */}
+          {["cancelled", "declined"].some((s) => selectedOrder?.order_details?.status?.toLowerCase()?.includes(s)) && (
+            <div className="bg-red-50/80 border border-red-200 rounded-2xl p-5 mb-8 shadow-sm">
+              <div className="flex items-start gap-3.5">
+                <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0 text-red-600 font-bold text-sm">
+                  ✕
+                </div>
+                <div className="flex-1">
+                  <h2 className="text-xs font-extrabold uppercase tracking-wider text-red-900">
+                    Order Cancelled {selectedOrder?.order_details?.cancelled_by === "customer" ? "(By You)" : "(By Store Staff)"}
+                  </h2>
+                  {selectedOrder?.order_details?.cancellation_reason ? (
+                    <p className="text-xs text-red-800 font-medium mt-1.5 leading-relaxed">
+                      <span className="font-bold">Reason:</span> {selectedOrder?.order_details?.cancellation_reason}
+                    </p>
+                  ) : (
+                    <p className="text-xs text-red-700 font-medium mt-1">
+                      This order has been cancelled.
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Shipped Info Banner */}
+          {["order_shipped", "shipped"].some((s) => selectedOrder?.order_details?.status?.toLowerCase()?.includes(s)) && (
+            <div className="bg-blue-50/80 border border-blue-200 rounded-2xl p-4 mb-8 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+              <div className="flex items-center gap-2.5 text-blue-900 font-semibold">
+                <span className="text-base">📦</span>
+                <span>Your order has been shipped and is on its way. It can no longer be cancelled.</span>
+              </div>
+              {selectedOrder?.order_details?.tracking_id && (
+                <span className="font-mono font-bold bg-blue-100 text-blue-950 px-3 py-1 rounded-lg self-start sm:self-auto">
+                  Tracking ID: {selectedOrder.order_details.tracking_id}
+                </span>
+              )}
+            </div>
+          )}
+
+          {/* Active Order Actions */}
+          {canCancelOrder(selectedOrder) && (
+            <div className="flex justify-end mb-6">
+              <button
+                onClick={() => setCancellingOrder(selectedOrder)}
+                className="bg-white hover:bg-red-600 hover:text-white text-red-600 border border-red-200 hover:border-red-600 text-xs font-bold uppercase tracking-wider px-4 py-2 rounded-xl transition-all cursor-pointer shadow-sm active:scale-95 flex items-center gap-2"
+              >
+                <span>Cancel Order</span>
+              </button>
+            </div>
+          )}
+
           {/* Ordered items */}
           <div className="border border-neutral-200/80 rounded-2xl overflow-hidden bg-white mb-8 shadow-sm">
             <div className="flex justify-between items-center bg-[#fbfbfb] font-bold text-xs uppercase tracking-wider px-6 py-4 border-b border-neutral-200 text-neutral-450">
@@ -671,8 +806,8 @@ function OrdersTab({ userOrders }: any) {
             </div>
 
             <div className="divide-y divide-neutral-150">
-              {selectedOrder?.items?.map((item: any) => (
-                <div key={item?.id} className="p-6 hover:bg-neutral-50/20 transition-colors">
+              {selectedOrder?.items?.map((item: any, itemIdx: number) => (
+                <div key={item?.id || item?.product_id || itemIdx} className="p-6 hover:bg-neutral-50/20 transition-colors">
                   <div className="flex justify-between items-start gap-6">
                     <div className="text-sm font-semibold text-neutral-800 flex-1">
                       <span className="font-bold text-neutral-950 block sm:inline">
@@ -741,11 +876,18 @@ function OrdersTab({ userOrders }: any) {
                   (isSelectedCod ? 49 : 0);
                 const selectedSubtotal = Number(selectedOrder?.order_details?.subtotal) || 0;
                 const selectedDiscount = Number(selectedOrder?.order_details?.discount_amount) || 0;
-                const selectedShipping = Number(selectedOrder?.order_details?.shipping_amount) || 49;
+                const selectedShipping =
+                  selectedOrder?.order_details?.shipping_amount !== undefined &&
+                  selectedOrder?.order_details?.shipping_amount !== null
+                    ? Number(selectedOrder?.order_details?.shipping_amount)
+                    : 49;
+                const selectedDbTotal = Number(selectedOrder?.order_details?.total_amount);
                 const selectedTotal =
-                  selectedSubtotal > 0
-                    ? (selectedSubtotal - selectedDiscount + selectedShipping + (isSelectedCod ? selectedCodFee : 0)).toFixed(2)
-                    : selectedOrder?.order_details?.total_amount;
+                  selectedDbTotal > 0
+                    ? selectedDbTotal.toFixed(2)
+                    : selectedSubtotal > 0
+                      ? (selectedSubtotal - selectedDiscount + selectedShipping + (isSelectedCod ? selectedCodFee : 0)).toFixed(2)
+                      : "0.00";
 
                 return (
                   <div className="flex justify-between pt-3.5 font-bold text-sm text-neutral-955">
@@ -805,6 +947,102 @@ function OrdersTab({ userOrders }: any) {
                   <span>{selectedOrder?.order_details?.email}</span>
                 </p>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Cancel Order Modal */}
+      {cancellingOrder && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+          <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-lg w-full shadow-2xl border border-neutral-200 relative animate-in fade-in duration-200">
+            <div className="flex items-center justify-between pb-4 border-b border-neutral-100">
+              <div>
+                <h3 className="text-lg font-extrabold text-neutral-900 uppercase tracking-tight">Cancel Order</h3>
+                <p className="text-xs text-neutral-400 font-bold uppercase tracking-wider mt-0.5">
+                  Order #{cancellingOrder?.order_details?.order_number}
+                </p>
+              </div>
+              <button
+                onClick={() => {
+                  if (!isCancelling) {
+                    setCancellingOrder(null);
+                    setCancelReasonCustom("");
+                  }
+                }}
+                disabled={isCancelling}
+                className="w-8 h-8 rounded-full border border-neutral-200 flex items-center justify-center text-neutral-400 hover:text-black hover:border-black transition-colors cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="py-5 space-y-4">
+              <p className="text-xs text-neutral-500 font-medium leading-relaxed">
+                Please let us know why you want to cancel this order. Once cancelled, this action cannot be undone.
+              </p>
+
+              <div>
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-neutral-700 mb-2">
+                  Reason for cancellation <span className="text-red-500">*</span>
+                </label>
+                <select
+                  value={cancelReasonPreset}
+                  onChange={(e) => setCancelReasonPreset(e.target.value)}
+                  disabled={isCancelling}
+                  className="w-full px-3.5 py-2.5 text-xs text-black font-semibold bg-[#f9f9f9] border border-neutral-200 focus:bg-white rounded-xl outline-none focus:border-black transition-all"
+                >
+                  <option value="Ordered by mistake">Ordered by mistake</option>
+                  <option value="Found a better price elsewhere">Found a better price elsewhere</option>
+                  <option value="Incorrect / change of delivery address">Incorrect / change of delivery address</option>
+                  <option value="Delivery time is too long / Changed mind">Delivery time is too long / Changed mind</option>
+                  <option value="Need to add more items / change items">Need to add more items / change items</option>
+                  <option value="Other reason">Other reason (specify below)</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-neutral-700 mb-2">
+                  Additional Comments / Remarks {cancelReasonPreset === "Other reason" && <span className="text-red-500">*</span>}
+                </label>
+                <textarea
+                  rows={3}
+                  placeholder={cancelReasonPreset === "Other reason" ? "Please specify your reason here..." : "Any additional notes (optional)..."}
+                  value={cancelReasonCustom}
+                  onChange={(e) => setCancelReasonCustom(e.target.value)}
+                  disabled={isCancelling}
+                  className="w-full p-3 text-xs text-black font-medium bg-[#f9f9f9] border border-neutral-200 focus:bg-white rounded-xl outline-none focus:border-black transition-all resize-none"
+                />
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end gap-3 pt-4 border-t border-neutral-100">
+              <button
+                type="button"
+                onClick={() => {
+                  setCancellingOrder(null);
+                  setCancelReasonCustom("");
+                }}
+                disabled={isCancelling}
+                className="px-4 py-2.5 rounded-xl border border-neutral-200 hover:border-black text-neutral-700 hover:text-black font-bold text-xs uppercase tracking-wider transition-all cursor-pointer"
+              >
+                Keep Order
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmCancel}
+                disabled={isCancelling || (cancelReasonPreset === "Other reason" && !cancelReasonCustom.trim())}
+                className="px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white font-bold text-xs uppercase tracking-wider transition-all cursor-pointer shadow-sm flex items-center gap-2"
+              >
+                {isCancelling ? (
+                  <>
+                    <FaSpinner className="w-3.5 h-3.5 animate-spin" />
+                    <span>Cancelling...</span>
+                  </>
+                ) : (
+                  <span>Confirm Cancellation</span>
+                )}
+              </button>
             </div>
           </div>
         </div>
@@ -1387,6 +1625,14 @@ function AccountDetailsTab({ customer, isEdited }: any) {
       toast.error("Phone is required.");
       return;
     }
+
+    const phoneError = getIndianMobileValidationError(trimmedPhone);
+    if (phoneError) {
+      toast.error(phoneError);
+      return;
+    }
+    const cleanPhone = normalizeIndianPhoneNumber(trimmedPhone);
+
     if (!trimmedDOB) {
       toast.error("Date of birth is required.");
       return;
@@ -1403,7 +1649,7 @@ function AccountDetailsTab({ customer, isEdited }: any) {
           email: customer?.email,
           first_name: trimmedFirstName,
           last_name: trimmedLastName,
-          phone: trimmedPhone,
+          phone: cleanPhone,
           date_of_birth: trimmedDOB,
           address: customer?.address,
           address_2: customer?.address_2,
@@ -1494,16 +1740,31 @@ function AccountDetailsTab({ customer, isEdited }: any) {
 
               {/* Phone */}
               <div className="flex flex-col gap-1.5">
-                <label className="text-sm font-semibold text-neutral-800 uppercase tracking-wider">Phone</label>
+                <label className="text-sm font-semibold text-neutral-800 uppercase tracking-wider">Mobile Number</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400">
                     <FaPhoneAlt className="w-4 h-4" />
                   </div>
                   <input
-                    type="text"
+                    type="tel"
                     name="phone"
+                    maxLength={10}
+                    placeholder="10-digit mobile number"
                     value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
+                    onChange={(e) => {
+                      const raw = e.target.value;
+                      if ((raw.startsWith("+") && !raw.startsWith("+91")) || (raw.startsWith("00") && !raw.startsWith("0091"))) {
+                        toast.error("Please enter a valid 10-digit mobile number.");
+                        return;
+                      }
+                      let clean = raw.replace(/\D/g, "");
+                      if (clean.startsWith("91") && clean.length > 10) {
+                        clean = clean.slice(2);
+                      } else if (clean.startsWith("0") && clean.length > 10) {
+                        clean = clean.slice(1);
+                      }
+                      setPhone(clean.slice(0, 10));
+                    }}
                     className="w-full pl-11 pr-4 py-3.5 text-base text-black bg-[#f4f4f4] hover:bg-neutral-100/50 focus:bg-white border border-neutral-200/80 rounded-xl outline-none focus:border-black focus:ring-2 focus:ring-black/5 transition-all duration-200"
                     required
                   />
