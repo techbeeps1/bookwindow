@@ -16,6 +16,7 @@ import { useCart } from "@/hooks/useCart";
 import { useSession } from "@/hooks/useSession";
 import { FaImage, FaShoppingBag } from "react-icons/fa";
 import { HiShoppingCart } from "react-icons/hi2";
+import { trackAddToCart } from "@/helper/analytics";
 
 export default function ProductDialog({ open, handleOpen, slug }: any) {
   const router = useRouter();
@@ -37,6 +38,15 @@ export default function ProductDialog({ open, handleOpen, slug }: any) {
         product_id: productId,
         quantity,
       }).unwrap();
+
+      // Trigger GA4 & Meta Pixel Add to Cart
+      trackAddToCart({
+        product_id: productId,
+        product_name: productData?.name || "Book",
+        price: productData?.sale_price || productData?.price || 0,
+        quantity,
+        category: productData?.category?.name,
+      });
 
       // wait until cart is refreshed
       await refetch();

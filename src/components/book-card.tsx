@@ -15,6 +15,7 @@ import toast from "react-hot-toast";
 import { HiShoppingCart } from "react-icons/hi2";
 import { AiFillEye } from "react-icons/ai";
 import { FaHeart } from "react-icons/fa";
+import { trackAddToCart } from "@/helper/analytics";
 
 
 interface BookCardProps {
@@ -107,6 +108,15 @@ export function BookCard({
         product_id: productId,
         quantity: qty,
       }).unwrap();
+
+      // Trigger GA4 & Meta Pixel Add to Cart
+      trackAddToCart({
+        product_id: productId,
+        product_name: title || "Book",
+        price: offPrice || price || 0,
+        quantity: qty,
+        category: category,
+      });
 
       setIsAddedToCart(true);
       setCartBounce(true);

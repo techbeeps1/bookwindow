@@ -8,6 +8,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { IoCheckmarkCircle, IoBagHandle, IoArrowForward, IoLocationSharp, IoCall, IoMailOutline, IoCallOutline } from "react-icons/io5";
 import FadeLoaderOverlay from "@/components/loader";
+import { trackPurchase } from "@/helper/analytics";
 
 interface CartItem {
   id: number;
@@ -132,6 +133,28 @@ export default function ShoppingCart() {
       : calculatedTotal > 0
         ? calculatedTotal.toFixed(2)
         : "0.00";
+
+  // Trigger GA4 and Meta Pixel Purchase Event
+  useEffect(() => {
+    const orderNum = orderData?.order_number || orderNumber;
+    if (orderNum && Array.isArray(orderItems) && orderItems.length > 0 && Number(finalTotal) > 0) {
+      trackPurchase({
+        orderNumber: String(orderNum),
+        total: finalTotal,
+        subtotal: subtotalAmount,
+        shipping: shippingCostNum,
+        discount: discountAmount,
+        coupon: orderData?.coupon_code || "",
+        currency: "INR",
+        items: orderItems.map((item) => ({
+          product_id: item.id,
+          product_name: item.product_name,
+          price: item.price,
+          quantity: item.quantity,
+        })),
+      });
+    }
+  }, [orderData, orderItems, finalTotal, orderNumber, subtotalAmount, shippingCostNum, discountAmount]);
 
   const customerName =
     orderData?.billing_name ||

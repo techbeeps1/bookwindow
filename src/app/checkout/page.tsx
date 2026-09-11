@@ -29,6 +29,7 @@ import {
   normalizeIndianPhoneNumber,
   isValidIndianPinCode,
 } from "@/helper/helperfun";
+import { trackBeginCheckout, trackRemoveFromCart } from "@/helper/analytics";
 
 interface CartItem {
   product_id: number;
@@ -265,9 +266,13 @@ export default function ShoppingCart() {
     }
 
     try {
-      setCartItems(data?.items || []);
+      const items = data?.items || [];
+      setCartItems(items);
       setItemsCount(data?.items_count || 0);
       setCartFetched(true);
+      if (items.length > 0 && !cartFetched) {
+        trackBeginCheckout(items, data?.total || 0);
+      }
     } catch (error) {
       console.error("Error loading cart:", error);
       setCartItems([]);
@@ -312,6 +317,13 @@ export default function ShoppingCart() {
   const removeItem = (id: number) => {
     const itemToRemove = cartItems?.find((item) => item.product_id === id);
     if (!itemToRemove) return;
+
+    trackRemoveFromCart({
+      product_id: id,
+      product_name: itemToRemove.product_name,
+      price: itemToRemove.product_price,
+      quantity: itemToRemove.quantity,
+    });
 
     const quantity = itemToRemove.quantity || 1;
     const newItemsCount = items_count - quantity;

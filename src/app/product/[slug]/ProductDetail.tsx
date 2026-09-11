@@ -17,6 +17,7 @@ import { ImageBook } from "@/components/ImageBook";
 import { FrequentlyBougth } from "@/components/FrequentlyBougth";
 import { useAddToWishlistMutation, useViewWishlistIdQuery } from "@/lib/api/wishlistApi";
 import toast from "react-hot-toast";
+import { trackAddToCart, trackViewItem } from "@/helper/analytics";
 
 const parseGallery = (gallery: any): string[] => {
   if (!gallery) return [];
@@ -165,6 +166,14 @@ export default function ProductDetail({
   useEffect(() => {
     setCurrentImageIndex(0);
     setMainImage(`${config.apiUrl}storage/app/public/${productData?.image}`);
+    if (productData?.id) {
+      trackViewItem({
+        product_id: productData.id,
+        product_name: productData.name,
+        price: productData.sale_price || productData.price,
+        category: productData?.category?.name || productData?.production?.name,
+      });
+    }
   }, [productData, similarProducts]);
 
   const [quantity, setQuantity] = useState(1);
@@ -188,6 +197,15 @@ export default function ProductDetail({
         quantity,
       }).unwrap();
 
+      // Trigger GA4 & Meta Pixel Add to Cart
+      trackAddToCart({
+        product_id: productId,
+        product_name: productData?.name || "Book",
+        price: productData?.sale_price || productData?.price || 0,
+        quantity,
+        category: productData?.category?.name || productData?.production?.name,
+      });
+
       // wait until cart is refreshed
       await refetch();
 
@@ -206,6 +224,15 @@ export default function ProductDetail({
         product_id: productId,
         quantity,
       }).unwrap();
+
+      // Trigger GA4 & Meta Pixel Add to Cart
+      trackAddToCart({
+        product_id: productId,
+        product_name: productData?.name || "Book",
+        price: productData?.sale_price || productData?.price || 0,
+        quantity,
+        category: productData?.category?.name || productData?.production?.name,
+      });
 
       // wait until cart is refreshed
       await refetch();

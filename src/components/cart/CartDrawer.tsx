@@ -20,6 +20,7 @@ import { BsCartCheck } from "react-icons/bs";
 import { useState, useEffect } from "react";
 import { IoIosArrowUp, IoIosArrowDown } from "react-icons/io";
 import { HiShoppingCart } from "react-icons/hi2";
+import { trackRemoveFromCart, trackBeginCheckout } from "@/helper/analytics";
 
 
 // Loading Skeleton Component - Only shown on initial load
@@ -227,12 +228,24 @@ export default function CartDrawer() {
   const handleRemove = async (productId: string) => {
     if (updatingItemId || removingItemId) return;
 
+    const itemToRemove = cart?.items?.find((i: any) => String(i.product_id) === String(productId));
+
     setRemovingItemId(productId);
     try {
       await removeCart({
         product_id: productId,
         session_id: sessionId,
       }).unwrap();
+
+      if (itemToRemove) {
+        trackRemoveFromCart({
+          product_id: productId,
+          product_name: itemToRemove.product_name,
+          price: itemToRemove.product_price,
+          quantity: itemToRemove.quantity,
+        });
+      }
+
       await refetch();
     } catch (error) {
       console.error('Failed to remove item:', error);
@@ -371,7 +384,10 @@ export default function CartDrawer() {
 
                 <Link
                   href="/checkout"
-                  onClick={() => dispatch(closeCartDrawer())}
+                  onClick={() => {
+                    trackBeginCheckout(cart?.items || [], cart?.total || 0);
+                    dispatch(closeCartDrawer());
+                  }}
                   className="group flex items-center justify-center gap-2 w-full rounded-full bg-black py-3.5 text-white text-center font-semibold hover:bg-gray-800 transition-all duration-300 hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]"
                 >
                   <BsCartCheck className="w-5 h-5 group-hover:scale-110 transition-transform" />

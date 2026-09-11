@@ -28,6 +28,7 @@ import { useAppDispatch, useAppSelector } from "@/hooks/useStore";
 import { openCartDrawer } from "@/lib/slices/uiSlice";
 import { ImageBook } from "@/components/ImageBook";
 import ProductDialog from "@/components/product-detail-popup";
+import { trackAddToCart } from "@/helper/analytics";
 import config from "@/app/config";
 import ProductFilterBar from "@/components/ProductFilterBar";
 import { useViewWishlistQuery, useRemoveWishlistMutation } from "@/lib/api/wishlistApi";
@@ -79,6 +80,15 @@ export default function WishlistPage() {
         product_id: product.id,
         quantity: 1,
       }).unwrap();
+
+      // Trigger GA4 & Meta Pixel Add to Cart
+      trackAddToCart({
+        product_id: product.id,
+        product_name: product.name || "Book",
+        price: product.offPrice || product.price || 0,
+        quantity: 1,
+        category: product.categories || product.production,
+      });
 
       await refetch();
       dispatch(openCartDrawer());
