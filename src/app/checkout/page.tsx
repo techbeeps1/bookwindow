@@ -29,7 +29,12 @@ import {
   normalizeIndianPhoneNumber,
   isValidIndianPinCode,
 } from "@/helper/helperfun";
-import { trackBeginCheckout, trackRemoveFromCart } from "@/helper/analytics";
+import {
+  trackBeginCheckout,
+  trackRemoveFromCart,
+  trackApplyCoupon,
+  trackRemoveCoupon,
+} from "@/helper/analytics";
 
 interface CartItem {
   product_id: number;
@@ -271,7 +276,11 @@ export default function ShoppingCart() {
       setItemsCount(data?.items_count || 0);
       setCartFetched(true);
       if (items.length > 0 && !cartFetched) {
-        trackBeginCheckout(items, data?.total || 0);
+        trackBeginCheckout(
+          items,
+          data?.total || 0,
+          isCouponApplied ? couponData?.code || coupon_code : undefined
+        );
       }
     } catch (error) {
       console.error("Error loading cart:", error);
@@ -691,6 +700,33 @@ export default function ShoppingCart() {
         setCouponError("");
         setIsCoupnApplied(true);
         setIsCouponsDrawerOpen(false);
+
+        // Calculate discount for analytics
+        let discount = 0;
+        if (coupon.type === "percent") {
+          discount = (subtotal * parseFloat(coupon.value)) / 100;
+        } else {
+          discount = Math.min(parseFloat(coupon.value), subtotal);
+        }
+        discount = parseFloat(discount.toFixed(2));
+        const finalValue = Math.max(0, subtotal - discount);
+
+        // Fire GA4 and Meta Pixel coupon applied event
+        trackApplyCoupon({
+          coupon: coupon.code,
+          discount: discount,
+          value: finalValue,
+          items: cartItems,
+        });
+
+        // Persist applied coupon in sessionStorage
+        try {
+          sessionStorage.setItem(
+            "bw_applied_coupon",
+            JSON.stringify({ code: coupon.code, discount, type: coupon.type, value: coupon.value })
+          );
+        } catch (e) {}
+
         return true;
       }
       return false;
@@ -701,15 +737,20 @@ export default function ShoppingCart() {
   };
 
   const removeCoupon = () => {
+    const codeToRemove = coupon_code || couponData?.code;
+    if (codeToRemove) {
+      trackRemoveCoupon({ coupon: codeToRemove });
+    }
+    try {
+      sessionStorage.removeItem("bw_applied_coupon");
+    } catch (e) {}
+
     setIsCoupnApplied(false);
     setCouponCode("");
     setCouponData({});
     setCouponSuccess("");
     setCouponError("");
   };
-
-
-
 
   const handlePlaceOrder = async () => {
     if (isorderProcess) return; // Prevent multiple submissions
@@ -733,6 +774,17 @@ export default function ShoppingCart() {
 
     const cleanPhone = normalizeIndianPhoneNumber(rawPhone);
 
+    const finalCouponCode =
+      isCouponApplied && (couponData?.code || coupon_code)
+        ? (couponData?.code || coupon_code).trim().toUpperCase()
+        : "";
+
+    if (finalCouponCode) {
+      try {
+        sessionStorage.setItem("bw_last_order_coupon", finalCouponCode);
+      } catch (e) {}
+    }
+
     setIsOrderProcess(true);
     try {
       const response = await fetch(`${config.apiUrl}api/cart/checkout`, {
@@ -748,12 +800,9 @@ export default function ShoppingCart() {
           shipping_method: deliveryType,
           payment_method: payment_method,
           delivery_amount: payment_method === "cod" ? 49 : 0,
-          coupon_code:
-            isCouponApplied && couponData && couponSuccess
-              ? couponData?.code
-              : "",
+          coupon_code: finalCouponCode,
           discount_amount:
-            isCouponApplied && couponData && couponSuccess
+            finalCouponCode
               ? parseFloat(Number((subtotal || 0) - calculateTotal()).toFixed(2))
               : 0,
         }),

@@ -7,6 +7,7 @@ import { HiOutlineTag } from "react-icons/hi2";
 import { FiArrowRight } from "react-icons/fi";
 import axios from "axios";
 import config from "@/app/config";
+import { trackViewPromotions } from "@/helper/analytics";
 
 export interface AvailableCoupon {
   id?: number;
@@ -56,7 +57,17 @@ export default function CouponsDrawer({
           response.data?.success &&
           Array.isArray(response.data?.coupons)
         ) {
-          setCouponsList(response.data.coupons);
+          const list = response.data.coupons;
+          setCouponsList(list);
+          if (list.length > 0) {
+            trackViewPromotions(
+              list.map((c: AvailableCoupon) => ({
+                id: c.id,
+                code: c.code,
+                name: `${c.code} (${c.type === "percent" ? `${c.value}% OFF` : `₹${c.value} OFF`})`,
+              }))
+            );
+          }
         } else {
           setCouponsList([]);
         }

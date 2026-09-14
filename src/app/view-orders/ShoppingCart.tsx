@@ -119,25 +119,49 @@ export default function ShoppingCart() {
 
   // Trigger GA4 and Meta Pixel Purchase Event (Must be called unconditionally before any returns)
   useEffect(() => {
+    // Only fire purchase when order loading has finished and we have a valid order and items
+    if (loading) return;
+
     const orderNum = orderData?.order_number || orderNumber;
     if (orderNum && Array.isArray(orderItems) && orderItems.length > 0 && Number(finalTotal) > 0) {
+      // Resolve coupon code from orderData or from sessionStorage fallback
+      let resolvedCoupon = (orderData?.coupon_code || "").trim();
+      if (!resolvedCoupon && typeof window !== "undefined") {
+        try {
+          const fallback = sessionStorage.getItem("bw_last_order_coupon") || "";
+          if (fallback) {
+            resolvedCoupon = fallback.trim();
+          }
+        } catch (e) {}
+      }
+
       trackPurchase({
         orderNumber: String(orderNum),
         total: finalTotal,
         subtotal: subtotalAmount,
         shipping: shippingCostNum,
         discount: discountAmount,
-        coupon: orderData?.coupon_code || "",
+        coupon: resolvedCoupon,
         currency: "INR",
         items: (orderItems || []).filter(Boolean).map((item) => ({
           product_id: item.id || (item as any).product_id,
           product_name: String(item.product_name || (item as any).name || "Book"),
           price: Number(item.price) || 0,
           quantity: Number(item.quantity) || 1,
+          coupon: resolvedCoupon || undefined,
+          discount: discountAmount > 0 ? discountAmount : undefined,
         })),
       });
+
+      // Clear the temporary fallback coupon after tracking
+      if (typeof window !== "undefined") {
+        try {
+          sessionStorage.removeItem("bw_last_order_coupon");
+          sessionStorage.removeItem("bw_applied_coupon");
+        } catch (e) {}
+      }
     }
-  }, [orderData, orderItems, finalTotal, orderNumber, subtotalAmount, shippingCostNum, discountAmount]);
+  }, [loading, orderData, orderItems, finalTotal, orderNumber, subtotalAmount, shippingCostNum, discountAmount]);
 
   const customerName =
     orderData?.billing_name ||

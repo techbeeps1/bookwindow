@@ -4,6 +4,27 @@ import type { NextRequest } from "next/server";
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  // Disallow search engine indexing for mail and admin subdomains if routed to frontend
+  const host = request.headers.get("host")?.toLowerCase() || "";
+  const isExcludedSubdomain =
+    host.startsWith("mail.") ||
+    host.startsWith("admin.") ||
+    host.includes("mail.bookwindow.in") ||
+    host.includes("admin.bookwindow.in");
+
+  if (isExcludedSubdomain) {
+    if (pathname === "/robots.txt") {
+      return new NextResponse("User-agent: *\nDisallow: /\n", {
+        status: 200,
+        headers: { "Content-Type": "text/plain" },
+      });
+    }
+
+    const response = NextResponse.next();
+    response.headers.set("X-Robots-Tag", "noindex, nofollow, noarchive, nosnippet");
+    return response;
+  }
+
   // 1. Handle legacy PHP redirects fallback if needed
   const lowerPath = pathname.toLowerCase();
 

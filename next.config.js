@@ -19,6 +19,11 @@ const nextConfig = {
     return [
       // Product detail legacy routes
       {
+        source: "/product.php/taxmann-clat-mathematics",
+        destination: "/product/taxmanns-mathematics-for-clat-common-law-admission",
+        permanent: true,
+      },
+      {
         source: "/product-detail/:slug*",
         destination: "/product/:slug*",
         permanent: true,

@@ -18,6 +18,8 @@ export interface AnalyticsItem {
   quantity?: number;
   item_category?: string;
   item_brand?: string;
+  coupon?: string;
+  discount?: number | string;
 }
 
 export interface PurchaseEventPayload {
@@ -38,6 +40,8 @@ export interface PurchaseEventPayload {
     quantity?: number;
     category?: string;
     category_name?: string;
+    coupon?: string;
+    discount?: number | string;
   }>;
 }
 
@@ -54,6 +58,19 @@ export interface ViewItemPayload {
   product_name: string;
   price: number | string;
   category?: string;
+}
+
+export interface ApplyCouponPayload {
+  coupon: string;
+  discount?: number | string;
+  value?: number | string;
+  currency?: string;
+  items?: any[];
+}
+
+export interface RemoveCouponPayload {
+  coupon: string;
+  currency?: string;
 }
 
 /**
@@ -95,7 +112,9 @@ export function trackPurchase(payload: PurchaseEventPayload) {
   const totalNum = Number(payload.total) || 0;
   const shippingNum = Number(payload.shipping) || 0;
   const taxNum = Number(payload.tax) || 0;
+  const discountNum = Number(payload.discount) || 0;
   const currency = payload.currency || "INR";
+  const couponCode = payload.coupon ? String(payload.coupon).trim().toUpperCase() : undefined;
 
   const formattedItems = (payload.items || []).map((item) => ({
     item_id: String(item.product_id || item.id || ""),
@@ -103,6 +122,8 @@ export function trackPurchase(payload: PurchaseEventPayload) {
     price: Number(item.price) || 0,
     quantity: Number(item.quantity) || 1,
     item_category: item.category_name || item.category || undefined,
+    coupon: item.coupon ? String(item.coupon).trim().toUpperCase() : couponCode,
+    discount: Number(item.discount || 0) || undefined,
   }));
 
   // A. Clear previous ecommerce object & Push to GA4 via dataLayer & gtag
@@ -116,7 +137,8 @@ export function trackPurchase(payload: PurchaseEventPayload) {
         tax: taxNum,
         shipping: shippingNum,
         currency: currency,
-        coupon: payload.coupon || undefined,
+        coupon: couponCode,
+        discount: discountNum > 0 ? discountNum : undefined,
         items: formattedItems,
       },
     });
@@ -128,12 +150,17 @@ export function trackPurchase(payload: PurchaseEventPayload) {
         tax: taxNum,
         shipping: shippingNum,
         currency: currency,
-        coupon: payload.coupon || undefined,
+        coupon: couponCode,
+        discount: discountNum > 0 ? discountNum : undefined,
         items: formattedItems,
       });
     }
 
-    console.log(`[Analytics] GA4 Purchase Event Fired: #${orderNumStr}, Total: ₹${totalNum}`);
+    console.log(
+      `[Analytics] GA4 Purchase Event Fired: #${orderNumStr}, Total: ₹${totalNum}, Coupon: ${couponCode || "None"}${
+        discountNum > 0 ? `, Discount: ₹${discountNum}` : ""
+      }`
+    );
   } catch (err) {
     console.error("[Analytics] Error tracking GA4 purchase:", err);
   }
@@ -152,8 +179,9 @@ export function trackPurchase(payload: PurchaseEventPayload) {
           item_price: i.price,
         })),
         num_items: formattedItems.reduce((acc, curr) => acc + curr.quantity, 0),
+        coupon: couponCode,
       });
-      console.log(`[Analytics] Meta Pixel Purchase Event Fired: #${orderNumStr}`);
+      console.log(`[Analytics] Meta Pixel Purchase Event Fired: #${orderNumStr} (Coupon: ${couponCode || "None"})`);
     }
   } catch (err) {
     console.error("[Analytics] Error tracking Meta Pixel purchase:", err);
@@ -271,16 +299,18 @@ export function trackRemoveFromCart(payload: AddToCartPayload) {
 /**
  * 4. Track Begin Checkout
  */
-export function trackBeginCheckout(items: any[], totalValue: number | string) {
+export function trackBeginCheckout(items: any[], totalValue: number | string, coupon?: string) {
   if (typeof window === "undefined" || !Array.isArray(items) || items.length === 0) return;
   ensureGtag();
 
   const value = Number(totalValue) || 0;
+  const couponCode = coupon ? String(coupon).trim().toUpperCase() : undefined;
   const formattedItems = items.map((it) => ({
     item_id: String(it.product_id || it.id || ""),
     item_name: String(it.product_name || it.name || "Book").replace(/#COMMA#/g, ","),
     price: Number(it.product_price || it.price || 0),
     quantity: Number(it.quantity || 1),
+    coupon: couponCode,
   }));
 
   try {
@@ -290,6 +320,7 @@ export function trackBeginCheckout(items: any[], totalValue: number | string) {
       ecommerce: {
         currency: "INR",
         value: value,
+        coupon: couponCode,
         items: formattedItems,
       },
     });
@@ -298,10 +329,15 @@ export function trackBeginCheckout(items: any[], totalValue: number | string) {
       window.gtag("event", "begin_checkout", {
         currency: "INR",
         value: value,
+        coupon: couponCode,
         items: formattedItems,
       });
     }
-    console.log(`[Analytics] GA4 Begin Checkout: ₹${value}, Items: ${formattedItems.length}`);
+    console.log(
+      `[Analytics] GA4 Begin Checkout: ₹${value}, Items: ${formattedItems.length}${
+        couponCode ? `, Coupon: ${couponCode}` : ""
+      }`
+    );
   } catch (err) {
     console.error("[Analytics] Error tracking begin_checkout:", err);
   }
@@ -314,6 +350,7 @@ export function trackBeginCheckout(items: any[], totalValue: number | string) {
         currency: "INR",
         content_ids: formattedItems.map((i) => i.item_id),
         num_items: formattedItems.reduce((acc, curr) => acc + curr.quantity, 0),
+        coupon: couponCode,
       });
     }
   } catch (err) {
@@ -375,5 +412,165 @@ export function trackViewItem(payload: ViewItemPayload) {
     }
   } catch (err) {
     console.error("[Analytics] Error tracking Meta ViewContent:", err);
+  }
+}
+
+/**
+ * 6. Track Apply Coupon
+ * Triggered when a coupon is successfully applied in Cart / Checkout
+ */
+export function trackApplyCoupon(payload: ApplyCouponPayload) {
+  if (typeof window === "undefined" || !payload || !payload.coupon) return;
+  ensureGtag();
+
+  const couponCode = String(payload.coupon).trim().toUpperCase();
+  const discountNum = Number(payload.discount) || 0;
+  const valueNum = Number(payload.value) || 0;
+  const currency = payload.currency || "INR";
+
+  const formattedItems = (payload.items || []).map((it) => ({
+    item_id: String(it.product_id || it.id || ""),
+    item_name: String(it.product_name || it.name || "Book").replace(/#COMMA#/g, ","),
+    price: Number(it.product_price || it.price || 0),
+    quantity: Number(it.quantity || 1),
+    coupon: couponCode,
+    discount: discountNum > 0 ? discountNum : undefined,
+  }));
+
+  // A. Push to GA4 via dataLayer & gtag
+  try {
+    window.dataLayer?.push({ ecommerce: null });
+    window.dataLayer?.push({
+      event: "apply_coupon",
+      ecommerce: {
+        currency: currency,
+        coupon: couponCode,
+        discount: discountNum > 0 ? discountNum : undefined,
+        value: valueNum > 0 ? valueNum : undefined,
+        items: formattedItems.length > 0 ? formattedItems : undefined,
+      },
+    });
+
+    if (typeof window.gtag === "function") {
+      window.gtag("event", "apply_coupon", {
+        currency: currency,
+        coupon: couponCode,
+        discount: discountNum > 0 ? discountNum : undefined,
+        value: valueNum > 0 ? valueNum : undefined,
+        items: formattedItems.length > 0 ? formattedItems : undefined,
+      });
+
+      // Also trigger select_promotion for GA4 promotion analytics
+      window.gtag("event", "select_promotion", {
+        promotion_id: couponCode,
+        promotion_name: couponCode,
+        creative_name: "checkout_coupon",
+        currency: currency,
+        items: formattedItems.length > 0 ? formattedItems : undefined,
+      });
+    }
+
+    console.log(
+      `[Analytics] GA4 Coupon Applied: ${couponCode}${
+        discountNum > 0 ? ` (Discount: ₹${discountNum})` : ""
+      }${valueNum > 0 ? ` (Cart Value: ₹${valueNum})` : ""}`
+    );
+  } catch (err) {
+    console.error("[Analytics] Error tracking apply_coupon:", err);
+  }
+
+  // B. Push to Meta Pixel
+  try {
+    if (typeof window.fbq === "function") {
+      window.fbq("trackCustom", "ApplyCoupon", {
+        coupon: couponCode,
+        discount: discountNum,
+        value: valueNum,
+        currency: currency,
+      });
+      console.log(`[Analytics] Meta Pixel ApplyCoupon Fired: ${couponCode}`);
+    }
+  } catch (err) {
+    console.error("[Analytics] Error tracking Meta ApplyCoupon:", err);
+  }
+}
+
+/**
+ * 7. Track Remove Coupon
+ * Triggered when an applied coupon is removed by the user
+ */
+export function trackRemoveCoupon(payload: RemoveCouponPayload) {
+  if (typeof window === "undefined" || !payload || !payload.coupon) return;
+  ensureGtag();
+
+  const couponCode = String(payload.coupon).trim().toUpperCase();
+  const currency = payload.currency || "INR";
+
+  try {
+    window.dataLayer?.push({ ecommerce: null });
+    window.dataLayer?.push({
+      event: "remove_coupon",
+      ecommerce: {
+        currency: currency,
+        coupon: couponCode,
+      },
+    });
+
+    if (typeof window.gtag === "function") {
+      window.gtag("event", "remove_coupon", {
+        currency: currency,
+        coupon: couponCode,
+      });
+    }
+
+    console.log(`[Analytics] GA4 Coupon Removed: ${couponCode}`);
+  } catch (err) {
+    console.error("[Analytics] Error tracking remove_coupon:", err);
+  }
+
+  try {
+    if (typeof window.fbq === "function") {
+      window.fbq("trackCustom", "RemoveCoupon", {
+        coupon: couponCode,
+        currency: currency,
+      });
+      console.log(`[Analytics] Meta Pixel RemoveCoupon Fired: ${couponCode}`);
+    }
+  } catch (err) {
+    console.error("[Analytics] Error tracking Meta RemoveCoupon:", err);
+  }
+}
+
+/**
+ * 8. Track Promotion Views (e.g. available coupons list viewed in drawer)
+ */
+export function trackViewPromotions(promotions: Array<{ id?: string | number; name?: string; code?: string }>) {
+  if (typeof window === "undefined" || !Array.isArray(promotions) || promotions.length === 0) return;
+  ensureGtag();
+
+  const formattedPromos = promotions.map((p) => ({
+    promotion_id: String(p.code || p.id || ""),
+    promotion_name: String(p.name || p.code || "Coupon Offer"),
+    creative_name: "coupon_drawer",
+  }));
+
+  try {
+    window.dataLayer?.push({ ecommerce: null });
+    window.dataLayer?.push({
+      event: "view_promotion",
+      ecommerce: {
+        items: formattedPromos,
+      },
+    });
+
+    if (typeof window.gtag === "function") {
+      window.gtag("event", "view_promotion", {
+        items: formattedPromos,
+      });
+    }
+
+    console.log(`[Analytics] GA4 View Promotion: ${formattedPromos.length} offers shown`);
+  } catch (err) {
+    console.error("[Analytics] Error tracking view_promotion:", err);
   }
 }
