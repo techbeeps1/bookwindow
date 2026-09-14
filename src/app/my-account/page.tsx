@@ -825,11 +825,18 @@ function OrdersTab({ userOrders, onRefreshOrders }: any) {
                 <span className="text-base">📦</span>
                 <span>Your order has been shipped and is on its way. It can no longer be cancelled.</span>
               </div>
-              {selectedOrder?.order_details?.tracking_id && (
-                <span className="font-mono font-bold bg-blue-100 text-blue-950 px-3 py-1 rounded-lg self-start sm:self-auto">
-                  Tracking ID: {selectedOrder.order_details.tracking_id}
-                </span>
-              )}
+              <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto">
+                {selectedOrder?.order_details?.courier_partner && (
+                  <span className="font-semibold bg-blue-100/80 text-blue-900 px-3 py-1 rounded-lg">
+                    Courier: {selectedOrder.order_details.courier_partner}
+                  </span>
+                )}
+                {selectedOrder?.order_details?.tracking_id && (
+                  <span className="font-mono font-bold bg-blue-100 text-blue-950 px-3 py-1 rounded-lg">
+                    Tracking ID: {selectedOrder.order_details.tracking_id}
+                  </span>
+                )}
+              </div>
             </div>
           )}
 
