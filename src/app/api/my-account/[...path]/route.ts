@@ -67,7 +67,7 @@ async function handle(
 
     if (!token) {
       return NextResponse.json(
-        { error: "Unauthorized" },
+        { error: "Unauthorized", message: "Unauthorized. Please login to continue." },
         { status: 401 }
       );
     }
@@ -106,11 +106,43 @@ async function handle(
     const cleanApiUrl = config.apiUrl.replace(/\/+$/, "");
     const url = `${cleanApiUrl}/api/my-account/${apiPath}${search}`;
 
-    const apiRes = await fetch(url, {
+    let apiRes = await fetch(url, {
       method: request.method,
       headers: outgoingHeaders,
       body,
     });
+
+    let refreshedToken: string | null = null;
+
+    // Automatic token refresh on 401 Unauthorized
+    if (apiRes.status === 401 && token) {
+      try {
+        const refreshRes = await fetch(`${cleanApiUrl}/api/my-account/refresh`, {
+          method: "POST",
+          headers: {
+            Accept: "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (refreshRes.ok) {
+          const refreshData = await refreshRes.json();
+          if (refreshData?.access_token) {
+            refreshedToken = refreshData.access_token;
+            outgoingHeaders["Authorization"] = `Bearer ${refreshedToken}`;
+
+            // Retry original request with refreshed token
+            apiRes = await fetch(url, {
+              method: request.method,
+              headers: outgoingHeaders,
+              body,
+            });
+          }
+        }
+      } catch (refreshErr) {
+        console.error("Auto token refresh failed:", refreshErr);
+      }
+    }
 
     const responseText = await apiRes.text();
 
@@ -124,13 +156,25 @@ async function handle(
       );
     }
 
-    return NextResponse.json(data, {
+    const nextResponse = NextResponse.json(data, {
       status: apiRes.status,
     });
+
+    // If token was refreshed, update cookie
+    if (refreshedToken) {
+      nextResponse.cookies.set("BWAT", refreshedToken, {
+        httpOnly: true,
+        secure: true,
+        path: "/",
+        maxAge: 30 * 24 * 60 * 60,
+      });
+    }
+
+    return nextResponse;
   } catch (err: any) {
     console.error("Proxy Error:", err);
     return NextResponse.json(
-      { error: err?.message || "Proxy failed" },
+      { error: err?.message || "Proxy failed", message: "Failed to process request" },
       { status: 500 }
     );
   }

@@ -33,12 +33,14 @@ export async function POST(req: Request) {
         httpOnly: true,
         secure: true,
         path: "/",
+        maxAge: 30 * 24 * 60 * 60,
       });
 
       response.cookies.set("BWDT", JSON.stringify(data.customer), {
         httpOnly: true,
         secure: true,
         path: "/",
+        maxAge: 30 * 24 * 60 * 60,
       });
     
 

@@ -308,6 +308,8 @@ function DashboardTab({ customer, logout, setActiveTab }: any) {
 }
 
 function OrdersTab({ userOrders, onRefreshOrders }: any) {
+  const router = useRouter();
+  const dispatch = useDispatch();
   const [isOrderShow, setIsOrderShow] = useState<boolean>(false);
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -321,10 +323,28 @@ function OrdersTab({ userOrders, onRefreshOrders }: any) {
   const [isCancelling, setIsCancelling] = useState<boolean>(false);
 
   const canCancelOrder = (order: any) => {
-    const status = order?.order_details?.status?.toLowerCase()?.trim() || "";
-    // Cannot cancel if already shipped, completed, delivered, cancelled, or declined
-    const nonCancellable = ["order_shipped", "shipped", "completed", "delivered", "cancelled", "declined"];
-    return !nonCancellable.includes(status);
+    const rawStatus = String(order?.order_details?.status || "").toLowerCase().trim();
+    if (!rawStatus) return false;
+
+    // Strict non-cancellable check: Any order with status containing these terms cannot be cancelled
+    const nonCancellableTerms = [
+      "cancel",      // covers "cancelled", "payment_cancelled", "order_cancelled", etc.
+      "fail",        // covers "failed", "payment_failed"
+      "ship",        // covers "shipped", "order_shipped"
+      "deliver",     // covers "delivered"
+      "complete",    // covers "completed"
+      "decline",     // covers "declined"
+      "refund",      // covers "refunded"
+      "return",      // covers "returned"
+    ];
+
+    if (nonCancellableTerms.some((term) => rawStatus.includes(term))) {
+      return false;
+    }
+
+    // Only allow cancellation for active/pending orders
+    const cancellableStatuses = ["pending", "new", "processing", "payment_pending", "created"];
+    return cancellableStatuses.some((st) => rawStatus === st || rawStatus.includes(st));
   };
 
   const handleConfirmCancel = async () => {
@@ -338,6 +358,8 @@ function OrdersTab({ userOrders, onRefreshOrders }: any) {
       const response = await axios.post("/api/my-account/cancel-order", {
         order_number: cancellingOrder?.order_details?.order_number,
         reason: finalReason,
+      }, {
+        withCredentials: true,
       });
 
       if (response.data?.status) {
@@ -363,6 +385,14 @@ function OrdersTab({ userOrders, onRefreshOrders }: any) {
       }
     } catch (err: any) {
       console.error("Cancellation error:", err);
+      if (err.response?.status === 401) {
+        toast.error("Your session has expired. Please log in again.");
+        setTimeout(() => {
+          dispatch(logout());
+          router.push("/sign-in");
+        }, 1500);
+        return;
+      }
       toast.error(err.response?.data?.message || "Failed to cancel order. Please try again.");
     } finally {
       setIsCancelling(false);
@@ -750,7 +780,7 @@ function OrdersTab({ userOrders, onRefreshOrders }: any) {
           </div>
 
           {/* Cancellation Info Banner */}
-          {["cancelled", "declined"].some((s) => selectedOrder?.order_details?.status?.toLowerCase()?.includes(s)) && (
+          {["cancel", "decline", "fail"].some((s) => selectedOrder?.order_details?.status?.toLowerCase()?.includes(s)) && (
             <div className="bg-red-50/80 border border-red-200 rounded-2xl p-5 mb-8 shadow-sm">
               <div className="flex items-start gap-3.5">
                 <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0 text-red-600 font-bold text-sm">
@@ -758,7 +788,21 @@ function OrdersTab({ userOrders, onRefreshOrders }: any) {
                 </div>
                 <div className="flex-1">
                   <h2 className="text-xs font-extrabold uppercase tracking-wider text-red-900">
-                    Order Cancelled {selectedOrder?.order_details?.cancelled_by === "customer" ? "(By You)" : "(By Store Staff)"}
+                    {(() => {
+                      const cancelledBy = selectedOrder?.order_details?.cancelled_by;
+                      const statusLower = String(selectedOrder?.order_details?.status || "").toLowerCase();
+                      const reasonLower = String(selectedOrder?.order_details?.cancellation_reason || "").toLowerCase();
+                      if (cancelledBy === "customer") {
+                        return "Order Cancelled (By You)";
+                      }
+                      if (cancelledBy === "admin") {
+                        return "Order Cancelled (By Store Staff)";
+                      }
+                      if (cancelledBy === "payment_failed" || statusLower.includes("payment") || reasonLower.includes("payment") || reasonLower.includes("gateway")) {
+                        return "Order Cancelled (Payment Incomplete / Cancelled during Checkout)";
+                      }
+                      return "Order Cancelled";
+                    })()}
                   </h2>
                   {selectedOrder?.order_details?.cancellation_reason ? (
                     <p className="text-xs text-red-800 font-medium mt-1.5 leading-relaxed">
